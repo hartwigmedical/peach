@@ -60,7 +60,7 @@ Remember to source the virtualenv before running `main.py`.
 ```
 
 ### Mandatory Arguments
-Long Argument | Short Argument | Description
+Long&nbsp;Argument | Short Argument | Description
 ---|---|---
 --vcf | -i | Path to germline VCF file of sample. For instance the germline VCF output from PURPLE. Calls should be wrt v37.
 --sample_t_id | -t | The tumor sample ID of the run. Used for names of output files.
@@ -71,7 +71,7 @@ Long Argument | Short Argument | Description
 --vcftools | -u | Path to [VCFtools](http://vcftools.sourceforge.net/) >= 0.1.14 (to allow for VCF v4.2).
 
 ### Optional Arguments
-Long Argument | Short Argument | Default | Description
+Long&nbsp;Argument | Short Argument | Default | Description
 ---|---|---|---
 --recreate_bed | -b | N/A | To filter the VCF to the genes of interest, we use a transcript file and VCFTools to filter on a bed file. Use this argument to regenerate the bed file. If not given, the cached bed-file is used. The path to the cached bed file is "{path/to/panel/json}.bed".
 --transcript_tsv | -x | None | If the bed file should be recreated, then this argument is required. This file should be a tsv file that describes transcripts for genes wrt v37, including the genes in the panel JSON.
