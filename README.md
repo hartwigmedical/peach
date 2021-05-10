@@ -149,12 +149,6 @@ filter_v38 | NO_CALL | Has value PASS, NO_CALL, UNKNOWN or INFERRED_PASS. See [A
 panel_version | DPYDpanel_v1.3 | Name and version of panel JSON. Both are taken from fields in the JSON.
 repo_version | 1.0 | Version of PEACH.
 
-### Filtered VCF
-Name: `[sample_t_id].filtered.vcf`
-
-The result of filtering the input VFC by sample id `sample_r_id` and by a bed file with ranges for genes from the JSON.
-See [Get Variant Calls V37](#get-variant-calls-v37) for a more detailed explanation.
-
 ## Algorithm
 Haplotypes are commonly defined wrt a v38 reference genome. 
 Since PEACH accepts VCF files wrt v37 as input, this requires a translation of v37 calls to v38 calls.
@@ -180,8 +174,6 @@ the range between those start and end positions covers the entire gene.
 
 ### Get Variant Calls V37
 Using VCFtools, the input VCF is filtered on the ranges in the bed file and on the sample name `sample_r_id`. 
-The resulting file is included in the output as `[sample_t_id].peach.filtered.vcf`.
-
 The filtered VCF is read, and it is compared to the variants in the panel JSON file. 
 Calls are ignored when none of the following are true:
 * At least one of the rs id's of the call matches an rs id from the panel JSON.

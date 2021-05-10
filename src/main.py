@@ -26,12 +26,12 @@ def main(vcf: str, sample_t_id: str, sample_r_id: str, version: str, panel_path:
 
     # Get configuration
     panel = load_panel(panel_path)
-    bed_file = get_bed_file(panel_path, recreate_bed, panel, transcript_tsv_path)
 
     if panel.is_empty():
         raise ValueError("No panel is given, so no analysis can be performed.")
 
     # Get data for patient
+    bed_file = get_bed_file(panel_path, recreate_bed, panel, transcript_tsv_path)
     filtered_vcf = get_filtered_vcf(vcf, bed_file, sample_r_id, sample_t_id, outputdir, vcftools)
     v37_call_data = VcfReader.get_v37_call_data(filtered_vcf, panel, sample_r_id)
 
@@ -41,8 +41,6 @@ def main(vcf: str, sample_t_id: str, sample_r_id: str, version: str, panel_path:
     # Output
     print_calls_to_file(pgx_analysis, outputdir, sample_t_id, panel.get_id(), version)
     print_genotypes_to_file(pgx_analysis, panel, outputdir, sample_t_id, panel.get_id(), version)
-    # Also copy the bed-filtered VCF file for research purposes
-    copy_filtered_vcf_file(filtered_vcf, outputdir, sample_t_id)
 
     # Clean up
     if os.path.exists(filtered_vcf):
