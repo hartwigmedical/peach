@@ -48,9 +48,9 @@ Remember to source the virtualenv before running `main.py`.
 #### Example Usage
 ```
 (peach) $ python main.py \
-    input.vcf.gz \
-    COLO829T \
-    COLO829R \
+    --input input.vcf.gz \
+    --sample_t_id COLO829T \
+    --sample_r_idCOLO829R \
     1.0 \
     /path/to/outputdir/ \
     /path/to/panel.json \
@@ -60,21 +60,21 @@ Remember to source the virtualenv before running `main.py`.
 ```
 
 ### Mandatory Arguments
-Argument | Description
----|---
-vcf | Path to germline VCF file of sample. For instance the germline VCF output from PURPLE. Calls should be wrt v37.
-sample_t_id | The tumor sample ID of the run. Used for names of output files.
-sample_r_id | The ref sample ID of the run.
-version | The version of PEACH.
-outputdir | Directory to write the output to.
-panel | Path to a JSON file that contains the variants and haplotypes to test on.
-vcftools | Path to [VCFtools](http://vcftools.sourceforge.net/) >= 0.1.14 (to allow for VCF v4.2).
+Long Argument | Short Argument | Description
+---|---|---
+--vcf | -i | Path to germline VCF file of sample. For instance the germline VCF output from PURPLE. Calls should be wrt v37.
+--sample_t_id | -t | The tumor sample ID of the run. Used for names of output files.
+--sample_r_id | -r | The ref sample ID of the run.
+--version | -v | The version of PEACH.
+--outputdir | -o | Directory to write the output to.
+--panel | -p | Path to a JSON file that contains the variants and haplotypes to test on.
+--vcftools | -u | Path to [VCFtools](http://vcftools.sourceforge.net/) >= 0.1.14 (to allow for VCF v4.2).
 
 ### Optional Arguments
-Argument | Default | Description
----|---|---
-recreate_bed | N/A | To filter the VCF to the genes of interest, we use a transcript file and VCFTools to filter on a bed file. Use this argument to regenerate the bed file. If not given, the cached bed-file is used. The path to the cached bed file is "{path/to/panel/json}.bed".
-transcript_tsv | None | If the bed file should be recreated, then this argument is required. This file should be a tsv file that describes transcripts for genes wrt v37, including the genes in the panel JSON.
+Long Argument | Short Argument | Default | Description
+---|---|---|---
+--recreate_bed | -b | N/A | To filter the VCF to the genes of interest, we use a transcript file and VCFTools to filter on a bed file. Use this argument to regenerate the bed file. If not given, the cached bed-file is used. The path to the cached bed file is "{path/to/panel/json}.bed".
+--transcript_tsv | -x | None | If the bed file should be recreated, then this argument is required. This file should be a tsv file that describes transcripts for genes wrt v37, including the genes in the panel JSON.
 
 ## Input
 ### VCF

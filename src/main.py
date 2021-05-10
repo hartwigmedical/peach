@@ -62,8 +62,8 @@ def get_filtered_vcf(vcf: str, bed_file: str, sample_r_id: str, sample_t_id: str
     if os.path.exists(filtered_vcf) or os.path.exists(filtered_vcf_log):
         raise IOError(f"Temporary VCF file {filtered_vcf} already exists. Exiting.")
 
-    subprocess.run([vcftools, '--gzvcf', vcf, '--bed', bed_file, '--out', filtered_vcf_prefix,
-                    '--indv', sample_r_id, '--recode', '--recode-INFO-all'])
+    subprocess.run([vcftools, "--gzvcf", vcf, "--bed", bed_file, "--out", filtered_vcf_prefix,
+                    "--indv", sample_r_id, "--recode", "--recode-INFO-all"])
     print("[INFO] Subprocess completed.")
 
     if os.path.exists(filtered_vcf_log):
@@ -80,7 +80,7 @@ def get_filtered_vcf(vcf: str, bed_file: str, sample_r_id: str, sample_t_id: str
 def load_panel(panel_path: str) -> Panel:
     """ Load manually annotated JSON panel file """
     try:
-        with open(panel_path, 'r+', encoding='utf-8') as json_file:
+        with open(panel_path, "r+", encoding="utf-8") as json_file:
             data = json.load(json_file)
             return Panel.from_json(data)
     except IOError:
@@ -115,7 +115,7 @@ def create_bed_file(genes_in_panel: Set[str], panel_path: str, transcript_tsv_pa
     )
     bed_regions = []  # chrom, start, end, gene
     covered = []
-    with open(transcript_tsv_path, 'r') as transcripts:
+    with open(transcript_tsv_path, "r") as transcripts:
         for line in transcripts:
             split_line = line.rstrip().split("\t")
             if split_line[4] in genes_in_panel and split_line[4] not in covered:
@@ -131,7 +131,7 @@ def create_bed_file(genes_in_panel: Set[str], panel_path: str, transcript_tsv_pa
         )
         raise ValueError(error_msg)
 
-    with open(bed_path, 'w') as bed:
+    with open(bed_path, "w") as bed:
         bed.write(header)
         for entry in bed_regions:
             bed.write("\t".join(entry) + "\n")
@@ -144,7 +144,7 @@ def print_calls_to_file(pgx_analysis: PgxAnalysis, outputdir: str, sample_t_id: 
     calls_file = f"{outputdir}/{sample_t_id}.peach.calls.tsv"
     if os.path.exists(calls_file):
         raise IOError(f"Calls output file {calls_file} already exists. Exiting.")
-    with open(calls_file, 'w') as f:
+    with open(calls_file, "w") as f:
         f.write(GenotypeReporter.get_calls_tsv_text(pgx_analysis, panel_id, version))
     if not os.path.exists(calls_file):
         raise FileNotFoundError(f"Failed to write calls output file {calls_file}")
@@ -155,7 +155,7 @@ def print_genotypes_to_file(pgx_analysis: PgxAnalysis, panel: Panel, outputdir: 
     genotype_file = f"{outputdir}/{sample_t_id}.peach.genotype.tsv"
     if os.path.exists(genotype_file):
         raise IOError(f"Genotype output file {genotype_file} already exists. Exiting.")
-    with open(genotype_file, 'w') as f:
+    with open(genotype_file, "w") as f:
         f.write(HaplotypeReporter.get_genotype_tsv_text(pgx_analysis, panel, panel_id, version))
     if not os.path.exists(genotype_file):
         raise FileNotFoundError(f"Failed to write calls output file {genotype_file}")
@@ -173,27 +173,38 @@ def copy_filtered_vcf_file(filtered_vcf: str, outputdir: str, sample_t_id: str) 
 def parse_args(sys_args: List[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         prog="peach",
-        description=('Run pharmacogenomics panel on v37 germline VCF file. The pharmacogenomic annotations are done on '
-                     'v38, so output for both reference genomes is given where possible.')
+        description=("Run pharmacogenomics panel on v37 germline VCF file. The pharmacogenomic annotations are done on "
+                     "v38, so output for both reference genomes is given where possible.")
     )
-    parser.add_argument('vcf', type=str, help='VCF file to use for pharmacogenomics analysis')
-    parser.add_argument('sample_t_id', type=str, help='The sample ID of the tumor')
-    parser.add_argument('sample_r_id', type=str, help='The sample ID of the normal')
-    parser.add_argument('version', type=str, help='The version of the tool')
-    parser.add_argument('outputdir', type=str, help='Directory to store output of pharmacogenomic analysis')
-    parser.add_argument('panel', type=str, help='Json file with the panel variants')
-    parser.add_argument('vcftools', type=str, default='vcftools', help="Path to vcftools > 0.1.14 if not in $PATH")
-    parser.add_argument(
-        '--recreate_bed', default=False, action='store_true',
-        help='Recreate bed-file from JSON files. If false, the panel file with extension .bed is searched for.'
+    parser._action_groups.pop()
+    required = parser.add_argument_group("required arguments")
+    required.add_argument(
+        "--vcf", "-i", type=str, help="VCF file to use for pharmacogenomics analysis.", required=True)
+    required.add_argument(
+        "--sample_t_id", "-t", type=str, help="The sample ID of the tumor.", required=True)
+    required.add_argument(
+        "--sample_r_id", "-r", type=str, help="The sample ID of the normal.", required=True)
+    required.add_argument(
+        "--version", "-v", type=str, help="The version of the tool.", required=True)
+    required.add_argument(
+        "--outputdir", "-o", type=str, help="Directory to store output of pharmacogenomic analysis.", required=True)
+    required.add_argument(
+        "--panel", "-p", type=str, help="Json file with the panel variants.", required=True)
+    required.add_argument(
+        "--vcftools", "-u", type=str, default="vcftools", help="Path to vcftools > 0.1.14.", required=True)
+
+    optional = parser.add_argument_group("optional arguments")
+    optional.add_argument(
+        "--recreate_bed", "-b", default=False, action="store_true",
+        help="Recreate bed-file from JSON files. If false, the panel file with extension .bed is searched for."
     )
-    parser.add_argument(
-        '--transcript_tsv', type=str, default=None, help="Optional path to tsv file containing gene transcripts"
+    optional.add_argument(
+        "--transcript_tsv", "-x", type=str, default=None, help="Optional path to tsv file containing gene transcripts."
     )
     return parser.parse_args(sys_args)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     args = parse_args(sys.argv[1:])
     main(args.vcf, args.sample_t_id, args.sample_r_id, args.version, args.panel,
          args.outputdir, args.recreate_bed, args.vcftools, args.transcript_tsv)
