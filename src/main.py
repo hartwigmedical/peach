@@ -172,8 +172,9 @@ def copy_filtered_vcf_file(filtered_vcf: str, outputdir: str, sample_t_id: str) 
 
 def parse_args(sys_args: List[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description=('Run pharmacogenomics panel on germline VCF file. The pharmacogenomic annotations are done on '
-                     'v38, so in the output both reference genome output is given where possible.')
+        prog="peach",
+        description=('Run pharmacogenomics panel on v37 germline VCF file. The pharmacogenomic annotations are done on '
+                     'v38, so output for both reference genomes is given where possible.')
     )
     parser.add_argument('vcf', type=str, help='VCF file to use for pharmacogenomics analysis')
     parser.add_argument('sample_t_id', type=str, help='The sample ID of the tumor')
