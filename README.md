@@ -48,13 +48,13 @@ Remember to source the virtualenv before running `main.py`.
 #### Example Usage
 ```
 (peach) $ python main.py \
-    --input input.vcf.gz \
+    --vcf input.vcf.gz \
     --sample_t_id COLO829T \
     --sample_r_idCOLO829R \
-    1.0 \
-    /path/to/outputdir/ \
-    /path/to/panel.json \
-    /path/to/vcftools \
+    --version 1.0 \
+    --outputdir /path/to/outputdir/ \
+    --panel /path/to/panel.json \
+    --vcftools /path/to/vcftools \
     --recreate_bed \
     --transcript_tsv /path/to/transcript_tsv
 ```
