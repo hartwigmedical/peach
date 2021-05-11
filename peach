@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
-REPO_DIR_NAME=$(dirname "$0") || exit 1
+REPO_DIR_NAME="$(dirname "$0")" || exit 1
 
 python "${REPO_DIR_NAME}/src/main.py" "$@" || exit 1
