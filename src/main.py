@@ -30,10 +30,16 @@ def main(vcf: str, sample_t_id: str, sample_r_id: str, version: str, panel_path:
     if panel.is_empty():
         raise ValueError("No panel is given, so no analysis can be performed.")
 
+
+    # bed_file = get_bed_file(panel_path, recreate_bed, panel, transcript_tsv_path)
+    # filtered_vcf = get_filtered_vcf(vcf, bed_file, sample_r_id, sample_t_id, outputdir, vcftools)
+
     # Get data for patient
-    bed_file = get_bed_file(panel_path, recreate_bed, panel, transcript_tsv_path)
-    filtered_vcf = get_filtered_vcf(vcf, bed_file, sample_r_id, sample_t_id, outputdir, vcftools)
-    v37_call_data = VcfReader.get_v37_call_data(filtered_vcf, panel, sample_r_id)
+    v37_call_data = VcfReader.get_v37_call_data(vcf, panel, sample_r_id)
+
+    # if os.path.exists(filtered_vcf):
+    #     os.remove(filtered_vcf)
+    #     print(f"[INFO] {filtered_vcf} removed.")
 
     # Compute output from input data
     pgx_analysis = PgxAnalyser.create_pgx_analysis(v37_call_data, panel)
@@ -41,11 +47,6 @@ def main(vcf: str, sample_t_id: str, sample_r_id: str, version: str, panel_path:
     # Output
     print_calls_to_file(pgx_analysis, outputdir, sample_t_id, panel.get_id(), version)
     print_genotypes_to_file(pgx_analysis, panel, outputdir, sample_t_id, panel.get_id(), version)
-
-    # Clean up
-    if os.path.exists(filtered_vcf):
-        os.remove(filtered_vcf)
-        print(f"[INFO] {filtered_vcf} removed.")
 
     # TODO: add genes CYP2D6, CYP3A4, CYP3A5
 

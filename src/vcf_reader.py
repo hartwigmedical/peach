@@ -43,8 +43,8 @@ class VcfReader(object):
         return variants
 
     @classmethod
-    def __get_call_data_from_variants(cls, variants: Optional[Dict[str, Any]], panel: Panel,
-                                      sample_r_id: str) -> V37CallData:
+    def __get_call_data_from_variants(
+            cls, variants: Optional[Dict[str, Any]], panel: Panel, sample_r_id: str) -> V37CallData:
         match_on_rsid = 0
         match_on_location = 0
         filtered_calls = set()
