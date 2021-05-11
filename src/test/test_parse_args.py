@@ -11,15 +11,13 @@ class TestParseArgs(unittest.TestCase):
     def test_parse_args_representative_example(self) -> None:
         arguments = [
             "--vcf", "vcf_file", "-t", "tumor_sample_id", "-r", "ref_sample_id", "-v", "script_version",
-            "-o", "output_directory", "-p", "panel_location", "--transcript_tsv", "path_to_transcripts_tsv",
-            "--vcftools", "vcftools_location"
+            "-o", "output_directory", "-p", "panel_location",
         ]
         actual_namespace = parse_args(arguments)
 
         expected_namespace = Namespace(
             vcf="vcf_file", sample_t_id="tumor_sample_id", sample_r_id="ref_sample_id", version="script_version",
-            outputdir="output_directory", panel="panel_location", recreate_bed=False,
-            vcftools="vcftools_location", transcript_tsv="path_to_transcripts_tsv"
+            outputdir="output_directory", panel="panel_location",
         )
         self.assertEqual(expected_namespace, actual_namespace)
 
@@ -27,15 +25,13 @@ class TestParseArgs(unittest.TestCase):
         arguments = [
             "--vcf", "vcf_file", "--sample_t_id", "tumor_sample_id", "--sample_r_id", "ref_sample_id",
             "--version", "script_version", "--outputdir", "output_directory", "--panel",
-            "panel_location", "--transcript_tsv", "path_to_transcripts_tsv",
-            "--recreate_bed", "--vcftools", "vcftools_location"
+            "panel_location",
         ]
         actual_namespace = parse_args(arguments)
 
         expected_namespace = Namespace(
             vcf="vcf_file", sample_t_id="tumor_sample_id", sample_r_id="ref_sample_id", version="script_version",
-            outputdir="output_directory", panel="panel_location", recreate_bed=True,
-            vcftools="vcftools_location", transcript_tsv="path_to_transcripts_tsv"
+            outputdir="output_directory", panel="panel_location",
         )
         self.assertEqual(expected_namespace, actual_namespace)
 
@@ -43,35 +39,32 @@ class TestParseArgs(unittest.TestCase):
         arguments = [
             "-i", "vcf_file", "-t", "tumor_sample_id", "-r", "ref_sample_id",
             "-v", "script_version", "-o", "output_directory", "-p", "panel_location",
-            "-x", "path_to_transcripts_tsv", "-b", "-u", "vcftools_location"
         ]
         actual_namespace = parse_args(arguments)
 
         expected_namespace = Namespace(
             vcf="vcf_file", sample_t_id="tumor_sample_id", sample_r_id="ref_sample_id", version="script_version",
-            outputdir="output_directory", panel="panel_location", recreate_bed=True,
-            vcftools="vcftools_location", transcript_tsv="path_to_transcripts_tsv"
+            outputdir="output_directory", panel="panel_location",
         )
         self.assertEqual(expected_namespace, actual_namespace)
 
     def test_parse_args_defaults(self) -> None:
         arguments = [
             "--vcf", "vcf_file", "-t", "tumor_sample_id", "-r", "ref_sample_id", "-v", "script_version",
-            "-o", "output_directory", "-p", "panel_location", "-u", "vcftools_location"
+            "-o", "output_directory", "-p", "panel_location",
         ]
         actual_namespace = parse_args(arguments)
 
         expected_namespace = Namespace(
             vcf="vcf_file", sample_t_id="tumor_sample_id", sample_r_id="ref_sample_id", version="script_version",
-            outputdir="output_directory", panel="panel_location", recreate_bed=False,
-            vcftools="vcftools_location", transcript_tsv=None
+            outputdir="output_directory", panel="panel_location",
         )
         self.assertEqual(expected_namespace, actual_namespace)
 
     def test_parse_args_missing_required_arguments(self) -> None:
         minimum_arguments = [
             "-i vcf_file", "-t tumor_sample_id", "-r ref_sample_id", "-v script_version",
-            "-o output_directory", "-p panel_location", "-u vcftools_location"
+            "-o output_directory", "-p panel_location",
         ]
         parse_args(minimum_arguments)
 
