@@ -5,7 +5,7 @@ the [Hartwig Medical Foundation pipeline](https://github.com/hartwigmedical/pipe
 It imports haplotypes and related variants from a curated JSON file, reports the presence of these variants in a 
 germline VCF, and infers the simplest combination of haplotypes that explains the presence of these variants. 
 
-The two main output files are:
+The two output files are:
 * A file that contains the determined genotype of the sample for each gene in the JSON, expressed in terms of haplotypes.
 * A file that contains calls for all positions of variants in the JSON file, including annotation and filters wrt both v37 and v38 reference genomes.
 
@@ -18,7 +18,6 @@ The two main output files are:
 * [Input](#input)
   + [VCF](#vcf)
   + [JSON](#json)
-  + [Transcript TSV](#transcript-tsv)
   + [Datastore file locations](#datastore-file-locations)
 * [Output](#output)
   + [Genotype TSV file](#genotype-tsv-file)
@@ -47,34 +46,27 @@ Remember to source the virtualenv before running `main.py`.
 
 #### Example Usage
 ```
-(peach) $ python main.py \
+(peach) $ peach \
     --vcf input.vcf.gz \
+    --sample_r_id COLO829R \
     --sample_t_id COLO829T \
-    --sample_r_idCOLO829R \
-    --version 1.0 \
+    --panel /path/to/panel.json 
     --outputdir /path/to/outputdir/ \
-    --panel /path/to/panel.json \
-    --vcftools /path/to/vcftools \
-    --recreate_bed \
-    --transcript_tsv /path/to/transcript_tsv
+    --version 1.0 \
 ```
 
 ### Mandatory Arguments
 Long&nbsp;Argument | Short Argument | Description
 ---|---|---
 --vcf | -i | Path to germline VCF file of sample. For instance the germline VCF output from PURPLE. Calls should be wrt v37.
---sample_t_id | -t | The tumor sample ID of the run. Used for names of output files.
 --sample_r_id | -r | The ref sample ID of the run.
---version | -v | The version of PEACH.
---outputdir | -o | Directory to write the output to.
+--sample_t_id | -t | The tumor sample ID of the run. Only used for the names of the output files.
 --panel | -p | Path to a JSON file that contains the variants and haplotypes to test on.
---vcftools | -u | Path to [VCFtools](http://vcftools.sourceforge.net/) >= 0.1.14 (to allow for VCF v4.2).
+--outputdir | -o | Directory to write the output to.
+--version | -v | The version of PEACH. It is included in the output files.
 
 ### Optional Arguments
-Long&nbsp;Argument | Short Argument | Default | Description
----|---|---|---
---recreate_bed | -b | N/A | To filter the VCF to the genes of interest, we use a transcript file and VCFTools to filter on a bed file. Use this argument to regenerate the bed file. If not given, the cached bed-file is used. The path to the cached bed file is "{path/to/panel/json}.bed".
---transcript_tsv | -x | None | If the bed file should be recreated, then this argument is required. This file should be a tsv file that describes transcripts for genes wrt v37, including the genes in the panel JSON.
+There are no optional arguments.
 
 ## Input
 ### VCF
@@ -100,21 +92,15 @@ This ensures that the variant annotation for variants at these locations can be 
 PEACH does not (properly) support panel JSON files that contain (partially) overlapping genes.
 Variants in a panel JSON file are not allowed to (partially) overlap.
 
-### Transcript TSV
-TODO: write or provide link
-
-#### Datastore file locations 
+### Datastore file locations 
 (Only relevant for internal use)
 
 Panel:
 * Smaller panel for DPYD with haplotypes and haplotypes restricted to those in SOC tests (`/data/common/dbs/peach/panelfiles/min_DPYD.json`).
 * Panel with common DPYD haplotypes and variants (`/data/common/dbs/peach/panelfiles/DPYD.json`).
 
-Transcript tsv: `/data/common/dbs/peach/all_genes.37.tsv`
-
 ## Output
 PEACH outputs two TSV files. One contains genotypes/haplotypes for each gene, the other contains calls for all variants from the panel JSON.
-PEACH also outputs a VCF file that is a filtered version of the input VCF.
 ### Genotype TSV file
 Name: `[sample_t_id].peach.genotype.tsv`
 
@@ -167,14 +153,8 @@ If there is no unique simplest combination of haplotypes that completely explain
 ### Preparation
 First, the panel JSON is loaded and checked for consistency. 
 
-If the `--recreate_bed` argument was passed, 
-then the bed file corresponding to the panel JSON is (re)created. 
-To this end, for each gene in the panel JSON, corresponding positions are extracted from the transcript TSV such that 
-the range between those start and end positions covers the entire gene.
-
 ### Get Variant Calls V37
-Using VCFtools, the input VCF is filtered on the ranges in the bed file and on the sample name `sample_r_id`. 
-The filtered VCF is read, and it is compared to the variants in the panel JSON file. 
+The calls for the sample `sample_r_id` are extracted from the VCF, and they are compared to the variants in the panel JSON file. 
 Calls are ignored when none of the following are true:
 * At least one of the rs id's of the call matches an rs id from the panel JSON.
 * At least one of the covered positions of the call matches at least one of the covered positions of the variants in the panel JSON.

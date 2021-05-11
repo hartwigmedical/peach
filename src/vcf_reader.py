@@ -29,17 +29,17 @@ class VcfReader(object):
     RS_ID_SEPARATOR = ";"
 
     @classmethod
-    def get_v37_call_data(cls, filtered_vcf: str, panel: Panel, sample_r_id: str) -> V37CallData:
-        variants = cls.__get_variants_from_filtered_vcf(filtered_vcf)
+    def get_v37_call_data(cls, vcf: str, panel: Panel, sample_r_id: str) -> V37CallData:
+        variants = cls.__get_variants_from_vcf(vcf)
         return cls.__get_call_data_from_variants(variants, panel, sample_r_id)
 
     @classmethod
-    def __get_variants_from_filtered_vcf(cls, filtered_vcf: str) -> Optional[Dict[str, Any]]:
+    def __get_variants_from_vcf(cls, vcf: str) -> Optional[Dict[str, Any]]:
         # variants is None precisely when filtered vcf file has no variants
         try:
-            variants = allel.read_vcf(filtered_vcf, fields=cls.FIELD_NAMES, transformers=allel.ANNTransformer())
+            variants = allel.read_vcf(vcf, fields=cls.FIELD_NAMES, transformers=allel.ANNTransformer())
         except IOError:
-            raise FileNotFoundError("File " + filtered_vcf + " not found or cannot be opened.")
+            raise FileNotFoundError("File " + vcf + " not found or cannot be opened.")
         return variants
 
     @classmethod
