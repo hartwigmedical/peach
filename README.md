@@ -29,20 +29,27 @@ The two output files are:
   + [Infer Haplotypes](#infer-haplotypes)
   + [Examples](#examples)
   + [Restrictions](#restrictions)
+* [Tests](#tests)
 
 ## Installation
 PEACH has been designed to work with Python 3.6.
 
-If you want to run PEACH, please generate a local Python 3.6 venv and install the requirements:
-
-```bash
-$ python3.6 -m venv [path/to/new/virtual/environment, for example: ./peach]
-$ source [path/to/new/venv, for example: ./peach/bin/activate]
-(peach) $ pip install -r requirements.txt
-```
+1. Download this repository. See for instance [Github instructions](https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository).
+2. Install the requirements in one fo the following ways:
+    1. Generate a local Python 3.6 virtual environment and install the requirements:
+    ```bash
+    $ python3.6 -m venv [path/to/new/virtual/environment, for example: ./peach]
+    $ source [path/to/new/venv, for example: ./peach/bin/activate]
+    (peach) $ pip install -r requirements.txt
+    ```
+    2. Install the requirements directly:
+    ```bash
+    $ pip install -r requirements.txt
+    ```
+3. Run PEACH.
 
 ## Arguments
-Remember to source the virtualenv before running `main.py`.
+If you have installed PEACH's requirements into a venv, then remember to source the venv before running `peach`.
 
 #### Example Usage
 ```
@@ -342,3 +349,7 @@ If one wishes to attain results for (partially) overlapping genes anyway,
 split them across separate panel JSON files and run PEACH multiple times.
 
 Variants in a panel JSON file are not allowed to (partially) overlap.
+
+## Tests
+To run PEACH's test suite, including mypy, run the script `test_peach`.
+If you have installed PEACH's requirements into a venv, then remember to source the venv before running `test_peach`.
