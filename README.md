@@ -30,6 +30,7 @@ The two output files are:
   + [Examples](#examples)
   + [Restrictions](#restrictions)
 * [Tests](#tests)
+* [Version History and Download Links](#version-history-and-download-links)
 
 ## Installation
 PEACH has been designed to work with Python 3.6.
@@ -353,3 +354,16 @@ Variants in a panel JSON file are not allowed to (partially) overlap.
 ## Tests
 To run PEACH's test suite, including mypy, run the script `test_peach`.
 If you have installed PEACH's requirements into a venv, then remember to source the venv before running `test_peach`.
+
+## Version History and Download Links
+* Upcoming
+    + Add shell script `peach` for running PEACH.
+    + Remove VCF filtering step. 
+        + Remove VCFTools dependency.
+        + Remove filtered vcf output file.
+    + Change format of arguments to PEACH. 
+        + Arguments are no longer positional. 
+        + Remove arguments vcftools, recreate_bed and transcript_tsv, since they are no longer needed.
+    + Add script for running tests.
+* [1.0](https://github.com/hartwigmedical/peach/releases/tag/v1.0)
+    + First release
