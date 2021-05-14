@@ -3,35 +3,34 @@ from typing import Dict, Set, FrozenSet
 
 from base.constants import REF_CALL_ANNOTATION_STRING
 from base.filter import Filter
-from call_data import V37CallData, FullCall, HaplotypeCall
+from call_data import V37CallData, FullCall, HaplotypeCall, FullCallData
 from config.panel import Panel
 from v37_call_translator import V37CallTranslator
 from haplotype_caller import HaplotypeCaller
 
 
 class PgxAnalysis(object):
-    def __init__(self, all_full_calls: FrozenSet[FullCall],
-                 gene_to_haplotype_calls: Dict[str, Set[HaplotypeCall]]) -> None:
-        self.__all_full_calls = all_full_calls
+    def __init__(self, full_call_data: FullCallData, gene_to_haplotype_calls: Dict[str, Set[HaplotypeCall]]) -> None:
+        self.__full_call_data = full_call_data
         self.__gene_to_haplotype_calls = gene_to_haplotype_calls
 
     def __eq__(self, other: object) -> bool:
         return (
             isinstance(other, PgxAnalysis)
-            and self.__all_full_calls == other.__all_full_calls
+            and self.__full_call_data == other.__full_call_data
             and self.__gene_to_haplotype_calls == other.__gene_to_haplotype_calls
         )
 
     def __repr__(self) -> str:  # pragma: no cover
         return (
             f"PgxAnalysis("
-            f"all_full_calls={self.__all_full_calls!r}, "
+            f"full_call_data={self.__full_call_data!r}, "
             f"gene_to_haplotype_calls={self.__gene_to_haplotype_calls!r}, "
             f")"
         )
 
     def get_all_full_calls(self) -> FrozenSet[FullCall]:
-        return self.__all_full_calls
+        return self.__full_call_data.calls
 
     def get_gene_to_haplotype_calls(self) -> Dict[str, Set[HaplotypeCall]]:
         return deepcopy(self.__gene_to_haplotype_calls)
@@ -42,8 +41,9 @@ class PgxAnalyser(object):
     def create_pgx_analysis(cls, call_data: V37CallData, panel: Panel) -> PgxAnalysis:
         full_calls_found_in_patient_v37 = V37CallTranslator.get_full_calls(call_data, panel)
         all_full_calls = cls.get_all_full_calls(full_calls_found_in_patient_v37, panel)
-        gene_to_haplotype_calls = HaplotypeCaller.get_gene_to_haplotypes_call(all_full_calls, panel)
-        return PgxAnalysis(all_full_calls, gene_to_haplotype_calls)
+        full_call_data = FullCallData(all_full_calls)
+        gene_to_haplotype_calls = HaplotypeCaller.get_gene_to_haplotypes_call(full_call_data, panel)
+        return PgxAnalysis(full_call_data, gene_to_haplotype_calls)
 
     @classmethod
     def get_all_full_calls(

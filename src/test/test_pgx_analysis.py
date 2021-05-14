@@ -3,7 +3,7 @@ from typing import Dict, Set
 
 from base.filter import Filter
 from base.gene_coordinate import GeneCoordinate
-from call_data import V37CallData, V37Call, HaplotypeCall, FullCall
+from call_data import V37CallData, V37Call, HaplotypeCall, FullCall, FullCallData
 from config.drug_info import DrugInfo
 from config.gene_info import GeneInfo
 from config.haplotype import Haplotype
@@ -165,7 +165,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 ("T", "T"), "FAKE", ("rs1212125",), "REF_CALL", Filter.NO_CALL, "REF_CALL", Filter.NO_CALL,
             ),
         })
-        pgx_analysis_expected = PgxAnalysis(all_full_calls_expected, gene_to_haplotype_calls_expected)
+        pgx_analysis_expected = PgxAnalysis(FullCallData(all_full_calls_expected), gene_to_haplotype_calls_expected)
         self.assertEqual(pgx_analysis_expected, pgx_analysis)
 
     def test_hom_ref(self) -> None:
@@ -210,7 +210,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 ("T", "T"), "FAKE", ("rs1212125",), "REF_CALL", Filter.NO_CALL, "REF_CALL", Filter.NO_CALL,
             ),
         })
-        pgx_analysis_expected = PgxAnalysis(all_full_calls_expected, gene_to_haplotype_calls_expected)
+        pgx_analysis_expected = PgxAnalysis(FullCallData(all_full_calls_expected), gene_to_haplotype_calls_expected)
         self.assertEqual(pgx_analysis_expected, pgx_analysis)
 
     def test_heterozygous(self) -> None:
@@ -261,7 +261,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 ("T", "C"), "FAKE", ("rs1212125",), "1005T>C", Filter.PASS, "1005T>C", Filter.PASS,
             ),
         })
-        pgx_analysis_expected = PgxAnalysis(all_full_calls_expected, gene_to_haplotype_calls_expected)
+        pgx_analysis_expected = PgxAnalysis(FullCallData(all_full_calls_expected), gene_to_haplotype_calls_expected)
         self.assertEqual(pgx_analysis_expected, pgx_analysis)
 
     def test_ref_call_on_ref_seq_differences(self) -> None:
@@ -304,7 +304,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 ("T", "T"), "FAKE", ("rs1212125",), "REF_CALL", Filter.NO_CALL, "REF_CALL", Filter.NO_CALL,
             ),
         })
-        pgx_analysis_expected = PgxAnalysis(all_full_calls_expected, gene_to_haplotype_calls_expected)
+        pgx_analysis_expected = PgxAnalysis(FullCallData(all_full_calls_expected), gene_to_haplotype_calls_expected)
         self.assertEqual(pgx_analysis_expected, pgx_analysis)
 
     def test_only_position_match_on_ref_seq_differences(self) -> None:
@@ -347,7 +347,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 ("T", "T"), "FAKE", ("rs1212125",), "REF_CALL", Filter.NO_CALL, "REF_CALL", Filter.NO_CALL,
             ),
         })
-        pgx_analysis_expected = PgxAnalysis(all_full_calls_expected, gene_to_haplotype_calls_expected)
+        pgx_analysis_expected = PgxAnalysis(FullCallData(all_full_calls_expected), gene_to_haplotype_calls_expected)
         self.assertEqual(pgx_analysis_expected, pgx_analysis)
 
     def test_wrong_rs_id_on_ref_seq_differences(self) -> None:
@@ -445,7 +445,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 ("T", "T"), "FAKE", ("rs1212125",), "REF_CALL", Filter.NO_CALL, "REF_CALL", Filter.NO_CALL,
             ),
         })
-        pgx_analysis_expected = PgxAnalysis(all_full_calls_expected, gene_to_haplotype_calls_expected)
+        pgx_analysis_expected = PgxAnalysis(FullCallData(all_full_calls_expected), gene_to_haplotype_calls_expected)
         self.assertEqual(pgx_analysis_expected, pgx_analysis)
 
     def test_double_different_allele_on_ref_seq_differences(self) -> None:
@@ -490,7 +490,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 ("T", "T"), "FAKE", ("rs1212125",), "REF_CALL", Filter.NO_CALL, "REF_CALL", Filter.NO_CALL,
             ),
         })
-        pgx_analysis_expected = PgxAnalysis(all_full_calls_expected, gene_to_haplotype_calls_expected)
+        pgx_analysis_expected = PgxAnalysis(FullCallData(all_full_calls_expected), gene_to_haplotype_calls_expected)
         self.assertEqual(pgx_analysis_expected, pgx_analysis)
 
     def test_unknown_variants(self) -> None:
@@ -545,7 +545,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 ("T", "C"), "FAKE", ("rs1212125",), "1005T>C", Filter.PASS, "1005T>C", Filter.PASS,
             ),
         })
-        pgx_analysis_expected = PgxAnalysis(all_full_calls_expected, gene_to_haplotype_calls_expected)
+        pgx_analysis_expected = PgxAnalysis(FullCallData(all_full_calls_expected), gene_to_haplotype_calls_expected)
         self.assertEqual(pgx_analysis_expected, pgx_analysis)
 
     def test_unknown_gene(self) -> None:
@@ -680,7 +680,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 ("TG", "TG"), "DPYD", ("rs72549303",), "REF_CALL", Filter.NO_CALL, "6744GA>CA", Filter.INFERRED_PASS,
             ),
         })
-        pgx_analysis_expected = PgxAnalysis(all_full_calls_expected, gene_to_haplotype_calls_expected)
+        pgx_analysis_expected = PgxAnalysis(FullCallData(all_full_calls_expected), gene_to_haplotype_calls_expected)
         self.assertEqual(pgx_analysis_expected, pgx_analysis)
 
     def test_ambiguous_haplotype_with_clear_winner_homozygous(self) -> None:
@@ -711,7 +711,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 ("C", "C"), "DPYD", ("rs1801159",), "293T>C", Filter.PASS, "293T>C", Filter.PASS,
             ),
         })
-        pgx_analysis_expected = PgxAnalysis(all_full_calls_expected, gene_to_haplotype_calls_expected)
+        pgx_analysis_expected = PgxAnalysis(FullCallData(all_full_calls_expected), gene_to_haplotype_calls_expected)
         self.assertEqual(pgx_analysis_expected, pgx_analysis)
 
     def test_ambiguous_haplotype_with_clear_winner_heterozygous(self) -> None:
@@ -742,7 +742,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 ("T", "C"), "DPYD", ("rs1801159",), "293T>C", Filter.PASS, "293T>C", Filter.PASS,
             ),
         })
-        pgx_analysis_expected = PgxAnalysis(all_full_calls_expected, gene_to_haplotype_calls_expected)
+        pgx_analysis_expected = PgxAnalysis(FullCallData(all_full_calls_expected), gene_to_haplotype_calls_expected)
         self.assertEqual(pgx_analysis_expected, pgx_analysis)
 
     def test_ambiguous_haplotype_with_clear_winner_mix(self) -> None:
@@ -773,7 +773,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 ("T", "C"), "DPYD", ("rs1801159",), "293T>C", Filter.PASS, "293T>C", Filter.PASS,
             ),
         })
-        pgx_analysis_expected = PgxAnalysis(all_full_calls_expected, gene_to_haplotype_calls_expected)
+        pgx_analysis_expected = PgxAnalysis(FullCallData(all_full_calls_expected), gene_to_haplotype_calls_expected)
         self.assertEqual(pgx_analysis_expected, pgx_analysis)
 
     def test_complicated_ambiguous_haplotype_with_a_clear_winner(self) -> None:
@@ -812,7 +812,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 ("T", "C"), "DPYD", ("rs1801159",), "293T>C", Filter.PASS, "293T>C", Filter.PASS,
             ),
         })
-        pgx_analysis_expected = PgxAnalysis(all_full_calls_expected, gene_to_haplotype_calls_expected)
+        pgx_analysis_expected = PgxAnalysis(FullCallData(all_full_calls_expected), gene_to_haplotype_calls_expected)
         self.assertEqual(pgx_analysis_expected, pgx_analysis)
 
     def test_ambiguous_homozygous_haplotype_with_a_less_clear_winner(self) -> None:
@@ -845,7 +845,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 ("C", "C"), "DPYD", ("rs1801159",), "293T>C", Filter.PASS, "293T>C", Filter.PASS,
             ),
         })
-        pgx_analysis_expected = PgxAnalysis(all_full_calls_expected, gene_to_haplotype_calls_expected)
+        pgx_analysis_expected = PgxAnalysis(FullCallData(all_full_calls_expected), gene_to_haplotype_calls_expected)
         self.assertEqual(pgx_analysis_expected, pgx_analysis)
 
     def test_ambiguous_heterozygous_haplotype_without_a_clear_winner(self) -> None:
@@ -879,7 +879,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 ("T", "C"), "DPYD", ("rs1801159",), "293T>C", Filter.PASS, "293T>C", Filter.PASS,
             ),
         })
-        pgx_analysis_expected = PgxAnalysis(all_full_calls_expected, gene_to_haplotype_calls_expected)
+        pgx_analysis_expected = PgxAnalysis(FullCallData(all_full_calls_expected), gene_to_haplotype_calls_expected)
         self.assertEqual(pgx_analysis_expected, pgx_analysis)
 
     def test_unresolved_haplotype_because_of_unexpected_base(self) -> None:
@@ -910,7 +910,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 ("C", "C"), "DPYD", ("rs1801159",), "293T>C", Filter.PASS, "293T>C", Filter.PASS,
             ),
         })
-        pgx_analysis_expected = PgxAnalysis(all_full_calls_expected, gene_to_haplotype_calls_expected)
+        pgx_analysis_expected = PgxAnalysis(FullCallData(all_full_calls_expected), gene_to_haplotype_calls_expected)
         self.assertEqual(pgx_analysis_expected, pgx_analysis)
 
     def test_unresolved_haplotype_because_of_only_half_of_haplotype(self) -> None:
@@ -941,7 +941,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 ("T", "C"), "DPYD", ("rs1801159",), "293T>C", Filter.PASS, "293T>C", Filter.PASS,
             ),
         })
-        pgx_analysis_expected = PgxAnalysis(all_full_calls_expected, gene_to_haplotype_calls_expected)
+        pgx_analysis_expected = PgxAnalysis(FullCallData(all_full_calls_expected), gene_to_haplotype_calls_expected)
         self.assertEqual(pgx_analysis_expected, pgx_analysis)
 
     def test_unresolved_haplotype_because_mnv_covers_snv_starting_early(self) -> None:
@@ -972,7 +972,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 ("C", "C"), "DPYD", ("rs1801159",), "293T>C", Filter.PASS, "293T>C", Filter.PASS,
             ),
         })
-        pgx_analysis_expected = PgxAnalysis(all_full_calls_expected, gene_to_haplotype_calls_expected)
+        pgx_analysis_expected = PgxAnalysis(FullCallData(all_full_calls_expected), gene_to_haplotype_calls_expected)
         self.assertEqual(pgx_analysis_expected, pgx_analysis)
 
     def test_unresolved_haplotype_because_mnv_covers_snv_starting_there(self) -> None:
@@ -1003,7 +1003,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 ("C", "C"), "DPYD", ("rs1801159",), "293T>C", Filter.PASS, "293T>C", Filter.PASS,
             ),
         })
-        pgx_analysis_expected = PgxAnalysis(all_full_calls_expected, gene_to_haplotype_calls_expected)
+        pgx_analysis_expected = PgxAnalysis(FullCallData(all_full_calls_expected), gene_to_haplotype_calls_expected)
         self.assertEqual(pgx_analysis_expected, pgx_analysis)
 
     def test_overlapping_mnv_and_snv(self) -> None:
@@ -1040,7 +1040,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 ("C", "C"), "DPYD", ("rs1801159",), "293T>C", Filter.PASS, "293T>C", Filter.PASS,
             ),
         })
-        pgx_analysis_expected = PgxAnalysis(all_full_calls_expected, gene_to_haplotype_calls_expected)
+        pgx_analysis_expected = PgxAnalysis(FullCallData(all_full_calls_expected), gene_to_haplotype_calls_expected)
         self.assertEqual(pgx_analysis_expected, pgx_analysis)
 
     def test_overlapping_mnv_and_snv_at_ref_seq_difference(self) -> None:
@@ -1077,7 +1077,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 ("C", "C"), "DPYD", ("rs1801159",), "293T>C", Filter.PASS, "293T>C", Filter.PASS,
             ),
         })
-        pgx_analysis_expected = PgxAnalysis(all_full_calls_expected, gene_to_haplotype_calls_expected)
+        pgx_analysis_expected = PgxAnalysis(FullCallData(all_full_calls_expected), gene_to_haplotype_calls_expected)
         self.assertEqual(pgx_analysis_expected, pgx_analysis)
 
 

@@ -43,20 +43,12 @@ class GenotypeReporter(object):
 
     @classmethod
     def get_calls_tsv_text(cls, pgx_analysis: PgxAnalysis, panel_id: str, version: str) -> str:
-        text = str(
-            cls.__get_panel_calls_df(pgx_analysis, panel_id, version).to_csv(sep=cls.TSV_SEPARATOR, index=False)
-        )
-        return text
+        return str(cls.__get_panel_calls_df(pgx_analysis, panel_id, version).to_csv(sep=cls.TSV_SEPARATOR, index=False))
 
     @classmethod
     def __get_panel_calls_df(cls, pgx_analysis: PgxAnalysis, panel_id: str, version: str) -> pd.DataFrame:
-        return cls.__get_calls_data_frame_from_full_calls(pgx_analysis.get_all_full_calls(), panel_id, version)
-
-    @classmethod
-    def __get_calls_data_frame_from_full_calls(
-            cls, full_calls: FrozenSet[FullCall], panel_id: str, version: str) -> pd.DataFrame:
         data_frame = pd.DataFrame(columns=cls.NEW_CALLS_TSV_COLUMNS)
-        for full_call in full_calls:
+        for full_call in pgx_analysis.get_all_full_calls():
             assert (
                     full_call.start_coordinate_v38 is None
                     or full_call.start_coordinate_v37.chromosome == full_call.start_coordinate_v38.chromosome), \

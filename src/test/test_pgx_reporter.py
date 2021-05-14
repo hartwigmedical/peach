@@ -3,7 +3,7 @@ from typing import Dict, Set
 
 from base.filter import Filter
 from base.gene_coordinate import GeneCoordinate
-from call_data import FullCall, HaplotypeCall
+from call_data import FullCall, HaplotypeCall, FullCallData
 from config.drug_info import DrugInfo
 from config.gene_info import GeneInfo
 from config.haplotype import Haplotype
@@ -77,7 +77,7 @@ class TestPgxReporter(unittest.TestCase):
         return Panel(name, version, gene_infos)
 
     def test_genotype_reporter_empty(self) -> None:
-        pgx_analysis = PgxAnalysis(frozenset(), {})
+        pgx_analysis = PgxAnalysis(FullCallData(frozenset()), {})
         panel_id = "Panel_v0.2"
         version = "V1"
         result = GenotypeReporter.get_calls_tsv_text(pgx_analysis, panel_id, version)
@@ -101,7 +101,7 @@ class TestPgxReporter(unittest.TestCase):
             FullCall(GeneCoordinate("15", 24113), "A", GeneCoordinate("15", 684633), "T", ("T", "T"),
                      ".", ("rs462", "rs9820", "rs536"), "29482A>T", Filter.PASS, "REF_CALL", Filter.NO_CALL),
         })
-        pgx_analysis = PgxAnalysis(all_full_calls, {})
+        pgx_analysis = PgxAnalysis(FullCallData(all_full_calls), {})
         panel_id = "Panel_v0.2"
         version = "V1"
         result = GenotypeReporter.get_calls_tsv_text(pgx_analysis, panel_id, version)
@@ -117,7 +117,7 @@ class TestPgxReporter(unittest.TestCase):
         self.assertEqual(result_expected, result)
 
     def test_haplotype_reporter_empty(self) -> None:
-        pgx_analysis = PgxAnalysis(frozenset(), {})
+        pgx_analysis = PgxAnalysis(FullCallData(frozenset()), {})
         panel = Panel("EmptyPanel", "0.3", frozenset())
         panel_id = "Panel_v0.2"
         version = "V1"
@@ -133,7 +133,7 @@ class TestPgxReporter(unittest.TestCase):
             "FAKE": empty_haplotype_set,
             "FAKE2": {HaplotypeCall("*1", 1), HaplotypeCall("*4A", 1)},
         }
-        pgx_analysis = PgxAnalysis(frozenset(), gene_to_haplotype_calls)
+        pgx_analysis = PgxAnalysis(FullCallData(frozenset()), gene_to_haplotype_calls)
         panel = self.__get_wide_example_panel()
         panel_id = "Panel_v0.2"
         version = "V1"

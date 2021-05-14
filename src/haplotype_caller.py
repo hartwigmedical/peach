@@ -2,7 +2,7 @@ import collections
 from copy import deepcopy
 from typing import Dict, Set, DefaultDict, FrozenSet, Tuple
 
-from call_data import FullCall, HaplotypeCall
+from call_data import FullCall, HaplotypeCall, FullCallData
 from config.gene_info import GeneInfo
 from config.haplotype import Haplotype
 from config.panel import Panel
@@ -11,18 +11,17 @@ from config.variant import Variant
 
 class HaplotypeCaller(object):
     @classmethod
-    def get_gene_to_haplotypes_call(
-            cls, full_calls: FrozenSet[FullCall], panel: Panel) -> Dict[str, Set[HaplotypeCall]]:
+    def get_gene_to_haplotypes_call(cls, full_call_data: FullCallData, panel: Panel) -> Dict[str, Set[HaplotypeCall]]:
         gene_to_haplotype_calls = {}
         for gene_info in panel.get_gene_infos():
             print("[INFO] PROCESSING GENE " + gene_info.gene)
-            gene_to_haplotype_calls[gene_info.gene] = cls.__get_haplotypes_call(full_calls, gene_info)
+            gene_to_haplotype_calls[gene_info.gene] = cls.__get_haplotypes_call(full_call_data, gene_info)
         return gene_to_haplotype_calls
 
     @classmethod
-    def __get_haplotypes_call(cls, full_calls: FrozenSet[FullCall], gene_info: GeneInfo) -> Set[HaplotypeCall]:
+    def __get_haplotypes_call(cls, full_call_data: FullCallData, gene_info: GeneInfo) -> Set[HaplotypeCall]:
         try:
-            variant_to_count = cls.__get_variant_to_count_for_gene(full_calls, gene_info.gene)
+            variant_to_count = cls.__get_variant_to_count_for_gene(full_call_data, gene_info.gene)
 
             explaining_haplotype_combinations = cls.__get_explaining_haplotype_combinations(
                 variant_to_count, gene_info.haplotypes)
@@ -45,8 +44,8 @@ class HaplotypeCaller(object):
             return set()
 
     @classmethod
-    def __get_variant_to_count_for_gene(cls, full_calls: FrozenSet[FullCall], gene: str) -> DefaultDict[Variant, int]:
-        full_calls_for_gene = {call for call in full_calls if call.gene == gene}
+    def __get_variant_to_count_for_gene(cls, full_call_data: FullCallData, gene: str) -> DefaultDict[Variant, int]:
+        full_calls_for_gene = {call for call in full_call_data.calls if call.gene == gene}
         variant_to_count: DefaultDict[Variant, int] = collections.defaultdict(int)
         for call in full_calls_for_gene:
             cls.__assert_handleable_call(call)

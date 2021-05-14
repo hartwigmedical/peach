@@ -105,6 +105,10 @@ class FullCall(NamedTuple):
             raise ValueError(error_msg)
 
 
+class FullCallData(NamedTuple):
+    calls: FrozenSet[FullCall]
+
+
 class HaplotypeCall(object):
     def __init__(self, haplotype_name: str, count: int) -> None:
         if not 1 <= count <= 2:
