@@ -9,10 +9,10 @@ from config.panel import Panel
 
 class V37CallTranslator(object):
     @classmethod
-    def get_all_full_call_data(cls, partial_v37_call_data: V37CallData, panel: Panel) -> FullCallData:
-        uncalled_v37_calls = cls.__get_v37_calls_not_found_in_patient(partial_v37_call_data, panel)
-        all_v37_call_data = V37CallData(partial_v37_call_data.calls.union(uncalled_v37_calls))
-        all_full_calls = cls.__get_translated_v37_calls(all_v37_call_data, panel)
+    def get_all_full_call_data(cls, v37_call_data: V37CallData, panel: Panel) -> FullCallData:
+        uncalled_v37_calls = cls.__get_v37_calls_not_found_in_patient(v37_call_data, panel)
+        all_v37_calls = v37_call_data.calls.union(uncalled_v37_calls)
+        all_full_calls = cls.__get_translated_v37_calls(all_v37_calls, panel)
         return FullCallData(all_full_calls)
 
     @classmethod
@@ -44,11 +44,11 @@ class V37CallTranslator(object):
         return frozenset(uncalled_calls)
 
     @classmethod
-    def __get_translated_v37_calls(cls, v37_call_data: V37CallData, panel: Panel) -> FrozenSet[FullCall]:
+    def __get_translated_v37_calls(cls, all_v37_calls: FrozenSet[V37Call], panel: Panel) -> FrozenSet[FullCall]:
         handled_v37_coordinates: Set[GeneCoordinate] = set()
         handled_v37_rs_ids: Set[str] = set()
         full_calls_from_v37_calls = set()
-        for v37_call in v37_call_data.calls:
+        for v37_call in all_v37_calls:
             full_call = cls.__get_full_call_from_v37_call(v37_call, panel)
 
             for rs_id in full_call.rs_ids:
