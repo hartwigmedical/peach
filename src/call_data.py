@@ -17,6 +17,14 @@ class V37Call(NamedTuple):
     def get_relevant_coordinates(self) -> Set[GeneCoordinate]:
         return get_covered_coordinates(self.start_coordinate, self.reference_allele)
 
+    def is_pass(self) -> bool:
+        if self.filter == SimpleCallFilter.PASS:
+            return True
+        elif self.filter == SimpleCallFilter.NO_CALL:
+            return False
+        else:
+            raise NotImplementedError("Unrecognized filer value")
+
 
 class V37CallData(NamedTuple):
     calls: FrozenSet[V37Call]

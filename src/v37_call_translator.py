@@ -9,14 +9,10 @@ from config.panel import Panel
 
 class V37CallTranslator(object):
     @classmethod
-    def get_all_full_call_data(cls, v37_call_data: V37CallData, panel: Panel) -> FullCallData:
-        # uncalled_v37_calls = cls.__get_v37_calls_not_found_in_patient(v37_call_data, panel)
-        # v37_call_data = V37CallData(v37_call_data.calls.union(uncalled_v37_calls))
-        full_calls_found_in_patient_v37 = cls.__get_translated_v37_calls(v37_call_data, panel)
-        full_calls_not_found_in_patient_v37 = cls.__get_full_calls_not_found_in_patient_v37(
-            full_calls_found_in_patient_v37, panel
-        )
-        all_full_calls = full_calls_found_in_patient_v37.union(full_calls_not_found_in_patient_v37)
+    def get_all_full_call_data(cls, partial_v37_call_data: V37CallData, panel: Panel) -> FullCallData:
+        uncalled_v37_calls = cls.__get_v37_calls_not_found_in_patient(partial_v37_call_data, panel)
+        all_v37_call_data = V37CallData(partial_v37_call_data.calls.union(uncalled_v37_calls))
+        all_full_calls = cls.__get_translated_v37_calls(all_v37_call_data, panel)
         return FullCallData(all_full_calls)
 
     @classmethod
@@ -79,48 +75,6 @@ class V37CallTranslator(object):
         return frozenset(full_calls_from_v37_calls)
 
     @classmethod
-    def __get_full_calls_not_found_in_patient_v37(
-            cls, full_calls: FrozenSet[FullCall], panel: Panel) -> FrozenSet[FullCall]:
-        rs_ids_found_in_patient = {rs_id for full_call in full_calls for rs_id in full_call.rs_ids if rs_id != "."}
-        v37_coordinates_covered_by_found_calls = {
-            coordinate for full_call in full_calls for coordinate in full_call.get_relevant_v37_coordinates()
-        }
-
-        v38_ref_full_calls = set()
-        for gene_info in panel.get_gene_infos():
-            for rs_id_info in gene_info.rs_id_infos:
-                v37_coordinates_partially_handled = bool(
-                    rs_id_info.get_relevant_v37_coordinates().intersection(
-                        v37_coordinates_covered_by_found_calls)
-                )
-                if rs_id_info.rs_id not in rs_ids_found_in_patient and not v37_coordinates_partially_handled:
-                    # Assuming REF/REF relative to v37
-
-                    if rs_id_info.reference_allele_v37 == rs_id_info.reference_allele_v38:
-                        annotation_v38 = REF_CALL_ANNOTATION_STRING
-                        filter_v38 = FullCallFilter.NO_CALL
-                    else:
-                        annotation_v38 = panel.get_ref_seq_difference_annotation(
-                            gene_info.gene, rs_id_info.start_coordinate_v37, rs_id_info.reference_allele_v37)
-                        filter_v38 = FullCallFilter.INFERRED_PASS
-
-                    v38_ref_full_call = FullCall(
-                        rs_id_info.start_coordinate_v37,
-                        rs_id_info.reference_allele_v37,
-                        rs_id_info.start_coordinate_v38,
-                        rs_id_info.reference_allele_v38,
-                        (rs_id_info.reference_allele_v37, rs_id_info.reference_allele_v37),
-                        gene_info.gene,
-                        (rs_id_info.rs_id,),
-                        REF_CALL_ANNOTATION_STRING,
-                        FullCallFilter.NO_CALL,
-                        annotation_v38,
-                        filter_v38,
-                    )
-                    v38_ref_full_calls.add(v38_ref_full_call)
-        return frozenset(v38_ref_full_calls)
-
-    @classmethod
     def __get_full_call_from_v37_call(cls, v37_call: V37Call, panel: Panel) -> FullCall:
         cls.__assert_gene_in_panel(v37_call.gene, panel)
 
@@ -162,14 +116,16 @@ class V37CallTranslator(object):
                 or (annotated.is_annotated_vs_v38() and not annotated.is_variant_vs_v38)
                 for annotated in annotated_alleles
             )
-
             if v38_ref_call_due_to_ref_sequence_difference:
                 variant_annotation_v38 = REF_CALL_ANNOTATION_STRING
                 filter_type_v38 = FullCallFilter.PASS
             elif all_variants_ref_to_v37_or_v38:
                 variant_annotation_v38 = panel.get_ref_seq_difference_annotation(
                     v37_call.gene, v37_call.start_coordinate, v37_call.reference_allele)
-                filter_type_v38 = FullCallFilter.PASS
+                if v37_call.is_pass():
+                    filter_type_v38 = FullCallFilter.PASS
+                else:
+                    filter_type_v38 = FullCallFilter.INFERRED_PASS
             else:
                 variant_annotation_v38 = v37_call.variant_annotation + "?"
                 filter_type_v38 = FullCallFilter.UNKNOWN
@@ -181,7 +137,10 @@ class V37CallTranslator(object):
         elif panel.contains_rs_id_matching_v37_call(v37_call):
             # known variant and no ref seq differences involved
             variant_annotation_v38 = v37_call.variant_annotation
-            filter_type_v38 = FullCallFilter.PASS
+            if v37_call.is_pass():
+                filter_type_v38 = FullCallFilter.PASS
+            else:
+                filter_type_v38 = FullCallFilter.NO_CALL
         else:
             # unknown variant, no ref seq difference involved
             variant_annotation_v38 = v37_call.variant_annotation + "?"
