@@ -1,22 +1,29 @@
 from typing import NamedTuple, Tuple, Optional, Set, FrozenSet
 
-from base.filter import Filter
+from base.filter import FullCallFilter, SimpleCallFilter
 from base.gene_coordinate import GeneCoordinate
 from base.util import get_covered_coordinates
 
 
 class V37Call(NamedTuple):
     start_coordinate: GeneCoordinate
-    ref_allele: str
+    reference_allele: str
     alleles: Tuple[str, str]  # The order is (ref, alt) when there is one of each
     gene: str
     rs_ids: Tuple[str, ...]
     variant_annotation: str
-    filter: Filter
+    filter: SimpleCallFilter
+
+    def get_relevant_coordinates(self) -> Set[GeneCoordinate]:
+        return get_covered_coordinates(self.start_coordinate, self.reference_allele)
 
 
 class V37CallData(NamedTuple):
     calls: FrozenSet[V37Call]
+
+    def __repr__(self) -> str:
+        calls_string = ", ".join(sorted([repr(call) for call in self.calls]))
+        return f"FullCallData(frozenset({calls_string}))"
 
 
 class AnnotatedAllele(object):
@@ -78,9 +85,9 @@ class FullCall(NamedTuple):
     gene: str
     rs_ids: Tuple[str, ...]
     variant_annotation_v37: str
-    filter_v37: Filter
+    filter_v37: FullCallFilter
     variant_annotation_v38: str
-    filter_v38: Filter
+    filter_v38: FullCallFilter
 
     def get_relevant_v37_coordinates(self) -> Set[GeneCoordinate]:
         return get_covered_coordinates(self.start_coordinate_v37, self.reference_allele_v37)
@@ -107,6 +114,10 @@ class FullCall(NamedTuple):
 
 class FullCallData(NamedTuple):
     calls: FrozenSet[FullCall]
+
+    def __repr__(self) -> str:
+        calls_string = ", ".join(sorted([repr(call) for call in self.calls]))
+        return f"FullCallData(frozenset({calls_string}))"
 
 
 class HaplotypeCall(object):

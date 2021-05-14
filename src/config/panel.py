@@ -79,7 +79,7 @@ class Panel(object):
         return False
 
     def contains_rs_id_matching_v37_call(self, v37_call: V37Call) -> bool:
-        if self.contains_rs_id_with_v37_coordinate_and_reference_allele(v37_call.start_coordinate, v37_call.ref_allele):
+        if self.contains_rs_id_with_v37_coordinate_and_reference_allele(v37_call.start_coordinate, v37_call.reference_allele):
             return True
         elif any(self.contains_rs_id(rs_id) for rs_id in v37_call.rs_ids):
             error_msg = (

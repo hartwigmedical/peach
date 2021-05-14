@@ -1,7 +1,7 @@
 import unittest
 from typing import Dict, Set
 
-from base.filter import Filter
+from base.filter import FullCallFilter
 from base.gene_coordinate import GeneCoordinate
 from call_data import FullCall, HaplotypeCall, FullCallData
 from config.drug_info import DrugInfo
@@ -91,15 +91,15 @@ class TestPgxReporter(unittest.TestCase):
     def test_genotype_reporter_non_empty(self) -> None:
         all_full_calls = frozenset({
             FullCall(GeneCoordinate("1", 5), "A", GeneCoordinate("1", 25), "A", ("G", "C"),
-                     "DPYD", (".",), "25A>C;25A>G", Filter.PASS, "25A>C;25A>G", Filter.PASS),
+                     "DPYD", (".",), "25A>C;25A>G", FullCallFilter.PASS, "25A>C;25A>G", FullCallFilter.PASS),
             FullCall(GeneCoordinate("1", 15), "C", None, None, ("C", "CAG"),
-                     "DPYD", ("rs536",), "35A>C;35A>G", Filter.PASS, "35A>C;35A>G?", Filter.UNKNOWN),
+                     "DPYD", ("rs536",), "35A>C;35A>G", FullCallFilter.PASS, "35A>C;35A>G?", FullCallFilter.UNKNOWN),
             FullCall(GeneCoordinate("X", 15), "TT", GeneCoordinate("X", 40), "AA", ("TT", "TT"),
-                     "GENE", ("rs23",), "REF_CALL", Filter.NO_CALL, "627AA>TT", Filter.PASS),
+                     "GENE", ("rs23",), "REF_CALL", FullCallFilter.NO_CALL, "627AA>TT", FullCallFilter.PASS),
             FullCall(GeneCoordinate("2", 154663), "T", GeneCoordinate("2", 40565464), "T", ("T", "T"),
-                     "BRAF", ("rs154", "rs8839"), "REF_CALL", Filter.NO_CALL, "REF_CALL", Filter.NO_CALL),
+                     "BRAF", ("rs154", "rs8839"), "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL),
             FullCall(GeneCoordinate("15", 24113), "A", GeneCoordinate("15", 684633), "T", ("T", "T"),
-                     ".", ("rs462", "rs9820", "rs536"), "29482A>T", Filter.PASS, "REF_CALL", Filter.NO_CALL),
+                     ".", ("rs462", "rs9820", "rs536"), "29482A>T", FullCallFilter.PASS, "REF_CALL", FullCallFilter.NO_CALL),
         })
         pgx_analysis = PgxAnalysis(FullCallData(all_full_calls), {})
         panel_id = "Panel_v0.2"

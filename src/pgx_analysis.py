@@ -2,7 +2,7 @@ from copy import deepcopy
 from typing import Dict, Set, FrozenSet
 
 from base.constants import REF_CALL_ANNOTATION_STRING
-from base.filter import Filter
+from base.filter import FullCallFilter
 from call_data import V37CallData, FullCall, HaplotypeCall, FullCallData
 from config.panel import Panel
 from v37_call_translator import V37CallTranslator

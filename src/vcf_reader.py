@@ -3,7 +3,7 @@ from typing import Dict, Any, Tuple, Optional
 import allel
 
 from base.constants import REF_CALL_ANNOTATION_STRING
-from base.filter import Filter
+from base.filter import SimpleCallFilter
 from base.gene_coordinate import GeneCoordinate
 from call_data import V37CallData, V37Call
 from config.panel import Panel
@@ -68,7 +68,7 @@ class VcfReader(object):
                     if coordinate_match_to_panel_exists:
                         match_on_location += 1
                     if variants[f"{cls.FILTER_FIELD_NAME}_PASS"][i]:
-                        filter_type = Filter.PASS
+                        filter_type = SimpleCallFilter.PASS
                     else:
                         # Ignore all calls with filter != PASS
                         continue

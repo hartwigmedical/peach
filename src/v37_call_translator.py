@@ -1,7 +1,7 @@
 from typing import Set, Tuple, Optional, FrozenSet
 
 from base.constants import REF_CALL_ANNOTATION_STRING
-from base.filter import Filter
+from base.filter import FullCallFilter, SimpleCallFilter
 from base.gene_coordinate import GeneCoordinate
 from call_data import V37CallData, FullCall, AnnotatedAllele, V37Call, FullCallData
 from config.panel import Panel
@@ -10,12 +10,42 @@ from config.panel import Panel
 class V37CallTranslator(object):
     @classmethod
     def get_all_full_call_data(cls, v37_call_data: V37CallData, panel: Panel) -> FullCallData:
+        # uncalled_v37_calls = cls.__get_v37_calls_not_found_in_patient(v37_call_data, panel)
+        # v37_call_data = V37CallData(v37_call_data.calls.union(uncalled_v37_calls))
         full_calls_found_in_patient_v37 = cls.__get_translated_v37_calls(v37_call_data, panel)
         full_calls_not_found_in_patient_v37 = cls.__get_full_calls_not_found_in_patient_v37(
             full_calls_found_in_patient_v37, panel
         )
         all_full_calls = full_calls_found_in_patient_v37.union(full_calls_not_found_in_patient_v37)
         return FullCallData(all_full_calls)
+
+    @classmethod
+    def __get_v37_calls_not_found_in_patient(cls, v37_call_data: V37CallData, panel: Panel) -> FrozenSet[V37Call]:
+        # assume ref call when no call is found. Set filter to NO_CALL
+        rs_ids_found_in_patient = {rs_id for call in v37_call_data.calls for rs_id in call.rs_ids if rs_id != "."}
+        coordinates_covered_by_found_calls = {
+            coordinate for call in v37_call_data.calls for coordinate in call.get_relevant_coordinates()
+        }
+
+        uncalled_calls = set()
+        for gene_info in panel.get_gene_infos():
+            for rs_id_info in gene_info.rs_id_infos:
+                v37_coordinates_partially_handled = bool(
+                    rs_id_info.get_relevant_v37_coordinates().intersection(coordinates_covered_by_found_calls)
+                )
+                if rs_id_info.rs_id not in rs_ids_found_in_patient and not v37_coordinates_partially_handled:
+                    # Assuming REF/REF relative to v37
+                    uncalled_ref_call = V37Call(
+                        rs_id_info.start_coordinate_v37,
+                        rs_id_info.reference_allele_v37,
+                        (rs_id_info.reference_allele_v37, rs_id_info.reference_allele_v37),
+                        gene_info.gene,
+                        (rs_id_info.rs_id,),
+                        REF_CALL_ANNOTATION_STRING,
+                        SimpleCallFilter.NO_CALL,
+                    )
+                    uncalled_calls.add(uncalled_ref_call)
+        return frozenset(uncalled_calls)
 
     @classmethod
     def __get_translated_v37_calls(cls, v37_call_data: V37CallData, panel: Panel) -> FrozenSet[FullCall]:
@@ -68,11 +98,11 @@ class V37CallTranslator(object):
 
                     if rs_id_info.reference_allele_v37 == rs_id_info.reference_allele_v38:
                         annotation_v38 = REF_CALL_ANNOTATION_STRING
-                        filter_v38 = Filter.NO_CALL
+                        filter_v38 = FullCallFilter.NO_CALL
                     else:
                         annotation_v38 = panel.get_ref_seq_difference_annotation(
                             gene_info.gene, rs_id_info.start_coordinate_v37, rs_id_info.reference_allele_v37)
-                        filter_v38 = Filter.INFERRED_PASS
+                        filter_v38 = FullCallFilter.INFERRED_PASS
 
                     v38_ref_full_call = FullCall(
                         rs_id_info.start_coordinate_v37,
@@ -83,7 +113,7 @@ class V37CallTranslator(object):
                         gene_info.gene,
                         (rs_id_info.rs_id,),
                         REF_CALL_ANNOTATION_STRING,
-                        Filter.NO_CALL,
+                        FullCallFilter.NO_CALL,
                         annotation_v38,
                         filter_v38,
                     )
@@ -99,7 +129,7 @@ class V37CallTranslator(object):
         reference_allele_v38: Optional[str]
         rs_ids: Tuple[str, ...]
         if panel.contains_rs_id_matching_v37_call(v37_call):
-            rs_id_info = panel.get_matching_rs_id_info(v37_call.start_coordinate, v37_call.ref_allele)
+            rs_id_info = panel.get_matching_rs_id_info(v37_call.start_coordinate, v37_call.reference_allele)
             cls.__assert_rs_id_call_matches_info(v37_call.rs_ids, (rs_id_info.rs_id,))
 
             start_coordinate_v38 = rs_id_info.start_coordinate_v38
@@ -115,12 +145,12 @@ class V37CallTranslator(object):
             rs_ids = v37_call.rs_ids
 
         annotated_alleles = (
-            AnnotatedAllele.from_alleles(v37_call.alleles[0], v37_call.ref_allele, reference_allele_v38),
-            AnnotatedAllele.from_alleles(v37_call.alleles[1], v37_call.ref_allele, reference_allele_v38),
+            AnnotatedAllele.from_alleles(v37_call.alleles[0], v37_call.reference_allele, reference_allele_v38),
+            AnnotatedAllele.from_alleles(v37_call.alleles[1], v37_call.reference_allele, reference_allele_v38),
         )
 
         # determine variant annotation v38 and filter v38
-        if panel.has_ref_seq_difference_annotation(v37_call.gene, v37_call.start_coordinate, v37_call.ref_allele):
+        if panel.has_ref_seq_difference_annotation(v37_call.gene, v37_call.start_coordinate, v37_call.reference_allele):
             v38_ref_call_due_to_ref_sequence_difference = all(
                 annotated.is_variant_vs_v37
                 and annotated.is_annotated_vs_v38()
@@ -135,14 +165,14 @@ class V37CallTranslator(object):
 
             if v38_ref_call_due_to_ref_sequence_difference:
                 variant_annotation_v38 = REF_CALL_ANNOTATION_STRING
-                filter_type_v38 = Filter.PASS
+                filter_type_v38 = FullCallFilter.PASS
             elif all_variants_ref_to_v37_or_v38:
                 variant_annotation_v38 = panel.get_ref_seq_difference_annotation(
-                    v37_call.gene, v37_call.start_coordinate, v37_call.ref_allele)
-                filter_type_v38 = Filter.PASS
+                    v37_call.gene, v37_call.start_coordinate, v37_call.reference_allele)
+                filter_type_v38 = FullCallFilter.PASS
             else:
                 variant_annotation_v38 = v37_call.variant_annotation + "?"
-                filter_type_v38 = Filter.UNKNOWN
+                filter_type_v38 = FullCallFilter.UNKNOWN
                 print(
                     f"[WARN] Unexpected allele in ref seq difference location. Check whether annotation is correct: "
                     f"found alleles=({annotated_alleles[0]}, {annotated_alleles[1]}), "
@@ -151,23 +181,28 @@ class V37CallTranslator(object):
         elif panel.contains_rs_id_matching_v37_call(v37_call):
             # known variant and no ref seq differences involved
             variant_annotation_v38 = v37_call.variant_annotation
-            filter_type_v38 = Filter.PASS
+            filter_type_v38 = FullCallFilter.PASS
         else:
             # unknown variant, no ref seq difference involved
             variant_annotation_v38 = v37_call.variant_annotation + "?"
-            filter_type_v38 = Filter.UNKNOWN
+            filter_type_v38 = FullCallFilter.UNKNOWN
             print(
                 f"[WARN] Unknown variant. Check whether annotation is correct: "
                 f"found alleles=({annotated_alleles[0]}, {annotated_alleles[1]}), "
                 f"annotation={variant_annotation_v38}"
             )
 
+        filter_type_v37 = cls.__get_full_call_filter(v37_call.filter)
         full_call = FullCall(
-            v37_call.start_coordinate, v37_call.ref_allele, start_coordinate_v38, reference_allele_v38,
+            v37_call.start_coordinate, v37_call.reference_allele, start_coordinate_v38, reference_allele_v38,
             v37_call.alleles, v37_call.gene, rs_ids,
-            v37_call.variant_annotation, v37_call.filter, variant_annotation_v38, filter_type_v38,
+            v37_call.variant_annotation, filter_type_v37, variant_annotation_v38, filter_type_v38,
         )
         return full_call
+
+    @classmethod
+    def __get_full_call_filter(cls, direct_filter: SimpleCallFilter) -> FullCallFilter:
+        return FullCallFilter[direct_filter.name]
 
     @classmethod
     def __assert_rs_id_call_matches_info(cls, rs_ids_call: Tuple[str, ...], rs_ids_info: Tuple[str, ...]) -> None:
