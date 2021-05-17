@@ -17,7 +17,7 @@ from pgx_reporter import GenotypeReporter, HaplotypeReporter
 
 class TestPgxReporter(unittest.TestCase):
     @classmethod
-    def __get_wide_example_panel(cls) -> Panel:
+    def __get_example_panel(cls) -> Panel:
         dpyd_two_a_variant = Variant("rs3918290", "T")
         dpyd_two_b_variant = Variant("rs1801159", "C")
         dpyd_three_variant = Variant("rs72549303", "TG")
@@ -40,7 +40,7 @@ class TestPgxReporter(unittest.TestCase):
             DrugInfo("Capecitabine", "https://www.pharmgkb.org/chemical/PA448771/guidelineAnnotation/PA166104963"),
         })
         dpyd_rs_id_to_difference_annotations = {
-            "rs72549303": Annotation("6744GA>CA"),
+            "rs72549303": Annotation("6744CA>GA", "6744GA>CA"),
         }
 
         fake_haplotypes = frozenset({
@@ -63,7 +63,7 @@ class TestPgxReporter(unittest.TestCase):
         fake2_drugs = frozenset({
             DrugInfo("Aspirin", "https://www.pharmgkb.org/some_other_url"),
         })
-        fake2_rs_id_to_difference_annotations = {"rs1212127": Annotation("1324T>C")}
+        fake2_rs_id_to_difference_annotations = {"rs1212127": Annotation("1324C>T", "1324T>C")}
 
         gene_infos = frozenset({
             GeneInfo("DPYD", "1", "*1", dpyd_haplotypes, dpyd_rs_id_infos,
@@ -135,7 +135,7 @@ class TestPgxReporter(unittest.TestCase):
             "FAKE2": {HaplotypeCall("*1", 1), HaplotypeCall("*4A", 1)},
         }
         pgx_analysis = PgxAnalysis(FullCallData(frozenset()), gene_to_haplotype_calls)
-        panel = self.__get_wide_example_panel()
+        panel = self.__get_example_panel()
         panel_id = "Panel_v0.2"
         version = "V1"
         result = HaplotypeReporter.get_genotype_tsv_text(pgx_analysis, panel, panel_id, version)

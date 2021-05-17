@@ -42,8 +42,8 @@ class TestLoadConfig(unittest.TestCase):
             DrugInfo("Capecitabine", "https://www.source_url.org/Capecitabine"),
         })
         dpyd_rs_id_to_difference_annotations = {
-            "rs72549303": Annotation("6744GA>CA"),
-            "rs1801265": Annotation("85T>C"),
+            "rs72549303": Annotation("6744CA>GA", "6744GA>CA"),
+            "rs1801265": Annotation("85C>T", "85T>C"),
         }
         fake_haplotypes_expected = frozenset({
             Haplotype("*4A", "Reduced Function", frozenset({fake_variant})),
@@ -65,7 +65,7 @@ class TestLoadConfig(unittest.TestCase):
         fake2_drugs_expected = frozenset({
             DrugInfo("Aspirin", "https://www.source_url.org/Aspirin"),
         })
-        fake2_rs_id_to_difference_annotations = {"rs1212127": Annotation("1324T>C")}
+        fake2_rs_id_to_difference_annotations = {"rs1212127": Annotation("1324C>T", "1324T>C")}
 
         gene_infos_expected = frozenset({
             GeneInfo(
@@ -79,15 +79,16 @@ class TestLoadConfig(unittest.TestCase):
                 fake2_drugs_expected, fake2_rs_id_to_difference_annotations),
         })
         name_expected = "fake_panel"
-        version_expected = "0.2"
+        version_expected = "0.3"
         panel_expected = Panel(name_expected, version_expected, gene_infos_expected)
 
         self.assertEqual(panel_expected, panel)
 
     def test_panel_name_from_json(self) -> None:
+        """Test extraction and formatting of panel name with version"""
         panel_path = get_test_resource("test_panel.json")
         panel = load_panel(str(panel_path))
-        expected_panel_id = "fake_panel_v0.2"
+        expected_panel_id = "fake_panel_v0.3"
         self.assertEqual(expected_panel_id, panel.get_id())
 
     def test_gene_info_with_overlapping_haplotype_names(self) -> None:
@@ -287,7 +288,7 @@ class TestLoadConfig(unittest.TestCase):
 
         rs_id = "rs294924"
 
-        rs_id_to_ref_seq_difference_annotation = {rs_id: Annotation("399483C>A")}
+        rs_id_to_ref_seq_difference_annotation = {rs_id: Annotation("399483A>C", "399483C>A")}
         haplotypes = frozenset([Haplotype("*3", "No Function", frozenset([Variant("rs294924", "G")]))])
 
         rs_id_infos1 = frozenset(
@@ -335,7 +336,7 @@ class TestLoadConfig(unittest.TestCase):
         drugs: FrozenSet[DrugInfo] = frozenset()
 
         empty_rs_id_to_ref_seq_difference_annotation: Dict[str, Annotation] = dict()
-        non_empty_rs_id_to_ref_seq_difference_annotation = {"rs2493023": Annotation("3445A>T")}
+        non_empty_rs_id_to_ref_seq_difference_annotation = {"rs2493023": Annotation("3445T>A", "3445A>T")}
 
         GeneInfo(
             gene, chromosome, reference_haplotype_name, haplotypes, rs_id_infos,

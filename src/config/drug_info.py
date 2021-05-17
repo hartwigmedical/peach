@@ -10,7 +10,9 @@ class DrugInfo(NamedTuple):
 
     @classmethod
     def from_json(cls, data: Json) -> "DrugInfo":
-        return DrugInfo(str(data["name"]), str(data["url_prescription_info"]))
+        name = str(data["name"])
+        url_prescription_info = str(data["urlPrescriptionInfo"])
+        return DrugInfo(name, url_prescription_info)
 
 
 def assert_no_overlap_drug_names(drugs: Collection[DrugInfo], source_name: str) -> None:

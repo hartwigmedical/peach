@@ -39,7 +39,7 @@ class TestPgxAnalysis(unittest.TestCase):
             DrugInfo("Capecitabine", "https://www.pharmgkb.org/chemical/PA448771/guidelineAnnotation/PA166104963"),
         })
         dpyd_rs_id_to_difference_annotations = {
-            "rs72549303": Annotation("6744GA>CA"),
+            "rs72549303": Annotation("6744CA>GA", "6744GA>CA"),
         }
 
         fake_haplotypes = frozenset({
@@ -62,7 +62,7 @@ class TestPgxAnalysis(unittest.TestCase):
         fake2_drugs = frozenset({
             DrugInfo("Aspirin", "https://www.pharmgkb.org/some_other_url"),
         })
-        fake2_rs_id_to_difference_annotations = {"rs1212127": Annotation("1324T>C")}
+        fake2_rs_id_to_difference_annotations = {"rs1212127": Annotation("1324C>T", "1324T>C")}
 
         gene_infos = frozenset({
             GeneInfo("DPYD", "1", "*1", dpyd_haplotypes, dpyd_rs_id_infos,
@@ -119,7 +119,7 @@ class TestPgxAnalysis(unittest.TestCase):
             DrugInfo("Capecitabine", "https://www.pharmgkb.org/chemical/PA448771/guidelineAnnotation/PA166104963"),
         })
         dpyd_rs_id_to_difference_annotations = {
-            "rs72549303": Annotation("6744GA>CA"),
+            "rs72549303": Annotation("6744CA>GA", "6744GA>CA"),
         }
 
         gene_infos = frozenset({

@@ -1,6 +1,6 @@
 {
   "panelName": "fake_panel",
-  "panelVersion": "0.2",
+  "panelVersion": "0.3",
   "genes": [
     {
       "gene": "DPYD",
@@ -82,20 +82,22 @@
       "drugs": [
         {
           "name": "5-Fluorouracil",
-          "url_prescription_info": "https://www.source_url.org/5-Fluorouracil"
+          "urlPrescriptionInfo": "https://www.source_url.org/5-Fluorouracil"
         },
         {
           "name": "Capecitabine",
-          "url_prescription_info": "https://www.source_url.org/Capecitabine"
+          "urlPrescriptionInfo": "https://www.source_url.org/Capecitabine"
         }
       ],
       "refSeqDifferenceAnnotations": [
         {
           "rsid": "rs72549303",
+          "annotationV37": "6744CA>GA",
           "annotationV38": "6744GA>CA"
         },
         {
           "rsid": "rs1801265",
+          "annotationV37": "85C>T",
           "annotationV38": "85T>C"
         }
       ]
@@ -128,7 +130,7 @@
       "drugs": [
         {
           "name": "Aspirin",
-          "url_prescription_info": "https://www.source_url.org/Aspirin"
+          "urlPrescriptionInfo": "https://www.source_url.org/Aspirin"
         }
       ],
       "refSeqDifferenceAnnotations": [
@@ -162,12 +164,13 @@
       "drugs": [
         {
           "name": "Aspirin",
-          "url_prescription_info": "https://www.source_url.org/Aspirin"
+          "urlPrescriptionInfo": "https://www.source_url.org/Aspirin"
         }
       ],
       "refSeqDifferenceAnnotations": [
         {
           "rsid": "rs1212127",
+          "annotationV37": "1324C>T",
           "annotationV38": "1324T>C"
         }
       ]
