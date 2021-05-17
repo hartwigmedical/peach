@@ -10,13 +10,13 @@ from config.panel import Panel
 from config.rs_id_info import RsIdInfo
 from config.variant import Variant
 from main import load_panel
-from test_resources.test_resource import get_panel_test_resource
+from test_resources.test_resource import get_test_resource
 
 
 class TestLoadConfig(unittest.TestCase):
     def test_load_panel(self) -> None:
         """Load panel from json"""
-        panel_path = get_panel_test_resource()
+        panel_path = get_test_resource("test_panel.json")
         panel = load_panel(str(panel_path))
 
         dpyd_two_a_variant = Variant("rs3918290", "T")
@@ -85,7 +85,7 @@ class TestLoadConfig(unittest.TestCase):
         self.assertEqual(panel_expected, panel)
 
     def test_panel_name_from_json(self) -> None:
-        panel_path = get_panel_test_resource()
+        panel_path = get_test_resource("test_panel.json")
         panel = load_panel(str(panel_path))
         expected_panel_id = "fake_panel_v0.2"
         self.assertEqual(expected_panel_id, panel.get_id())

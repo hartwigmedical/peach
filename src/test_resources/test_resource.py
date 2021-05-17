@@ -13,5 +13,5 @@ def get_test_resources_dir() -> Path:
     return Path(source_file).parent
 
 
-def get_panel_test_resource() -> Path:
-    return get_test_resources_dir() / "test_panel.json"
+def get_test_resource(file_name: str) -> Path:
+    return get_test_resources_dir() / file_name
