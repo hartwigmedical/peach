@@ -4,6 +4,7 @@ from typing import Dict, Set
 from base.filter import FullCallFilter
 from base.gene_coordinate import GeneCoordinate
 from call_data import FullCall, HaplotypeCall, FullCallData
+from config.annotation import Annotation
 from config.drug_info import DrugInfo
 from config.gene_info import GeneInfo
 from config.haplotype import Haplotype
@@ -39,7 +40,7 @@ class TestPgxReporter(unittest.TestCase):
             DrugInfo("Capecitabine", "https://www.pharmgkb.org/chemical/PA448771/guidelineAnnotation/PA166104963"),
         })
         dpyd_rs_id_to_difference_annotations = {
-            "rs72549303": "6744GA>CA",
+            "rs72549303": Annotation("6744GA>CA"),
         }
 
         fake_haplotypes = frozenset({
@@ -51,7 +52,7 @@ class TestPgxReporter(unittest.TestCase):
         fake_drugs = frozenset({
             DrugInfo("Aspirin", "https://www.pharmgkb.org/some_other_url"),
         })
-        fake_rs_id_to_difference_annotations: Dict[str, str] = {}
+        fake_rs_id_to_difference_annotations: Dict[str, Annotation] = {}
 
         fake2_haplotypes = frozenset({
             Haplotype("*4A", "Reduced Function", frozenset({fake2_variant})),
@@ -62,7 +63,7 @@ class TestPgxReporter(unittest.TestCase):
         fake2_drugs = frozenset({
             DrugInfo("Aspirin", "https://www.pharmgkb.org/some_other_url"),
         })
-        fake2_rs_id_to_difference_annotations: Dict[str, str] = {"rs1212127": "1324T>C"}
+        fake2_rs_id_to_difference_annotations = {"rs1212127": Annotation("1324T>C")}
 
         gene_infos = frozenset({
             GeneInfo("DPYD", "1", "*1", dpyd_haplotypes, dpyd_rs_id_infos,
