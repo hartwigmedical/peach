@@ -364,6 +364,9 @@ If you have installed PEACH's requirements into a venv, then remember to source 
     + Change format of arguments to PEACH. 
         + Arguments are no longer positional. 
         + Remove arguments vcftools, recreate_bed and transcript_tsv, since they are no longer needed.
+    + Change format of panel JSON.
+        + Change key "url_prescription_info" to "urlPrescriptionInfo" for consistency with other keys.
+        + Add "annotationV37" key for reference sequence differences, for support of v38 reference genomes.
     + Add script for running tests.
 * [1.0](https://github.com/hartwigmedical/peach/releases/tag/v1.0)
     + First release
