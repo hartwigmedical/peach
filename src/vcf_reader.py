@@ -5,7 +5,7 @@ import allel
 from base.constants import REF_CALL_ANNOTATION_STRING
 from base.filter import SimpleCallFilter
 from base.gene_coordinate import GeneCoordinate
-from call_data import V37CallData, V37Call
+from call_data import SimpleCallData, SimpleCall
 from config.panel import Panel
 
 
@@ -29,9 +29,9 @@ class VcfReader(object):
     RS_ID_SEPARATOR = ";"
 
     @classmethod
-    def get_v37_call_data(cls, vcf: str, panel: Panel, sample_r_id: str) -> V37CallData:
+    def get_v37_call_data(cls, vcf: str, panel: Panel, sample_r_id: str) -> SimpleCallData:
         variants = cls.__get_variants_from_vcf(vcf)
-        return cls.__get_call_data_from_variants(variants, panel, sample_r_id)
+        return cls.__get_v37_call_data_from_variants(variants, panel, sample_r_id)
 
     @classmethod
     def __get_variants_from_vcf(cls, vcf: str) -> Optional[Dict[str, Any]]:
@@ -43,8 +43,8 @@ class VcfReader(object):
         return variants
 
     @classmethod
-    def __get_call_data_from_variants(
-            cls, variants: Optional[Dict[str, Any]], panel: Panel, sample_r_id: str) -> V37CallData:
+    def __get_v37_call_data_from_variants(
+            cls, variants: Optional[Dict[str, Any]], panel: Panel, sample_r_id: str) -> SimpleCallData:
         match_on_rsid = 0
         match_on_location = 0
         filtered_calls = set()
@@ -89,7 +89,7 @@ class VcfReader(object):
                         error_msg = f"Genotype not found: {genotype}"
                         raise ValueError(error_msg)
 
-                    call = V37Call(
+                    call = SimpleCall(
                         GeneCoordinate(chromosome, position),
                         reference_allele,
                         alleles,
@@ -103,7 +103,7 @@ class VcfReader(object):
         print("[INFO] Matches on RS id: " + str(match_on_rsid))
         print("[INFO] Matches on location: " + str(match_on_location))
 
-        return V37CallData(frozenset(filtered_calls))
+        return SimpleCallData(frozenset(filtered_calls))
 
     @classmethod
     def __get_rs_ids_from_string(cls, rs_ids_string: str) -> Tuple[str, ...]:

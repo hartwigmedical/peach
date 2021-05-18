@@ -3,7 +3,7 @@ from typing import Dict, Set
 
 from base.filter import FullCallFilter, SimpleCallFilter
 from base.gene_coordinate import GeneCoordinate
-from call_data import V37CallData, V37Call, HaplotypeCall, FullCall, FullCallData
+from call_data import SimpleCallData, SimpleCall, HaplotypeCall, FullCall, FullCallData
 from config.annotation import Annotation
 from config.drug_info import DrugInfo
 from config.gene_info import GeneInfo
@@ -133,7 +133,7 @@ class TestPgxAnalysis(unittest.TestCase):
     def test_empty(self) -> None:
         """No variants wrt v37"""
         panel = self.__get_wide_example_panel()
-        ids_found_in_patient = V37CallData(frozenset())
+        ids_found_in_patient = SimpleCallData(frozenset())
         pgx_analysis = PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
 
         gene_to_haplotype_calls_expected = {
@@ -172,12 +172,12 @@ class TestPgxAnalysis(unittest.TestCase):
     def test_hom_ref(self) -> None:
         """All haplotypes are  *1_HOM"""
         panel = self.__get_wide_example_panel()
-        ids_found_in_patient = V37CallData(frozenset({
-            V37Call(
+        ids_found_in_patient = SimpleCallData(frozenset({
+            SimpleCall(
                 GeneCoordinate("16", 97915617), "C", ("T", "T"), "FAKE2", ("rs1212127",), "1324C>T", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97915621), "TG", ("TC", "TC"), "DPYD", ("rs72549303",), "6744CA>GA", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97915614), "C", ("C", "C"), "DPYD", ("rs3918290",), "REF_CALL", SimpleCallFilter.PASS),
         }))
         pgx_analysis = PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
@@ -217,16 +217,16 @@ class TestPgxAnalysis(unittest.TestCase):
     def test_heterozygous(self) -> None:
         """All haplotypes are heterozygous. Both variant/ref and variant/variant"""
         panel = self.__get_wide_example_panel()
-        ids_found_in_patient = V37CallData(frozenset({
-            V37Call(
+        ids_found_in_patient = SimpleCallData(frozenset({
+            SimpleCall(
                 GeneCoordinate("16", 97915617), "C", ("C", "T"), "FAKE2", ("rs1212127",), "1324C>T", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("5", 97915617), "T", ("T", "C"), "FAKE", ("rs1212125",), "1005T>C", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97915621), "TG", ("TG", "TC"), "DPYD", ("rs72549303",), "6744CA>GA", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97915614), "C", ("C", "T"), "DPYD", ("rs3918290",), "35G>A", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97981395), "T", ("T", "C"), "DPYD", ("rs1801159",), "674A>G", SimpleCallFilter.PASS),
         }))
         pgx_analysis = PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
@@ -268,10 +268,10 @@ class TestPgxAnalysis(unittest.TestCase):
     def test_ref_call_on_ref_seq_differences(self) -> None:
         """Explicit ref calls wrt v37 at differences between v37 and v38"""
         panel = self.__get_wide_example_panel()
-        ids_found_in_patient = V37CallData(frozenset({
-            V37Call(
+        ids_found_in_patient = SimpleCallData(frozenset({
+            SimpleCall(
                 GeneCoordinate("16", 97915617), "C", ("C", "C"), "FAKE2", ("rs1212127",), "REF_CALL", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97915621), "TG", ("TG", "TG"), "DPYD", ("rs72549303",), "REF_CALL", SimpleCallFilter.PASS),
         }))
         pgx_analysis = PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
@@ -311,9 +311,9 @@ class TestPgxAnalysis(unittest.TestCase):
     def test_only_position_match_on_ref_seq_differences(self) -> None:
         """At reference sequence differences: heterozygous between ref v37 and v38, and no rs_id provided"""
         panel = self.__get_wide_example_panel()
-        ids_found_in_patient = V37CallData(frozenset({
-            V37Call(GeneCoordinate("16", 97915617), "C", ("C", "T"), "FAKE2", (".",), "1324C>T", SimpleCallFilter.PASS),
-            V37Call(GeneCoordinate("1", 97915621), "TG", ("TG", "TC"), "DPYD", (".",), "6744CA>GA", SimpleCallFilter.PASS),
+        ids_found_in_patient = SimpleCallData(frozenset({
+            SimpleCall(GeneCoordinate("16", 97915617), "C", ("C", "T"), "FAKE2", (".",), "1324C>T", SimpleCallFilter.PASS),
+            SimpleCall(GeneCoordinate("1", 97915621), "TG", ("TG", "TC"), "DPYD", (".",), "6744CA>GA", SimpleCallFilter.PASS),
         }))
         pgx_analysis = PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
 
@@ -357,10 +357,10 @@ class TestPgxAnalysis(unittest.TestCase):
         and incorrect rs id provided
         """
         panel = self.__get_wide_example_panel()
-        ids_found_in_patient = V37CallData(frozenset({
-            V37Call(
+        ids_found_in_patient = SimpleCallData(frozenset({
+            SimpleCall(
                 GeneCoordinate("16", 97915617), "C", ("C", "T"), "FAKE2", ("rs939535",), "1324C>T", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97915621), "TG", ("TG", "TC"), "DPYD", ("rs4020942",), "6744CA>GA", SimpleCallFilter.PASS),
         }))
         with self.assertRaises(ValueError):
@@ -369,10 +369,10 @@ class TestPgxAnalysis(unittest.TestCase):
     def test_wrong_position_on_ref_seq_differences(self) -> None:
         """Explicit ref calls wrt v37 at differences between v37 and v38, except positions are incorrect"""
         panel = self.__get_wide_example_panel()
-        ids_found_in_patient = V37CallData(frozenset({
-            V37Call(
+        ids_found_in_patient = SimpleCallData(frozenset({
+            SimpleCall(
                 GeneCoordinate("16", 97915618), "C", ("C", "C"), "FAKE2", ("rs1212127",), "REF_CALL", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97915623), "TG", ("TG", "TG"), "DPYD", ("rs72549303",), "REF_CALL", SimpleCallFilter.PASS),
         }))
         with self.assertRaises(ValueError):
@@ -381,10 +381,10 @@ class TestPgxAnalysis(unittest.TestCase):
     def test_wrong_chromosome_on_ref_seq_differences(self) -> None:
         """Explicit ref calls wrt v37 at differences between v37 and v38, except chromosomes are incorrect"""
         panel = self.__get_wide_example_panel()
-        ids_found_in_patient = V37CallData(frozenset({
-            V37Call(
+        ids_found_in_patient = SimpleCallData(frozenset({
+            SimpleCall(
                 GeneCoordinate("7", 97915617), "C", ("C", "C"), "FAKE2", ("rs1212127",), "REF_CALL", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("8", 97915621), "TG", ("TG", "TG"), "DPYD", ("rs72549303",), "REF_CALL", SimpleCallFilter.PASS),
         }))
         with self.assertRaises(ValueError):
@@ -395,10 +395,10 @@ class TestPgxAnalysis(unittest.TestCase):
         Explicit ref calls wrt v37 at differences between v37 and v38, except position is of other variant
         """
         panel = self.__get_wide_example_panel()
-        ids_found_in_patient = V37CallData(frozenset({
-            V37Call(
+        ids_found_in_patient = SimpleCallData(frozenset({
+            SimpleCall(
                 GeneCoordinate("16", 97915617), "C", ("C", "C"), "FAKE2", ("rs1212127",), "REF_CALL", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 98205966), "TG", ("TG", "TG"), "DPYD", ("rs72549303",), "REF_CALL", SimpleCallFilter.PASS),
         }))
         with self.assertRaises(ValueError):
@@ -407,11 +407,11 @@ class TestPgxAnalysis(unittest.TestCase):
     def test_single_different_allele_on_ref_seq_differences(self) -> None:
         """At reference sequence differences: single allele that is ref v37 or v38, other allele is neither"""
         panel = self.__get_wide_example_panel()
-        ids_found_in_patient = V37CallData(frozenset({
-            V37Call(
+        ids_found_in_patient = SimpleCallData(frozenset({
+            SimpleCall(
                 GeneCoordinate("16", 97915617), "C", ("C", "A"),
                 "FAKE2", ("rs1212127",), "1324C>A", SimpleCallFilter.PASS),  # with ref v37
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97915621), "TG", ("AC", "TC"),
                 "DPYD", ("rs72549303",), "6744CT>GT;6744CT>GC", SimpleCallFilter.PASS),  # with ref v38
         }))
@@ -452,11 +452,11 @@ class TestPgxAnalysis(unittest.TestCase):
     def test_double_different_allele_on_ref_seq_differences(self) -> None:
         """At reference sequence differences: both alleles not ref v37 or v38"""
         panel = self.__get_wide_example_panel()
-        ids_found_in_patient = V37CallData(frozenset({
-            V37Call(
+        ids_found_in_patient = SimpleCallData(frozenset({
+            SimpleCall(
                 GeneCoordinate("16", 97915617), "C", ("A", "G"),
                 "FAKE2", ("rs1212127",), "1324C>A;1324C>G", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97915621), "TG", ("AC", "AG"),
                 "DPYD", ("rs72549303",), "6744CT>GT;6744CT>GC", SimpleCallFilter.PASS),
         }))
@@ -497,14 +497,14 @@ class TestPgxAnalysis(unittest.TestCase):
     def test_unknown_variants(self) -> None:
         """Variants that are completely unknown, including with unknown rs id"""
         panel = self.__get_wide_example_panel()
-        ids_found_in_patient = V37CallData(frozenset({
-            V37Call(
+        ids_found_in_patient = SimpleCallData(frozenset({
+            SimpleCall(
                 GeneCoordinate("16", 39593405), "A", ("A", "G"),
                 "FAKE2", ("rs1949223",), "384C>T", SimpleCallFilter.PASS),  # unknown
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("5", 97915617), "T", ("T", "C"),
                 "FAKE", ("rs1212125",), "1005T>C", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 2488242), "AC", ("AC", "AG"),
                 "DPYD", (".",), "9213CT>GT", SimpleCallFilter.PASS),  # unknown
         }))
@@ -552,10 +552,10 @@ class TestPgxAnalysis(unittest.TestCase):
     def test_unknown_gene(self) -> None:
         """Variants that are of an unknown gene"""
         panel = self.__get_wide_example_panel()
-        ids_found_in_patient = V37CallData(frozenset({
-            V37Call(
+        ids_found_in_patient = SimpleCallData(frozenset({
+            SimpleCall(
                 GeneCoordinate("5", 97915617), "T", ("T", "C"), "FAKE", ("rs1212125",), "1005T>C", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("3", 18473423), "T", ("T", "C"), ".", ("rs2492932",), "12T>C", SimpleCallFilter.PASS),  # unknown
         }))
         with self.assertRaises(ValueError):
@@ -564,20 +564,20 @@ class TestPgxAnalysis(unittest.TestCase):
     def test_known_variants_with_incorrect_or_missing_rs_id(self) -> None:
         """Known variants (not ref seq differences) with incorrect or unknown rs id"""
         panel = self.__get_wide_example_panel()
-        ids_found_in_patient = V37CallData(frozenset({
-            V37Call(
+        ids_found_in_patient = SimpleCallData(frozenset({
+            SimpleCall(
                 GeneCoordinate("16", 97915617), "C", ("C", "T"),
                 "FAKE2", ("rs1212127",), "1324C>T", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("5", 97915617), "T", ("T", "C"),
                 "FAKE", ("rs27384",), "1005T>C", SimpleCallFilter.PASS),  # incorrect
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97915621), "TG", ("TG", "TC"),
                 "DPYD", ("rs72549303",), "6744CA>GA", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97915614), "C", ("C", "T"),
                 "DPYD", (".",), "35G>A", SimpleCallFilter.PASS),  # missing
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97981395), "T", ("T", "C"),
                 "DPYD", ("rs1801159",), "674A>G", SimpleCallFilter.PASS),
         }))
@@ -587,20 +587,20 @@ class TestPgxAnalysis(unittest.TestCase):
     def test_known_variant_with_incorrect_position(self) -> None:
         """Known variants (not ref seq differences), with one incorrect position"""
         panel = self.__get_wide_example_panel()
-        ids_found_in_patient = V37CallData(frozenset({
-            V37Call(
+        ids_found_in_patient = SimpleCallData(frozenset({
+            SimpleCall(
                 GeneCoordinate("16", 97915617), "C", ("C", "T"),
                 "FAKE2", ("rs1212127",), "1324C>T", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("5", 97915617), "T", ("T", "C"),
                 "FAKE", ("rs1212125",), "1005T>C", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97915621), "TG", ("TG", "TC"),
                 "DPYD", ("rs72549303",), "6744CA>GA", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 6778543), "C", ("C", "T"),
                 "DPYD", ("rs3918290",), "35G>A", SimpleCallFilter.PASS),  # incorrect
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97981395), "T", ("T", "C"),
                 "DPYD", ("rs1801159",), "674A>G", SimpleCallFilter.PASS),
         }))
@@ -610,20 +610,20 @@ class TestPgxAnalysis(unittest.TestCase):
     def test_known_variant_with_incorrect_chromosome(self) -> None:
         """Known variants (not ref seq differences), with one incorrect chromosome"""
         panel = self.__get_wide_example_panel()
-        ids_found_in_patient = V37CallData(frozenset({
-            V37Call(
+        ids_found_in_patient = SimpleCallData(frozenset({
+            SimpleCall(
                 GeneCoordinate("16", 97915617), "C", ("C", "T"),
                 "FAKE2", ("rs1212127",), "1324C>T", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("5", 97915617), "T", ("T", "C"),
                 "FAKE", ("rs1212125",), "1005T>C", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97915621), "TG", ("TG", "TC"),
                 "DPYD", ("rs72549303",), "6744CA>GA", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("3", 97915614), "C", ("C", "T"),
                 "DPYD", ("rs3918290",), "35G>A", SimpleCallFilter.PASS),  # incorrect
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97981395), "T", ("T", "C"),
                 "DPYD", ("rs1801159",), "674A>G", SimpleCallFilter.PASS),
         }))
@@ -633,20 +633,20 @@ class TestPgxAnalysis(unittest.TestCase):
     def test_known_variant_with_multiple_rs_ids_not_matching_panel(self) -> None:
         """Multiple rs ids when panel says there should be one"""
         panel = self.__get_wide_example_panel()
-        ids_found_in_patient = V37CallData(frozenset({
-            V37Call(
+        ids_found_in_patient = SimpleCallData(frozenset({
+            SimpleCall(
                 GeneCoordinate("16", 97915617), "C", ("C", "T"),
                 "FAKE2", ("rs1212127", "rs394832"), "1324C>T", SimpleCallFilter.PASS),  # incorrect
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("5", 97915617), "T", ("T", "C"),
                 "FAKE", ("rs1212125",), "1005T>C", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97915621), "TG", ("TG", "TC"),
                 "DPYD", ("rs72549303",), "6744CA>GA", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97915614), "C", ("C", "T"),
                 "DPYD", ("rs3918290", "rs202093"), "35G>A", SimpleCallFilter.PASS),  # incorrect
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97981395), "T", ("T", "C"),
                 "DPYD", ("rs1801159",), "674A>G", SimpleCallFilter.PASS),
         }))
@@ -656,10 +656,10 @@ class TestPgxAnalysis(unittest.TestCase):
     def test_more_than_two_haplotypes_present(self) -> None:
         """More than two haplotypes are present, specifically three"""
         panel = self.__get_narrow_example_panel({"*2A", "*3", "*7"})
-        ids_found_in_patient = V37CallData(frozenset({
-            V37Call(
+        ids_found_in_patient = SimpleCallData(frozenset({
+            SimpleCall(
                 GeneCoordinate("1", 97915614), "C", ("C", "T"), "DPYD", ("rs3918290",), "9213C>T", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97912838), "A", ("AGT", "AGT"), "DPYD", ("rs2938101",), "293A>AGT", SimpleCallFilter.PASS),
         }))
         pgx_analysis = PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
@@ -687,12 +687,12 @@ class TestPgxAnalysis(unittest.TestCase):
     def test_ambiguous_haplotype_with_clear_winner_homozygous(self) -> None:
         """Ambiguous homozygous haplotype, where the simpler possibility should be preferred"""
         panel = self.__get_narrow_example_panel({"*2A", "*5", "*2B"})
-        ids_found_in_patient = V37CallData(frozenset({
-            V37Call(
+        ids_found_in_patient = SimpleCallData(frozenset({
+            SimpleCall(
                 GeneCoordinate("1", 97915614), "C", ("T", "T"), "DPYD", ("rs3918290",), "9213C>T", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97981395), "T", ("C", "C"), "DPYD", ("rs1801159",), "293T>C", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97915621), "TG", ("TC", "TC"), "DPYD", ("rs72549303",), "6744CA>GA", SimpleCallFilter.PASS),
         }))
         pgx_analysis = PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
@@ -718,12 +718,12 @@ class TestPgxAnalysis(unittest.TestCase):
     def test_ambiguous_haplotype_with_clear_winner_heterozygous(self) -> None:
         """Ambiguous heterozygous haplotype, where the simpler possibility should be preferred"""
         panel = self.__get_narrow_example_panel({"*2A", "*5", "*2B"})
-        ids_found_in_patient = V37CallData(frozenset({
-            V37Call(
+        ids_found_in_patient = SimpleCallData(frozenset({
+            SimpleCall(
                 GeneCoordinate("1", 97915614), "C", ("C", "T"), "DPYD", ("rs3918290",), "9213C>T", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97981395), "T", ("T", "C"), "DPYD", ("rs1801159",), "293T>C", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97915621), "TG", ("TC", "TC"), "DPYD", ("rs72549303",), "6744CA>GA", SimpleCallFilter.PASS),
         }))
         pgx_analysis = PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
@@ -749,12 +749,12 @@ class TestPgxAnalysis(unittest.TestCase):
     def test_ambiguous_haplotype_with_clear_winner_mix(self) -> None:
         """Ambiguous mix of homozygous and heterozygous haplotype, where the simplest possibility should be preferred"""
         panel = self.__get_narrow_example_panel({"*2A", "*5", "*2B"})
-        ids_found_in_patient = V37CallData(frozenset({
-            V37Call(
+        ids_found_in_patient = SimpleCallData(frozenset({
+            SimpleCall(
                 GeneCoordinate("1", 97915614), "C", ("T", "T"), "DPYD", ("rs3918290",), "9213C>T", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97981395), "T", ("T", "C"), "DPYD", ("rs1801159",), "293T>C", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97915621), "TG", ("TC", "TC"), "DPYD", ("rs72549303",), "6744CA>GA", SimpleCallFilter.PASS),
         }))
         pgx_analysis = PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
@@ -780,14 +780,14 @@ class TestPgxAnalysis(unittest.TestCase):
     def test_complicated_ambiguous_haplotype_with_a_clear_winner(self) -> None:
         """Ambiguous set of haplotypes, with no haplotype that is simplest"""
         panel = self.__get_narrow_example_panel({"*2A", "*5", "*2B", "*3", "*9", "*10", "*7"})
-        ids_found_in_patient = V37CallData(frozenset({
-            V37Call(
+        ids_found_in_patient = SimpleCallData(frozenset({
+            SimpleCall(
                 GeneCoordinate("1", 97915614), "C", ("T", "T"), "DPYD", ("rs3918290",), "9213C>T", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97981395), "T", ("T", "C"), "DPYD", ("rs1801159",), "293T>C", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97915621), "TG", ("TG", "TC"), "DPYD", ("rs72549303",), "6744CA>GA", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97912838), "A", ("AGT", "AGT"), "DPYD", ("rs2938101",), "301A>AGT", SimpleCallFilter.PASS),
         }))
         pgx_analysis = PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
@@ -819,12 +819,12 @@ class TestPgxAnalysis(unittest.TestCase):
     def test_ambiguous_homozygous_haplotype_with_a_less_clear_winner(self) -> None:
         """Ambiguous set of homozygous haplotypes, with winning haplotype that might not be ideal"""
         panel = self.__get_narrow_example_panel({"*2A", "*5", "*2B", "*3", "*9", "*10"})
-        ids_found_in_patient = V37CallData(frozenset({
-            V37Call(
+        ids_found_in_patient = SimpleCallData(frozenset({
+            SimpleCall(
                 GeneCoordinate("1", 97915614), "C", ("T", "T"), "DPYD", ("rs3918290",), "9213C>T", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97981395), "T", ("C", "C"), "DPYD", ("rs1801159",), "293T>C", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97915621), "TG", ("TG", "TG"), "DPYD", ("rs72549303",), "REF_CALL", SimpleCallFilter.PASS),
         }))
         pgx_analysis = PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
@@ -855,12 +855,12 @@ class TestPgxAnalysis(unittest.TestCase):
         Could  be {*2A_HET,*10_HET}, {*5_HET,*9_HET} or {*3_HET,*2B_HET}
         """
         panel = self.__get_narrow_example_panel({"*2A", "*5", "*2B", "*3", "*9", "*10"})
-        ids_found_in_patient = V37CallData(frozenset({
-            V37Call(
+        ids_found_in_patient = SimpleCallData(frozenset({
+            SimpleCall(
                 GeneCoordinate("1", 97915614), "C", ("C", "T"), "DPYD", ("rs3918290",), "9213C>T", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97981395), "T", ("T", "C"), "DPYD", ("rs1801159",), "293T>C", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97915621), "TG", ("TG", "TC"), "DPYD", ("rs72549303",), "6744CA>GA", SimpleCallFilter.PASS),
         }))
         pgx_analysis = PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
@@ -886,12 +886,12 @@ class TestPgxAnalysis(unittest.TestCase):
     def test_unresolved_haplotype_because_of_unexpected_base(self) -> None:
         """No haplotype call because of unexpected base at known variant location"""
         panel = self.__get_narrow_example_panel({"*2A", "*5", "*2B"})
-        ids_found_in_patient = V37CallData(frozenset({
-            V37Call(
+        ids_found_in_patient = SimpleCallData(frozenset({
+            SimpleCall(
                 GeneCoordinate("1", 97915614), "C", ("T", "A"), "DPYD", ("rs3918290",), "9213C>T", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97981395), "T", ("C", "C"), "DPYD", ("rs1801159",), "293T>C", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97915621), "TG", ("TC", "TC"), "DPYD", ("rs72549303",), "6744CA>GA", SimpleCallFilter.PASS),
         }))
         pgx_analysis = PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
@@ -917,12 +917,12 @@ class TestPgxAnalysis(unittest.TestCase):
     def test_unresolved_haplotype_because_of_only_half_of_haplotype(self) -> None:
         """No haplotype call because of missing half of haplotype. One half is present twice, other once"""
         panel = self.__get_narrow_example_panel({"*2B"})
-        ids_found_in_patient = V37CallData(frozenset({
-            V37Call(
+        ids_found_in_patient = SimpleCallData(frozenset({
+            SimpleCall(
                 GeneCoordinate("1", 97915614), "C", ("T", "T"), "DPYD", ("rs3918290",), "9213C>T", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97981395), "T", ("T", "C"), "DPYD", ("rs1801159",), "293T>C", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97915621), "TG", ("TC", "TC"), "DPYD", ("rs72549303",), "6744CA>GA", SimpleCallFilter.PASS),
         }))
         pgx_analysis = PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
@@ -948,12 +948,12 @@ class TestPgxAnalysis(unittest.TestCase):
     def test_unresolved_haplotype_because_mnv_covers_snv_starting_early(self) -> None:
         """Unresolved haplotype because MNV covers where SNV was expected, where MNV starts before this location"""
         panel = self.__get_narrow_example_panel({"*2A", "*5", "*2B"})
-        ids_found_in_patient = V37CallData(frozenset({
-            V37Call(
+        ids_found_in_patient = SimpleCallData(frozenset({
+            SimpleCall(
                 GeneCoordinate("1", 97915613), "GC", ("CT", "CT"), "DPYD", (".",), "9212GC>CT", SimpleCallFilter.PASS),  # unknown
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97981395), "T", ("C", "C"), "DPYD", ("rs1801159",), "293T>C", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97915621), "TG", ("TC", "TC"), "DPYD", ("rs72549303",), "6744CA>GA", SimpleCallFilter.PASS),
         }))
         pgx_analysis = PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
@@ -979,12 +979,12 @@ class TestPgxAnalysis(unittest.TestCase):
     def test_unresolved_haplotype_because_mnv_covers_snv_starting_there(self) -> None:
         """Unresolved haplotype because MNV covers where SNV was expected, where MNV starts at this location"""
         panel = self.__get_narrow_example_panel({"*2A", "*5", "*2B"})
-        ids_found_in_patient = V37CallData(frozenset({
-            V37Call(
+        ids_found_in_patient = SimpleCallData(frozenset({
+            SimpleCall(
                 GeneCoordinate("1", 97915614), "CG", ("TC", "TC"), "DPYD", (".",), "9212CG>TC", SimpleCallFilter.PASS),  # unknown
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97981395), "T", ("C", "C"), "DPYD", ("rs1801159",), "293T>C", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97915621), "TG", ("TC", "TC"), "DPYD", ("rs72549303",), "6744CA>GA", SimpleCallFilter.PASS),
         }))
         pgx_analysis = PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
@@ -1010,14 +1010,14 @@ class TestPgxAnalysis(unittest.TestCase):
     def test_overlapping_mnv_and_snv(self) -> None:
         """Overlapping SNV and unrecognized MNV do not cause errors"""
         panel = self.__get_narrow_example_panel({"*2A", "*5", "*2B"})
-        ids_found_in_patient = V37CallData(frozenset({
-            V37Call(
+        ids_found_in_patient = SimpleCallData(frozenset({
+            SimpleCall(
                 GeneCoordinate("1", 97915614), "C", ("T", "T"), "DPYD", ("rs3918290",), "9212C>T", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97915614), "CG", ("CG", "TC"), "DPYD", (".",), "9212CG>TC", SimpleCallFilter.PASS),  # unknown
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97981395), "T", ("C", "C"), "DPYD", ("rs1801159",), "293T>C", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97915621), "TG", ("TC", "TC"), "DPYD", ("rs72549303",), "6744CA>GA", SimpleCallFilter.PASS),
         }))
         pgx_analysis = PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
@@ -1047,14 +1047,14 @@ class TestPgxAnalysis(unittest.TestCase):
     def test_overlapping_mnv_and_snv_at_ref_seq_difference(self) -> None:
         """Overlapping SNV and unrecognized MNV at ref seq difference do not cause error"""
         panel = self.__get_narrow_example_panel({"*2A", "*5", "*2B"})
-        ids_found_in_patient = V37CallData(frozenset({
-            V37Call(
+        ids_found_in_patient = SimpleCallData(frozenset({
+            SimpleCall(
                 GeneCoordinate("1", 97915614), "C", ("T", "T"), "DPYD", ("rs3918290",), "9212C>T", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97981395), "T", ("C", "C"), "DPYD", ("rs1801159",), "293T>C", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97915621), "TG", ("TG", "AC"), "DPYD", ("rs72549303",), "6744CA>GT", SimpleCallFilter.PASS),
-            V37Call(
+            SimpleCall(
                 GeneCoordinate("1", 97915622), "G", ("C", "C"), "DPYD", (".",), "6744C>G", SimpleCallFilter.PASS),  # unknown
         }))
         pgx_analysis = PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)

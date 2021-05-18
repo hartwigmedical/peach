@@ -5,7 +5,8 @@ from base.gene_coordinate import GeneCoordinate
 from base.util import get_covered_coordinates
 
 
-class V37Call(NamedTuple):
+class SimpleCall(NamedTuple):
+    # Call with data and annotation for only a single reference assembly version. So only v37 or v38
     start_coordinate: GeneCoordinate
     reference_allele: str
     alleles: Tuple[str, str]  # The order is (ref, alt) when there is one of each
@@ -26,12 +27,12 @@ class V37Call(NamedTuple):
             raise NotImplementedError("Unrecognized filer value")
 
 
-class V37CallData(NamedTuple):
-    calls: FrozenSet[V37Call]
+class SimpleCallData(NamedTuple):
+    calls: FrozenSet[SimpleCall]
 
     def __repr__(self) -> str:
         calls_string = ", ".join(sorted([repr(call) for call in self.calls]))
-        return f"FullCallData(frozenset({calls_string}))"
+        return f"SimpleCallData(frozenset({calls_string}))"
 
 
 class AnnotatedAllele(object):
@@ -85,6 +86,7 @@ class AnnotatedAllele(object):
 
 
 class FullCall(NamedTuple):
+    # Call with both v37 and v38 data and annotation
     start_coordinate_v37: GeneCoordinate
     reference_allele_v37: str
     start_coordinate_v38: Optional[GeneCoordinate]  # is None if unknown

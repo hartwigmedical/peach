@@ -3,7 +3,7 @@ from typing import Set, FrozenSet
 
 from base.gene_coordinate import GeneCoordinate
 from base.json_alias import Json
-from call_data import V37Call
+from call_data import SimpleCall
 from config.gene_info import GeneInfo, assert_no_overlap_gene_names
 from config.rs_id_info import RsIdInfo
 
@@ -78,7 +78,7 @@ class Panel(object):
                 return True
         return False
 
-    def contains_rs_id_matching_v37_call(self, v37_call: V37Call) -> bool:
+    def contains_rs_id_matching_v37_call(self, v37_call: SimpleCall) -> bool:
         if self.contains_rs_id_with_v37_coordinate_and_reference_allele(v37_call.start_coordinate, v37_call.reference_allele):
             return True
         elif any(self.contains_rs_id(rs_id) for rs_id in v37_call.rs_ids):

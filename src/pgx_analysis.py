@@ -3,7 +3,7 @@ from typing import Dict, Set, FrozenSet
 
 from base.constants import REF_CALL_ANNOTATION_STRING
 from base.filter import FullCallFilter
-from call_data import V37CallData, FullCall, HaplotypeCall, FullCallData
+from call_data import SimpleCallData, FullCall, HaplotypeCall, FullCallData
 from config.panel import Panel
 from v37_call_translator import V37CallTranslator
 from haplotype_caller import HaplotypeCaller
@@ -38,7 +38,7 @@ class PgxAnalysis(object):
 
 class PgxAnalyser(object):
     @classmethod
-    def create_pgx_analysis(cls, v37_call_data: V37CallData, panel: Panel) -> PgxAnalysis:
+    def create_pgx_analysis(cls, v37_call_data: SimpleCallData, panel: Panel) -> PgxAnalysis:
         full_call_data = V37CallTranslator.get_all_full_call_data(v37_call_data, panel)
         gene_to_haplotype_calls = HaplotypeCaller.get_gene_to_haplotypes_call(full_call_data, panel)
         return PgxAnalysis(full_call_data, gene_to_haplotype_calls)
