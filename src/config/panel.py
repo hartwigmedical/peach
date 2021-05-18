@@ -3,6 +3,7 @@ from typing import Set, FrozenSet
 
 from base.gene_coordinate import GeneCoordinate
 from base.json_alias import Json
+from base.reference_assembly import ReferenceAssembly
 from call_data import SimpleCall
 from config.gene_info import GeneInfo, assert_no_overlap_gene_names
 from config.rs_id_info import RsIdInfo
@@ -64,9 +65,9 @@ class Panel(object):
     def get_gene_infos(self) -> Set[GeneInfo]:
         return set(self.__gene_infos)
 
-    def contains_rs_id_with_v37_coordinate(self, v37_coordinate: GeneCoordinate) -> bool:
+    def contains_rs_id_with_coordinate(self, coordinate: GeneCoordinate, reference_assembly: ReferenceAssembly) -> bool:
         for info in self.__get_rs_id_infos():
-            if info.start_coordinate_v37 == v37_coordinate:
+            if info.get_start_coordinate(reference_assembly) == coordinate:
                 return True
         return False
 

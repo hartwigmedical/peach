@@ -2,6 +2,7 @@ from typing import NamedTuple, Tuple, Optional, Set, FrozenSet
 
 from base.filter import FullCallFilter, SimpleCallFilter
 from base.gene_coordinate import GeneCoordinate
+from base.reference_assembly import ReferenceAssembly
 from base.util import get_covered_coordinates
 
 
@@ -29,10 +30,11 @@ class SimpleCall(NamedTuple):
 
 class SimpleCallData(NamedTuple):
     calls: FrozenSet[SimpleCall]
+    reference_assembly: ReferenceAssembly
 
     def __repr__(self) -> str:
-        calls_string = ", ".join(sorted([repr(call) for call in self.calls]))
-        return f"SimpleCallData(frozenset({calls_string}))"
+        calls_string = "frozenset(" + ", ".join(sorted([repr(call) for call in self.calls])) + ")"
+        return f"SimpleCallData({calls_string}, {self.reference_assembly!r})"
 
 
 class AnnotatedAllele(object):

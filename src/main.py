@@ -4,15 +4,18 @@ import os
 import sys
 from typing import List
 
+from base.reference_assembly import ReferenceAssembly
 from config.panel import Panel
 from pgx_analysis import PgxAnalyser, PgxAnalysis
 from pgx_reporter import HaplotypeReporter, GenotypeReporter
 from vcf_reader import VcfReader
 
 
-def main(vcf: str, sample_t_id: str, sample_r_id: str, version: str, panel_path: str, outputdir: str) -> None:
+def main(vcf: str, sample_t_id: str, sample_r_id: str, version: str,
+         panel_path: str, outputdir: str, vcf_reference_assembly: ReferenceAssembly) -> None:
     """ Run pharmacogenomics analysis on sample """
     print("\n[INFO] ## START PHARMACOGENOMICS ANALYSIS")
+
     # Check if output dir exists, create if it does not
     if not os.path.exists(outputdir):
         try:
@@ -28,10 +31,13 @@ def main(vcf: str, sample_t_id: str, sample_r_id: str, version: str, panel_path:
         raise ValueError("No panel is given, so no analysis can be performed.")
 
     # Get data for patient
-    v37_call_data = VcfReader.get_v37_call_data(vcf, panel, sample_r_id)
+    vcf_call_data = VcfReader.get_call_data(vcf, panel, sample_r_id, vcf_reference_assembly)
+
+    if vcf_reference_assembly != ReferenceAssembly.V37:
+        raise NotImplementedError()
 
     # Compute output from input data
-    pgx_analysis = PgxAnalyser.create_pgx_analysis(v37_call_data, panel)
+    pgx_analysis = PgxAnalyser.create_pgx_analysis(vcf_call_data, panel)
 
     # Output
     print_calls_to_file(pgx_analysis, outputdir, sample_t_id, panel.get_id(), version)
@@ -100,4 +106,4 @@ def parse_args(sys_args: List[str]) -> argparse.Namespace:
 
 if __name__ == "__main__":
     args = parse_args(sys.argv[1:])
-    main(args.vcf, args.sample_t_id, args.sample_r_id, args.version, args.panel, args.outputdir)
+    main(args.vcf, args.sample_t_id, args.sample_r_id, args.version, args.panel, args.outputdir, ReferenceAssembly.V37)

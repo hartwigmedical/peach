@@ -2,6 +2,7 @@ from typing import NamedTuple, Set
 
 from base.gene_coordinate import GeneCoordinate
 from base.json_alias import Json
+from base.reference_assembly import ReferenceAssembly
 from base.util import get_covered_coordinates
 
 
@@ -36,6 +37,15 @@ class RsIdInfo(NamedTuple):
                 not self.get_relevant_v37_coordinates().intersection(other.get_relevant_v37_coordinates())
                 and not self.get_relevant_v38_coordinates().intersection(other.get_relevant_v38_coordinates())
             )
+
+    def get_start_coordinate(self, reference_assembly: ReferenceAssembly) -> GeneCoordinate:
+        if reference_assembly == ReferenceAssembly.V37:
+            return self.start_coordinate_v37
+        elif reference_assembly == ReferenceAssembly.V38:
+            return self.start_coordinate_v38
+        else:
+            error_msg = "Unrecognized reference assembly version"
+            raise NotImplementedError(error_msg)
 
     def get_relevant_v37_coordinates(self) -> Set[GeneCoordinate]:
         return get_covered_coordinates(self.start_coordinate_v37, self.reference_allele_v37)

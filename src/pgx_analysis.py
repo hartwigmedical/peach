@@ -38,7 +38,7 @@ class PgxAnalysis(object):
 
 class PgxAnalyser(object):
     @classmethod
-    def create_pgx_analysis(cls, v37_call_data: SimpleCallData, panel: Panel) -> PgxAnalysis:
-        full_call_data = V37CallTranslator.get_all_full_call_data(v37_call_data, panel)
+    def create_pgx_analysis(cls, vcf_call_data: SimpleCallData, panel: Panel) -> PgxAnalysis:
+        full_call_data = V37CallTranslator.get_all_full_call_data(vcf_call_data, panel)
         gene_to_haplotype_calls = HaplotypeCaller.get_gene_to_haplotypes_call(full_call_data, panel)
         return PgxAnalysis(full_call_data, gene_to_haplotype_calls)

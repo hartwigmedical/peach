@@ -3,6 +3,7 @@ from typing import Dict, Set
 
 from base.filter import FullCallFilter, SimpleCallFilter
 from base.gene_coordinate import GeneCoordinate
+from base.reference_assembly import ReferenceAssembly
 from call_data import SimpleCallData, SimpleCall, HaplotypeCall, FullCall, FullCallData
 from config.annotation import Annotation
 from config.drug_info import DrugInfo
@@ -133,7 +134,7 @@ class TestPgxAnalysis(unittest.TestCase):
     def test_empty(self) -> None:
         """No variants wrt v37"""
         panel = self.__get_wide_example_panel()
-        ids_found_in_patient = SimpleCallData(frozenset())
+        ids_found_in_patient = SimpleCallData(frozenset(), ReferenceAssembly.V37)
         pgx_analysis = PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
 
         gene_to_haplotype_calls_expected = {
@@ -179,7 +180,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 GeneCoordinate("1", 97915621), "TG", ("TC", "TC"), "DPYD", ("rs72549303",), "6744CA>GA", SimpleCallFilter.PASS),
             SimpleCall(
                 GeneCoordinate("1", 97915614), "C", ("C", "C"), "DPYD", ("rs3918290",), "REF_CALL", SimpleCallFilter.PASS),
-        }))
+        }), ReferenceAssembly.V37)
         pgx_analysis = PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
 
         gene_to_haplotype_calls_expected = {
@@ -228,7 +229,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 GeneCoordinate("1", 97915614), "C", ("C", "T"), "DPYD", ("rs3918290",), "35G>A", SimpleCallFilter.PASS),
             SimpleCall(
                 GeneCoordinate("1", 97981395), "T", ("T", "C"), "DPYD", ("rs1801159",), "674A>G", SimpleCallFilter.PASS),
-        }))
+        }), ReferenceAssembly.V37)
         pgx_analysis = PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
 
         gene_to_haplotype_calls_expected = {
@@ -273,7 +274,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 GeneCoordinate("16", 97915617), "C", ("C", "C"), "FAKE2", ("rs1212127",), "REF_CALL", SimpleCallFilter.PASS),
             SimpleCall(
                 GeneCoordinate("1", 97915621), "TG", ("TG", "TG"), "DPYD", ("rs72549303",), "REF_CALL", SimpleCallFilter.PASS),
-        }))
+        }), ReferenceAssembly.V37)
         pgx_analysis = PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
 
         gene_to_haplotype_calls_expected = {
@@ -314,7 +315,7 @@ class TestPgxAnalysis(unittest.TestCase):
         ids_found_in_patient = SimpleCallData(frozenset({
             SimpleCall(GeneCoordinate("16", 97915617), "C", ("C", "T"), "FAKE2", (".",), "1324C>T", SimpleCallFilter.PASS),
             SimpleCall(GeneCoordinate("1", 97915621), "TG", ("TG", "TC"), "DPYD", (".",), "6744CA>GA", SimpleCallFilter.PASS),
-        }))
+        }), ReferenceAssembly.V37)
         pgx_analysis = PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
 
         gene_to_haplotype_calls_expected = {
@@ -362,7 +363,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 GeneCoordinate("16", 97915617), "C", ("C", "T"), "FAKE2", ("rs939535",), "1324C>T", SimpleCallFilter.PASS),
             SimpleCall(
                 GeneCoordinate("1", 97915621), "TG", ("TG", "TC"), "DPYD", ("rs4020942",), "6744CA>GA", SimpleCallFilter.PASS),
-        }))
+        }), ReferenceAssembly.V37)
         with self.assertRaises(ValueError):
             PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
 
@@ -374,7 +375,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 GeneCoordinate("16", 97915618), "C", ("C", "C"), "FAKE2", ("rs1212127",), "REF_CALL", SimpleCallFilter.PASS),
             SimpleCall(
                 GeneCoordinate("1", 97915623), "TG", ("TG", "TG"), "DPYD", ("rs72549303",), "REF_CALL", SimpleCallFilter.PASS),
-        }))
+        }), ReferenceAssembly.V37)
         with self.assertRaises(ValueError):
             PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
 
@@ -386,7 +387,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 GeneCoordinate("7", 97915617), "C", ("C", "C"), "FAKE2", ("rs1212127",), "REF_CALL", SimpleCallFilter.PASS),
             SimpleCall(
                 GeneCoordinate("8", 97915621), "TG", ("TG", "TG"), "DPYD", ("rs72549303",), "REF_CALL", SimpleCallFilter.PASS),
-        }))
+        }), ReferenceAssembly.V37)
         with self.assertRaises(ValueError):
             PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
 
@@ -400,7 +401,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 GeneCoordinate("16", 97915617), "C", ("C", "C"), "FAKE2", ("rs1212127",), "REF_CALL", SimpleCallFilter.PASS),
             SimpleCall(
                 GeneCoordinate("1", 98205966), "TG", ("TG", "TG"), "DPYD", ("rs72549303",), "REF_CALL", SimpleCallFilter.PASS),
-        }))
+        }), ReferenceAssembly.V37)
         with self.assertRaises(ValueError):
             PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
 
@@ -414,7 +415,7 @@ class TestPgxAnalysis(unittest.TestCase):
             SimpleCall(
                 GeneCoordinate("1", 97915621), "TG", ("AC", "TC"),
                 "DPYD", ("rs72549303",), "6744CT>GT;6744CT>GC", SimpleCallFilter.PASS),  # with ref v38
-        }))
+        }), ReferenceAssembly.V37)
         pgx_analysis = PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
 
         gene_to_haplotype_calls_expected: Dict[str, Set[HaplotypeCall]] = {
@@ -459,7 +460,7 @@ class TestPgxAnalysis(unittest.TestCase):
             SimpleCall(
                 GeneCoordinate("1", 97915621), "TG", ("AC", "AG"),
                 "DPYD", ("rs72549303",), "6744CT>GT;6744CT>GC", SimpleCallFilter.PASS),
-        }))
+        }), ReferenceAssembly.V37)
         pgx_analysis = PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
 
         gene_to_haplotype_calls_expected: Dict[str, Set[HaplotypeCall]] = {
@@ -507,7 +508,7 @@ class TestPgxAnalysis(unittest.TestCase):
             SimpleCall(
                 GeneCoordinate("1", 2488242), "AC", ("AC", "AG"),
                 "DPYD", (".",), "9213CT>GT", SimpleCallFilter.PASS),  # unknown
-        }))
+        }), ReferenceAssembly.V37)
         pgx_analysis = PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
 
         gene_to_haplotype_calls_expected: Dict[str, Set[HaplotypeCall]] = {
@@ -557,7 +558,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 GeneCoordinate("5", 97915617), "T", ("T", "C"), "FAKE", ("rs1212125",), "1005T>C", SimpleCallFilter.PASS),
             SimpleCall(
                 GeneCoordinate("3", 18473423), "T", ("T", "C"), ".", ("rs2492932",), "12T>C", SimpleCallFilter.PASS),  # unknown
-        }))
+        }), ReferenceAssembly.V37)
         with self.assertRaises(ValueError):
             PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
 
@@ -580,7 +581,7 @@ class TestPgxAnalysis(unittest.TestCase):
             SimpleCall(
                 GeneCoordinate("1", 97981395), "T", ("T", "C"),
                 "DPYD", ("rs1801159",), "674A>G", SimpleCallFilter.PASS),
-        }))
+        }), ReferenceAssembly.V37)
         with self.assertRaises(ValueError):
             PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
 
@@ -603,7 +604,7 @@ class TestPgxAnalysis(unittest.TestCase):
             SimpleCall(
                 GeneCoordinate("1", 97981395), "T", ("T", "C"),
                 "DPYD", ("rs1801159",), "674A>G", SimpleCallFilter.PASS),
-        }))
+        }), ReferenceAssembly.V37)
         with self.assertRaises(ValueError):
             PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
 
@@ -626,7 +627,7 @@ class TestPgxAnalysis(unittest.TestCase):
             SimpleCall(
                 GeneCoordinate("1", 97981395), "T", ("T", "C"),
                 "DPYD", ("rs1801159",), "674A>G", SimpleCallFilter.PASS),
-        }))
+        }), ReferenceAssembly.V37)
         with self.assertRaises(ValueError):
             PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
 
@@ -649,7 +650,7 @@ class TestPgxAnalysis(unittest.TestCase):
             SimpleCall(
                 GeneCoordinate("1", 97981395), "T", ("T", "C"),
                 "DPYD", ("rs1801159",), "674A>G", SimpleCallFilter.PASS),
-        }))
+        }), ReferenceAssembly.V37)
         with self.assertRaises(ValueError):
             PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
 
@@ -661,7 +662,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 GeneCoordinate("1", 97915614), "C", ("C", "T"), "DPYD", ("rs3918290",), "9213C>T", SimpleCallFilter.PASS),
             SimpleCall(
                 GeneCoordinate("1", 97912838), "A", ("AGT", "AGT"), "DPYD", ("rs2938101",), "293A>AGT", SimpleCallFilter.PASS),
-        }))
+        }), ReferenceAssembly.V37)
         pgx_analysis = PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
 
         gene_to_haplotype_calls_expected = {
@@ -694,7 +695,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 GeneCoordinate("1", 97981395), "T", ("C", "C"), "DPYD", ("rs1801159",), "293T>C", SimpleCallFilter.PASS),
             SimpleCall(
                 GeneCoordinate("1", 97915621), "TG", ("TC", "TC"), "DPYD", ("rs72549303",), "6744CA>GA", SimpleCallFilter.PASS),
-        }))
+        }), ReferenceAssembly.V37)
         pgx_analysis = PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
 
         gene_to_haplotype_calls_expected = {"DPYD": {HaplotypeCall("*2B", 2)}}
@@ -725,7 +726,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 GeneCoordinate("1", 97981395), "T", ("T", "C"), "DPYD", ("rs1801159",), "293T>C", SimpleCallFilter.PASS),
             SimpleCall(
                 GeneCoordinate("1", 97915621), "TG", ("TC", "TC"), "DPYD", ("rs72549303",), "6744CA>GA", SimpleCallFilter.PASS),
-        }))
+        }), ReferenceAssembly.V37)
         pgx_analysis = PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
 
         gene_to_haplotype_calls_expected = {"DPYD": {HaplotypeCall("*2B", 1), HaplotypeCall("*1", 1)}}
@@ -756,7 +757,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 GeneCoordinate("1", 97981395), "T", ("T", "C"), "DPYD", ("rs1801159",), "293T>C", SimpleCallFilter.PASS),
             SimpleCall(
                 GeneCoordinate("1", 97915621), "TG", ("TC", "TC"), "DPYD", ("rs72549303",), "6744CA>GA", SimpleCallFilter.PASS),
-        }))
+        }), ReferenceAssembly.V37)
         pgx_analysis = PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
 
         gene_to_haplotype_calls_expected = {"DPYD": {HaplotypeCall("*2B", 1), HaplotypeCall("*2A", 1)}}
@@ -789,7 +790,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 GeneCoordinate("1", 97915621), "TG", ("TG", "TC"), "DPYD", ("rs72549303",), "6744CA>GA", SimpleCallFilter.PASS),
             SimpleCall(
                 GeneCoordinate("1", 97912838), "A", ("AGT", "AGT"), "DPYD", ("rs2938101",), "301A>AGT", SimpleCallFilter.PASS),
-        }))
+        }), ReferenceAssembly.V37)
         pgx_analysis = PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
 
         gene_to_haplotype_calls_expected = {
@@ -826,7 +827,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 GeneCoordinate("1", 97981395), "T", ("C", "C"), "DPYD", ("rs1801159",), "293T>C", SimpleCallFilter.PASS),
             SimpleCall(
                 GeneCoordinate("1", 97915621), "TG", ("TG", "TG"), "DPYD", ("rs72549303",), "REF_CALL", SimpleCallFilter.PASS),
-        }))
+        }), ReferenceAssembly.V37)
         pgx_analysis = PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
 
         gene_to_haplotype_calls_expected = {
@@ -862,7 +863,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 GeneCoordinate("1", 97981395), "T", ("T", "C"), "DPYD", ("rs1801159",), "293T>C", SimpleCallFilter.PASS),
             SimpleCall(
                 GeneCoordinate("1", 97915621), "TG", ("TG", "TC"), "DPYD", ("rs72549303",), "6744CA>GA", SimpleCallFilter.PASS),
-        }))
+        }), ReferenceAssembly.V37)
         pgx_analysis = PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
 
         gene_to_haplotype_calls_expected: Dict[str, Set[HaplotypeCall]] = {"DPYD": set()}
@@ -893,7 +894,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 GeneCoordinate("1", 97981395), "T", ("C", "C"), "DPYD", ("rs1801159",), "293T>C", SimpleCallFilter.PASS),
             SimpleCall(
                 GeneCoordinate("1", 97915621), "TG", ("TC", "TC"), "DPYD", ("rs72549303",), "6744CA>GA", SimpleCallFilter.PASS),
-        }))
+        }), ReferenceAssembly.V37)
         pgx_analysis = PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
 
         gene_to_haplotype_calls_expected: Dict[str, Set[HaplotypeCall]] = {"DPYD": set()}
@@ -924,7 +925,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 GeneCoordinate("1", 97981395), "T", ("T", "C"), "DPYD", ("rs1801159",), "293T>C", SimpleCallFilter.PASS),
             SimpleCall(
                 GeneCoordinate("1", 97915621), "TG", ("TC", "TC"), "DPYD", ("rs72549303",), "6744CA>GA", SimpleCallFilter.PASS),
-        }))
+        }), ReferenceAssembly.V37)
         pgx_analysis = PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
 
         gene_to_haplotype_calls_expected: Dict[str, Set[HaplotypeCall]] = {"DPYD": set()}
@@ -955,7 +956,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 GeneCoordinate("1", 97981395), "T", ("C", "C"), "DPYD", ("rs1801159",), "293T>C", SimpleCallFilter.PASS),
             SimpleCall(
                 GeneCoordinate("1", 97915621), "TG", ("TC", "TC"), "DPYD", ("rs72549303",), "6744CA>GA", SimpleCallFilter.PASS),
-        }))
+        }), ReferenceAssembly.V37)
         pgx_analysis = PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
 
         gene_to_haplotype_calls_expected: Dict[str, Set[HaplotypeCall]] = {"DPYD": set()}
@@ -986,7 +987,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 GeneCoordinate("1", 97981395), "T", ("C", "C"), "DPYD", ("rs1801159",), "293T>C", SimpleCallFilter.PASS),
             SimpleCall(
                 GeneCoordinate("1", 97915621), "TG", ("TC", "TC"), "DPYD", ("rs72549303",), "6744CA>GA", SimpleCallFilter.PASS),
-        }))
+        }), ReferenceAssembly.V37)
         pgx_analysis = PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
 
         gene_to_haplotype_calls_expected: Dict[str, Set[HaplotypeCall]] = {"DPYD": set()}
@@ -1019,7 +1020,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 GeneCoordinate("1", 97981395), "T", ("C", "C"), "DPYD", ("rs1801159",), "293T>C", SimpleCallFilter.PASS),
             SimpleCall(
                 GeneCoordinate("1", 97915621), "TG", ("TC", "TC"), "DPYD", ("rs72549303",), "6744CA>GA", SimpleCallFilter.PASS),
-        }))
+        }), ReferenceAssembly.V37)
         pgx_analysis = PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
 
         gene_to_haplotype_calls_expected: Dict[str, Set[HaplotypeCall]] = {"DPYD": set()}
@@ -1056,7 +1057,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 GeneCoordinate("1", 97915621), "TG", ("TG", "AC"), "DPYD", ("rs72549303",), "6744CA>GT", SimpleCallFilter.PASS),
             SimpleCall(
                 GeneCoordinate("1", 97915622), "G", ("C", "C"), "DPYD", (".",), "6744C>G", SimpleCallFilter.PASS),  # unknown
-        }))
+        }), ReferenceAssembly.V37)
         pgx_analysis = PgxAnalyser.create_pgx_analysis(ids_found_in_patient, panel)
 
         gene_to_haplotype_calls_expected: Dict[str, Set[HaplotypeCall]] = {"DPYD": set()}

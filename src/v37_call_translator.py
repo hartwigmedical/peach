@@ -3,6 +3,7 @@ from typing import Set, Tuple, Optional, FrozenSet
 from base.constants import REF_CALL_ANNOTATION_STRING
 from base.filter import FullCallFilter, SimpleCallFilter
 from base.gene_coordinate import GeneCoordinate
+from base.reference_assembly import ReferenceAssembly
 from call_data import SimpleCallData, FullCall, AnnotatedAllele, SimpleCall, FullCallData
 from config.panel import Panel
 
@@ -10,6 +11,8 @@ from config.panel import Panel
 class V37CallTranslator(object):
     @classmethod
     def get_all_full_call_data(cls, v37_call_data: SimpleCallData, panel: Panel) -> FullCallData:
+        if v37_call_data.reference_assembly != ReferenceAssembly.V37:
+            raise NotImplementedError("WIP")
         uncalled_v37_calls = cls.__get_v37_calls_not_found_in_patient(v37_call_data, panel)
         all_v37_calls = v37_call_data.calls.union(uncalled_v37_calls)
         all_full_calls = cls.__get_translated_v37_calls(all_v37_calls, panel)
