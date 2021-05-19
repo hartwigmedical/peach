@@ -1,11 +1,9 @@
 from copy import deepcopy
 from typing import Dict, Set, FrozenSet
 
-from base.constants import REF_CALL_ANNOTATION_STRING
-from base.filter import FullCallFilter
 from call_data import SimpleCallData, FullCall, HaplotypeCall, FullCallData
-from config.panel import Panel
 from call_translator import SimpleCallTranslator
+from config.panel import Panel
 from haplotype_caller import HaplotypeCaller
 
 

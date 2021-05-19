@@ -1,4 +1,4 @@
-from typing import FrozenSet, Dict, Union
+from typing import Dict, Union
 
 import pandas as pd
 

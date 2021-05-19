@@ -1,5 +1,4 @@
 import itertools
-from copy import deepcopy
 from typing import List, Dict, Collection, FrozenSet
 
 from base.constants import NORMAL_FUNCTION_STRING
