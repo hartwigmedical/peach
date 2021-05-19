@@ -115,6 +115,13 @@ class FullCall(NamedTuple):
         else:
             return get_covered_coordinates(self.start_coordinate_v37, self.reference_allele_v37)
 
+    def get_relevant_v38_coordinates(self) -> Optional[Set[GeneCoordinate]]:
+        # Returns None if missing some information to determine these coordinates
+        if self.start_coordinate_v38 is None or self.reference_allele_v38 is None:
+            return None
+        else:
+            return get_covered_coordinates(self.start_coordinate_v38, self.reference_allele_v38)
+
     def get_annotated_alleles(self) -> Tuple[AnnotatedAllele, AnnotatedAllele]:
         annotated_alleles = self.__annotate_allele(self.alleles[0]), self.__annotate_allele(self.alleles[1])
         self.__assert_alleles_in_expected_order(annotated_alleles)

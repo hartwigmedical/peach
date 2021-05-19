@@ -4,6 +4,7 @@ from typing import List, Dict, Collection, FrozenSet
 
 from base.constants import NORMAL_FUNCTION_STRING
 from base.json_alias import Json
+from base.reference_assembly import ReferenceAssembly
 from base.util import get_key_to_multiple_values
 from config.annotation import Annotation
 from config.drug_info import DrugInfo, assert_no_overlap_drug_names
@@ -124,8 +125,13 @@ class GeneInfo(object):
     def has_ref_sequence_difference_annotation(self, rs_id: str) -> bool:
         return rs_id in self.__rs_id_to_ref_seq_difference_annotation.keys()
 
-    def get_ref_sequence_difference_annotation_v38(self, rs_id: str) -> str:
-        return self.__rs_id_to_ref_seq_difference_annotation[rs_id].annotation_v38
+    def get_ref_sequence_difference_annotation(self, rs_id: str, reference_assembly: ReferenceAssembly) -> str:
+        if reference_assembly == ReferenceAssembly.V37:
+            return self.__rs_id_to_ref_seq_difference_annotation[rs_id].annotation_v37
+        elif reference_assembly == ReferenceAssembly.V38:
+            return self.__rs_id_to_ref_seq_difference_annotation[rs_id].annotation_v38
+        else:
+            raise NotImplementedError(f"Unrecognized reference assembly: {reference_assembly}")
 
     def get_haplotype_function(self, haplotype_name: str) -> str:
         if haplotype_name == self.__wild_type_haplotype_name:

@@ -50,17 +50,20 @@ class Panel(object):
     def version(self) -> str:
         return self.__version
 
-    def has_ref_seq_difference_annotation(
-            self, gene: str, v37_coordinate: GeneCoordinate, v37_reference_allele: str) -> bool:
-        if not self.contains_rs_id_with_v37_coordinate_and_reference_allele(v37_coordinate, v37_reference_allele):
+    def has_ref_seq_difference_annotation(self, gene: str, coordinate: GeneCoordinate,
+                                          reference_allele: str, reference_assembly: ReferenceAssembly) -> bool:
+        rs_id_is_known = self.contains_rs_id_with_coordinate_and_reference_allele(
+            coordinate, reference_allele, reference_assembly)
+        if not rs_id_is_known:
             return False
-        rs_id = self.get_matching_rs_id_info(v37_coordinate, v37_reference_allele).rs_id
-        return self.__get_gene_info(gene).has_ref_sequence_difference_annotation(rs_id)
+        else:
+            rs_id = self.get_matching_rs_id_info(coordinate, reference_allele, reference_assembly).rs_id
+            return self.__get_gene_info(gene).has_ref_sequence_difference_annotation(rs_id)
 
-    def get_ref_seq_difference_annotation(
-            self, gene: str, v37_coordinate: GeneCoordinate, v37_reference_allele: str) -> str:
-        rs_id = self.get_matching_rs_id_info(v37_coordinate, v37_reference_allele).rs_id
-        return self.__get_gene_info(gene).get_ref_sequence_difference_annotation_v38(rs_id)
+    def get_ref_seq_difference_annotation(self, gene: str, coordinate: GeneCoordinate,
+                                          reference_allele: str, reference_assembly: ReferenceAssembly) -> str:
+        rs_id = self.get_matching_rs_id_info(coordinate, reference_allele, reference_assembly).rs_id
+        return self.__get_gene_info(gene).get_ref_sequence_difference_annotation(rs_id, reference_assembly.opposite())
 
     def get_gene_infos(self) -> Set[GeneInfo]:
         return set(self.__gene_infos)
@@ -71,40 +74,41 @@ class Panel(object):
                 return True
         return False
 
-    def contains_rs_id_with_v37_coordinate_and_reference_allele(
-            self, v37_coordinate: GeneCoordinate, v37_reference_allele: str) -> bool:
+    def contains_rs_id_with_coordinate_and_reference_allele(self, coordinate: GeneCoordinate,
+            reference_allele: str, reference_assembly: ReferenceAssembly) -> bool:
         for info in self.__get_rs_id_infos():
-            if (info.start_coordinate_v37 == v37_coordinate
-                    and info.reference_allele_v37 == v37_reference_allele):
+            if (info.get_start_coordinate(reference_assembly) == coordinate
+                    and info.get_reference_allele(reference_assembly) == reference_allele):
                 return True
         return False
 
-    def contains_rs_id_matching_v37_call(self, v37_call: SimpleCall) -> bool:
-        if self.contains_rs_id_with_v37_coordinate_and_reference_allele(v37_call.start_coordinate, v37_call.reference_allele):
+    def contains_rs_id_matching_call(self, call: SimpleCall, reference_assembly: ReferenceAssembly) -> bool:
+        if self.contains_rs_id_with_coordinate_and_reference_allele(
+                call.start_coordinate, call.reference_allele, reference_assembly):
             return True
-        elif any(self.contains_rs_id(rs_id) for rs_id in v37_call.rs_ids):
+        elif any(self.contains_rs_id(rs_id) for rs_id in call.rs_ids):
             error_msg = (
-                f"Match v37 call with rs id info from panel on an rs id but not position:\n"
-                f"rs ids: {v37_call.rs_ids}, input file position: {v37_call.start_coordinate}"
+                f"Match call with rs id info from panel on an rs id but not position:\n"
+                f"rs ids: {call.rs_ids}, input file position: {call.start_coordinate}, reference assembly: {reference_assembly}"
             )
             raise ValueError(error_msg)
         else:
             return False
 
-    def get_matching_rs_id_info(
-            self, v37_coordinate: GeneCoordinate, v37_reference_allele: str) -> RsIdInfo:
+    def get_matching_rs_id_info(self, coordinate: GeneCoordinate, reference_allele: str,
+                                reference_assembly: ReferenceAssembly) -> RsIdInfo:
         matching_rs_id_infos = []
         for info in self.__get_rs_id_infos():
-            if (info.start_coordinate_v37 == v37_coordinate
-                    and info.reference_allele_v37 == v37_reference_allele):
+            if (info.get_start_coordinate(reference_assembly) == coordinate
+                    and info.get_reference_allele(reference_assembly) == reference_allele):
                 matching_rs_id_infos.append(info)
 
         if matching_rs_id_infos and len(matching_rs_id_infos) == 1:
             return matching_rs_id_infos.pop()
         elif not matching_rs_id_infos:
-            raise ValueError("No rs id infos match position")
+            raise ValueError("No rs id infos match position and ref allele")
         else:
-            raise ValueError("Multiple rs id infos match position")
+            raise ValueError("Multiple rs id infos match position and ref allele")
 
     def contains_rs_id(self, rs_id: str) -> bool:
         return rs_id in self.__get_rs_ids()
