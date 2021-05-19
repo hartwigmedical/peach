@@ -110,10 +110,10 @@ class GenotypeReporter(object):
                     f"call={full_call}"
                 )
                 raise NotImplementedError(error_msg)
-        elif full_call.start_coordinate_v37 is None and full_call.start_coordinate_v38 is not None:
-            chromosome = full_call.start_coordinate_v38.chromosome
         elif full_call.start_coordinate_v37 is not None and full_call.start_coordinate_v38 is None:
             chromosome = full_call.start_coordinate_v37.chromosome
+        elif full_call.start_coordinate_v37 is None and full_call.start_coordinate_v38 is not None:
+            chromosome = full_call.start_coordinate_v38.chromosome
         else:
             # Full call has no coordinates. This should not be possible
             error_msg = (

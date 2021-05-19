@@ -5,7 +5,7 @@ from base.constants import REF_CALL_ANNOTATION_STRING
 from base.filter import FullCallFilter
 from call_data import SimpleCallData, FullCall, HaplotypeCall, FullCallData
 from config.panel import Panel
-from v37_call_translator import V37CallTranslator
+from call_translator import SimpleCallTranslator
 from haplotype_caller import HaplotypeCaller
 
 
@@ -39,6 +39,6 @@ class PgxAnalysis(object):
 class PgxAnalyser(object):
     @classmethod
     def create_pgx_analysis(cls, vcf_call_data: SimpleCallData, panel: Panel) -> PgxAnalysis:
-        full_call_data = V37CallTranslator.get_all_full_call_data(vcf_call_data, panel)
+        full_call_data = SimpleCallTranslator.get_all_full_call_data(vcf_call_data, panel)
         gene_to_haplotype_calls = HaplotypeCaller.get_gene_to_haplotypes_call(full_call_data, panel)
         return PgxAnalysis(full_call_data, gene_to_haplotype_calls)

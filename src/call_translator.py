@@ -15,12 +15,10 @@ class Translation(NamedTuple):
     filter: FullCallFilter
 
 
-class V37CallTranslator(object):
+class SimpleCallTranslator(object):
     @classmethod
     def get_all_full_call_data(cls, simple_call_data: SimpleCallData, panel: Panel) -> FullCallData:
         complete_simple_call_data = cls.__add_calls_for_uncalled_variants_in_panel(simple_call_data, panel)
-        if simple_call_data.reference_assembly != ReferenceAssembly.V37:
-            raise NotImplementedError("WIP")
         all_full_calls = cls.__get_full_calls_from_simple_calls(complete_simple_call_data, panel)
         return FullCallData(all_full_calls)
 
@@ -76,7 +74,7 @@ class V37CallTranslator(object):
         handled_rs_ids: Set[str] = set()
         full_calls = set()
         for simple_call in simple_call_data.calls:
-            full_call = cls.__get_full_call_from_v37_call(simple_call, panel, simple_call_data.reference_assembly)
+            full_call = cls.__get_full_call_from_simple_call(simple_call, panel, simple_call_data.reference_assembly)
 
             for rs_id in full_call.rs_ids:
                 if rs_id != ".":
@@ -123,20 +121,45 @@ class V37CallTranslator(object):
         return frozenset(full_calls)
 
     @classmethod
-    def __get_full_call_from_v37_call(
-            cls, v37_call: SimpleCall, panel: Panel, call_reference_assembly: ReferenceAssembly) -> FullCall:
-        cls.__assert_gene_in_panel(v37_call.gene, panel)
+    def __get_full_call_from_simple_call(
+            cls, simple_call: SimpleCall, panel: Panel, call_reference_assembly: ReferenceAssembly) -> FullCall:
+        cls.__assert_gene_in_panel(simple_call.gene, panel)
 
-        v37_call = cls.__fill_in_rs_ids_if_needed(v37_call, panel, call_reference_assembly)
-        translation = cls.get_translation_to_other_assembly(v37_call, panel, call_reference_assembly)
-        filter_v37 = cls.__get_full_call_filter(v37_call.filter)
-        full_call = FullCall(
-            v37_call.start_coordinate, v37_call.reference_allele,
-            translation.start_coordinate, translation.reference_allele,
-            v37_call.alleles, v37_call.gene, v37_call.rs_ids,
-            v37_call.variant_annotation, filter_v37,
-            translation.variant_annotation, translation.filter,
-        )
+        complete_simple_call = cls.__fill_in_rs_ids_if_needed(simple_call, panel, call_reference_assembly)
+        translation = cls.__get_translation_to_other_assembly(complete_simple_call, panel, call_reference_assembly)
+
+        if call_reference_assembly == ReferenceAssembly.V37:
+            filter_v37 = cls.__get_full_call_filter(complete_simple_call.filter)
+            full_call = FullCall(
+                start_coordinate_v37=complete_simple_call.start_coordinate,
+                reference_allele_v37=complete_simple_call.reference_allele,
+                start_coordinate_v38=translation.start_coordinate,
+                reference_allele_v38=translation.reference_allele,
+                alleles=complete_simple_call.alleles,
+                gene=complete_simple_call.gene,
+                rs_ids=complete_simple_call.rs_ids,
+                variant_annotation_v37=complete_simple_call.variant_annotation,
+                filter_v37=filter_v37,
+                variant_annotation_v38=translation.variant_annotation,
+                filter_v38=translation.filter,
+            )
+        elif call_reference_assembly == ReferenceAssembly.V38:
+            filter_v38 = cls.__get_full_call_filter(complete_simple_call.filter)
+            full_call = FullCall(
+                start_coordinate_v37=translation.start_coordinate,
+                reference_allele_v37=translation.reference_allele,
+                start_coordinate_v38=complete_simple_call.start_coordinate,
+                reference_allele_v38=complete_simple_call.reference_allele,
+                alleles=complete_simple_call.alleles,
+                gene=complete_simple_call.gene,
+                rs_ids=complete_simple_call.rs_ids,
+                variant_annotation_v37=translation.variant_annotation,
+                filter_v37=translation.filter,
+                variant_annotation_v38=complete_simple_call.variant_annotation,
+                filter_v38=filter_v38,
+            )
+        else:
+            raise NotImplementedError(f"Unrecognized reference assembly: {call_reference_assembly}")
         return full_call
 
     @classmethod
@@ -160,9 +183,9 @@ class V37CallTranslator(object):
             return call
 
     @classmethod
-    def get_translation_to_other_assembly(
+    def __get_translation_to_other_assembly(
             cls, call: SimpleCall, panel: Panel, call_reference_assembly: ReferenceAssembly) -> Translation:
-        # determine start_coordinate_v38, reference_allele_v38
+        # determine translated start_coordinate and reference_allele
         translated_start_coordinate: Optional[GeneCoordinate]
         translated_reference_allele: Optional[str]
         if panel.contains_rs_id_matching_call(call, call_reference_assembly):
@@ -177,9 +200,6 @@ class V37CallTranslator(object):
             translated_start_coordinate = None
             translated_reference_allele = None
 
-        if call_reference_assembly != ReferenceAssembly.V37:
-            raise NotImplementedError("WIP")
-
         reference_assembly_to_reference_allele = {
             call_reference_assembly: call.reference_allele,
             call_reference_assembly.opposite(): translated_reference_allele
@@ -188,61 +208,61 @@ class V37CallTranslator(object):
             AnnotatedAllele.from_alleles(call.alleles[0], reference_assembly_to_reference_allele),
             AnnotatedAllele.from_alleles(call.alleles[1], reference_assembly_to_reference_allele),
         )
-        # determine variant annotation v38 and filter v38
+        # determine translated variant annotation and filter
         if panel.has_ref_seq_difference_annotation(
                 call.gene, call.start_coordinate, call.reference_allele, call_reference_assembly):
-            v38_ref_call_due_to_ref_sequence_difference = all(
-                annotated.is_annotated_vs(ReferenceAssembly.V37)
-                and annotated.is_annotated_vs(ReferenceAssembly.V38)
-                and annotated.is_variant_vs(ReferenceAssembly.V37)
-                and not annotated.is_variant_vs(ReferenceAssembly.V38)
+            ref_call_to_opposite_assembly_due_to_ref_sequence_difference = all(
+                annotated.is_annotated_vs(call_reference_assembly)
+                and annotated.is_annotated_vs(call_reference_assembly.opposite())
+                and annotated.is_variant_vs(call_reference_assembly)
+                and not annotated.is_variant_vs(call_reference_assembly.opposite())
                 for annotated in annotated_alleles
             )
-            all_variants_ref_to_v37_or_v38 = all(
+            all_variants_ref_to_a_reference_assembly = all(
                 (
-                    annotated.is_annotated_vs(ReferenceAssembly.V37)
-                    and not annotated.is_variant_vs(ReferenceAssembly.V37))
+                    annotated.is_annotated_vs(call_reference_assembly)
+                    and not annotated.is_variant_vs(call_reference_assembly))
                 or (
-                    annotated.is_annotated_vs(ReferenceAssembly.V38)
-                    and not annotated.is_variant_vs(ReferenceAssembly.V38))
+                    annotated.is_annotated_vs(call_reference_assembly.opposite())
+                    and not annotated.is_variant_vs(call_reference_assembly.opposite()))
                 for annotated in annotated_alleles
             )
-            if v38_ref_call_due_to_ref_sequence_difference:
-                variant_annotation_v38 = REF_CALL_ANNOTATION_STRING
-                filter_v38 = FullCallFilter.PASS
-            elif all_variants_ref_to_v37_or_v38:
-                variant_annotation_v38 = panel.get_ref_seq_difference_annotation(
+            if ref_call_to_opposite_assembly_due_to_ref_sequence_difference:
+                translated_variant_annotation = REF_CALL_ANNOTATION_STRING
+                translated_filter = FullCallFilter.PASS
+            elif all_variants_ref_to_a_reference_assembly:
+                translated_variant_annotation = panel.get_ref_seq_difference_annotation(
                     call.gene, call.start_coordinate, call.reference_allele, call_reference_assembly)
                 if call.is_pass():
-                    filter_v38 = FullCallFilter.PASS
+                    translated_filter = FullCallFilter.PASS
                 else:
-                    filter_v38 = FullCallFilter.INFERRED_PASS
+                    translated_filter = FullCallFilter.INFERRED_PASS
             else:
-                variant_annotation_v38 = call.variant_annotation + "?"
-                filter_v38 = FullCallFilter.UNKNOWN
+                translated_variant_annotation = call.variant_annotation + "?"
+                translated_filter = FullCallFilter.UNKNOWN
                 print(
                     f"[WARN] Unexpected allele in ref seq difference location. Check whether annotation is correct: "
                     f"found alleles=({annotated_alleles[0]}, {annotated_alleles[1]}), "
-                    f"annotation={variant_annotation_v38}"
+                    f"annotation={translated_variant_annotation}"
                 )
         elif panel.contains_rs_id_matching_call(call, call_reference_assembly):
             # known variant and no ref seq differences involved
-            variant_annotation_v38 = call.variant_annotation
+            translated_variant_annotation = call.variant_annotation
             if call.is_pass():
-                filter_v38 = FullCallFilter.PASS
+                translated_filter = FullCallFilter.PASS
             else:
-                filter_v38 = FullCallFilter.NO_CALL
+                translated_filter = FullCallFilter.NO_CALL
         else:
             # unknown variant, no ref seq difference involved
-            variant_annotation_v38 = call.variant_annotation + "?"
-            filter_v38 = FullCallFilter.UNKNOWN
+            translated_variant_annotation = call.variant_annotation + "?"
+            translated_filter = FullCallFilter.UNKNOWN
             print(
                 f"[WARN] Unknown variant. Check whether annotation is correct: "
                 f"found alleles=({annotated_alleles[0]}, {annotated_alleles[1]}), "
-                f"annotation={variant_annotation_v38}"
+                f"annotation={translated_variant_annotation}"
             )
         translation = Translation(
-            translated_start_coordinate, translated_reference_allele, variant_annotation_v38, filter_v38)
+            translated_start_coordinate, translated_reference_allele, translated_variant_annotation, translated_filter)
         return translation
 
     @classmethod
