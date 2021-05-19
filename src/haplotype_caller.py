@@ -2,6 +2,7 @@ import collections
 from copy import deepcopy
 from typing import Dict, Set, DefaultDict, FrozenSet, Tuple
 
+from base.reference_assembly import ReferenceAssembly
 from call_data import FullCall, HaplotypeCall, FullCallData
 from config.gene_info import GeneInfo
 from config.haplotype import Haplotype
@@ -51,10 +52,10 @@ class HaplotypeCaller(object):
             cls.__assert_handleable_call(call)
             rs_id = call.rs_ids[0]
             for annotated_allele in call.get_annotated_alleles():
-                if not annotated_allele.is_annotated_vs_v38:
+                if not annotated_allele.is_annotated_vs(ReferenceAssembly.V38):
                     error_msg = f"Unknown variant: allele={annotated_allele}"
                     raise ValueError(error_msg)
-                if annotated_allele.is_variant_vs_v38:
+                if annotated_allele.is_variant_vs(ReferenceAssembly.V38):
                     variant_to_count[Variant(rs_id, annotated_allele.allele)] += 1
         return variant_to_count
 

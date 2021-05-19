@@ -1,4 +1,5 @@
-from typing import NamedTuple, Tuple, Optional, Set, FrozenSet
+from copy import deepcopy
+from typing import NamedTuple, Tuple, Optional, Set, FrozenSet, Dict
 
 from base.filter import FullCallFilter, SimpleCallFilter
 from base.gene_coordinate import GeneCoordinate
@@ -38,36 +39,34 @@ class SimpleCallData(NamedTuple):
 
 
 class AnnotatedAllele(object):
-    def __init__(self, allele: str, is_variant_vs_v37: Optional[bool], is_variant_vs_v38: Optional[bool]) -> None:
+    def __init__(self, allele: str, reference_assembly_to_is_variant: Dict[ReferenceAssembly, bool]) -> None:
         self.__allele = allele
-        self.__is_variant_vs_v37 = is_variant_vs_v37  # is None if unknown
-        self.__is_variant_vs_v38 = is_variant_vs_v38  # is None if unknown
+        self.__reference_assembly_to_is_variant = deepcopy(reference_assembly_to_is_variant)
 
     @classmethod
-    def from_alleles(cls, allele: str, reference_allele_v37: Optional[str],
-                     reference_allele_v38: Optional[str]) -> "AnnotatedAllele":
-        is_v37_variant = (
-            (allele != reference_allele_v37) if reference_allele_v37 is not None else None
-        )
-        is_v38_variant = (
-            (allele != reference_allele_v38) if reference_allele_v38 is not None else None
-        )
-        return AnnotatedAllele(allele, is_v37_variant, is_v38_variant)
+    def from_alleles(
+            cls,
+            allele: str,
+            reference_assembly_to_reference_allele: Dict[ReferenceAssembly, Optional[str]]
+    ) -> "AnnotatedAllele":
+        reference_assembly_to_is_variant: Dict[ReferenceAssembly, bool] = {}
+        for reference_assembly, reference_allele in reference_assembly_to_reference_allele.items():
+            if reference_allele is not None:
+                reference_assembly_to_is_variant[reference_assembly] = (allele != reference_allele)
+        return AnnotatedAllele(allele, reference_assembly_to_is_variant)
 
     def __eq__(self, other: object) -> bool:  # pragma: no cover
         return (
                 isinstance(other, AnnotatedAllele)
                 and self.__allele == other.__allele
-                and self.__is_variant_vs_v37 == other.__is_variant_vs_v37
-                and self.__is_variant_vs_v38 == other.__is_variant_vs_v38
+                and self.__reference_assembly_to_is_variant == other.__reference_assembly_to_is_variant
         )
 
     def __repr__(self) -> str:  # pragma: no cover
         return (
             f"AnnotatedAllele("
             f"allele={self.__allele!r}, "
-            f"is_variant_vs_v37={self.__is_variant_vs_v37!r}, "
-            f"is_variant_vs_v38={self.__is_variant_vs_v38!r}, "
+            f"reference_assembly_to_is_variant={self.__reference_assembly_to_is_variant!r}, "
             f")"
         )
 
@@ -75,23 +74,14 @@ class AnnotatedAllele(object):
     def allele(self) -> str:
         return self.__allele
 
-    @property
-    def is_variant_vs_v37(self) -> bool:
-        if self.__is_variant_vs_v37 is None:
-            raise ValueError("Cannot get is_variant_vs_v37 if it is None")
-        return self.__is_variant_vs_v37
+    def is_annotated_vs(self, reference_assembly: ReferenceAssembly) -> bool:
+        return reference_assembly in self.__reference_assembly_to_is_variant.keys()
 
-    def is_annotated_vs_v37(self) -> bool:
-        return self.__is_variant_vs_v37 is not None
-
-    @property
-    def is_variant_vs_v38(self) -> bool:
-        if self.__is_variant_vs_v38 is None:
-            raise ValueError("Cannot get is_variant_vs_v38 if it is None")
-        return self.__is_variant_vs_v38
-
-    def is_annotated_vs_v38(self) -> bool:
-        return self.__is_variant_vs_v38 is not None
+    def is_variant_vs(self, reference_assembly: ReferenceAssembly) -> bool:
+        try:
+            return self.__reference_assembly_to_is_variant[reference_assembly]
+        except KeyError:
+            raise SyntaxError(f"Allele not annotated vs reference assembly: {reference_assembly}")
 
 
 class FullCall(NamedTuple):
@@ -123,23 +113,14 @@ class FullCall(NamedTuple):
             return get_covered_coordinates(self.start_coordinate_v38, self.reference_allele_v38)
 
     def get_annotated_alleles(self) -> Tuple[AnnotatedAllele, AnnotatedAllele]:
-        annotated_alleles = self.__annotate_allele(self.alleles[0]), self.__annotate_allele(self.alleles[1])
-        self.__assert_alleles_in_expected_order(annotated_alleles)
-        return annotated_alleles
+        return self.__annotate_allele(self.alleles[0]), self.__annotate_allele(self.alleles[1])
 
     def __annotate_allele(self, allele: str) -> AnnotatedAllele:
-        return AnnotatedAllele.from_alleles(allele, self.reference_allele_v37, self.reference_allele_v38)
-
-    @classmethod
-    def __assert_alleles_in_expected_order(cls, annotated_alleles: Tuple[AnnotatedAllele, AnnotatedAllele]) -> None:
-        alleles_in_unexpected_order = (
-                annotated_alleles[0].is_variant_vs_v37
-                and not annotated_alleles[1].is_variant_vs_v37
-        )
-        if alleles_in_unexpected_order:
-            error_msg = (f"Alleles are in unexpected order, alt before ref: "
-                         f"alleles=({annotated_alleles[0]}, {annotated_alleles[1]})")
-            raise ValueError(error_msg)
+        reference_assembly_to_reference_allele = {
+            ReferenceAssembly.V37: self.reference_allele_v37,
+            ReferenceAssembly.V38: self.reference_allele_v38,
+        }
+        return AnnotatedAllele.from_alleles(allele, reference_assembly_to_reference_allele)
 
 
 class FullCallData(NamedTuple):

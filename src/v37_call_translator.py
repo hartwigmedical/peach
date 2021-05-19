@@ -179,24 +179,32 @@ class V37CallTranslator(object):
 
         if call_reference_assembly != ReferenceAssembly.V37:
             raise NotImplementedError("WIP")
-        
+
+        reference_assembly_to_reference_allele = {
+            call_reference_assembly: call.reference_allele,
+            call_reference_assembly.opposite(): translated_reference_allele
+        }
         annotated_alleles = (
-            AnnotatedAllele.from_alleles(call.alleles[0], call.reference_allele, translated_reference_allele),
-            AnnotatedAllele.from_alleles(call.alleles[1], call.reference_allele, translated_reference_allele),
+            AnnotatedAllele.from_alleles(call.alleles[0], reference_assembly_to_reference_allele),
+            AnnotatedAllele.from_alleles(call.alleles[1], reference_assembly_to_reference_allele),
         )
         # determine variant annotation v38 and filter v38
         if panel.has_ref_seq_difference_annotation(
                 call.gene, call.start_coordinate, call.reference_allele, call_reference_assembly):
             v38_ref_call_due_to_ref_sequence_difference = all(
-                annotated.is_annotated_vs_v37()
-                and annotated.is_annotated_vs_v38()
-                and annotated.is_variant_vs_v37
-                and not annotated.is_variant_vs_v38
+                annotated.is_annotated_vs(ReferenceAssembly.V37)
+                and annotated.is_annotated_vs(ReferenceAssembly.V38)
+                and annotated.is_variant_vs(ReferenceAssembly.V37)
+                and not annotated.is_variant_vs(ReferenceAssembly.V38)
                 for annotated in annotated_alleles
             )
             all_variants_ref_to_v37_or_v38 = all(
-                (annotated.is_annotated_vs_v37() and not annotated.is_variant_vs_v37)
-                or (annotated.is_annotated_vs_v38() and not annotated.is_variant_vs_v38)
+                (
+                    annotated.is_annotated_vs(ReferenceAssembly.V37)
+                    and not annotated.is_variant_vs(ReferenceAssembly.V37))
+                or (
+                    annotated.is_annotated_vs(ReferenceAssembly.V38)
+                    and not annotated.is_variant_vs(ReferenceAssembly.V38))
                 for annotated in annotated_alleles
             )
             if v38_ref_call_due_to_ref_sequence_difference:
@@ -233,7 +241,8 @@ class V37CallTranslator(object):
                 f"found alleles=({annotated_alleles[0]}, {annotated_alleles[1]}), "
                 f"annotation={variant_annotation_v38}"
             )
-        translation = Translation(translated_start_coordinate, translated_reference_allele, variant_annotation_v38, filter_v38)
+        translation = Translation(
+            translated_start_coordinate, translated_reference_allele, variant_annotation_v38, filter_v38)
         return translation
 
     @classmethod
