@@ -34,7 +34,7 @@ def main(vcf: str, sample_t_id: str, sample_r_id: str, version: str,
     vcf_call_data = VcfReader.get_call_data(vcf, panel, sample_r_id, vcf_reference_assembly)
 
     if vcf_reference_assembly != ReferenceAssembly.V37:
-        raise NotImplementedError()
+        raise NotImplementedError("WIP")
 
     # Compute output from input data
     pgx_analysis = PgxAnalyser.create_pgx_analysis(vcf_call_data, panel)

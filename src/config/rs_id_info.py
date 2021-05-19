@@ -33,10 +33,11 @@ class RsIdInfo(NamedTuple):
         if self.rs_id == other.rs_id:
             return self == other
         else:
-            return (
-                not self.get_relevant_v37_coordinates().intersection(other.get_relevant_v37_coordinates())
-                and not self.get_relevant_v38_coordinates().intersection(other.get_relevant_v38_coordinates())
-            )
+            v37_coordinates_overlap = self.get_relevant_coordinates(ReferenceAssembly.V37).intersection(
+                other.get_relevant_coordinates(ReferenceAssembly.V37))
+            v38_coordinates_overlap = self.get_relevant_coordinates(ReferenceAssembly.V38).intersection(
+                other.get_relevant_coordinates(ReferenceAssembly.V38))
+            return not v37_coordinates_overlap and not v38_coordinates_overlap
 
     def get_start_coordinate(self, reference_assembly: ReferenceAssembly) -> GeneCoordinate:
         if reference_assembly == ReferenceAssembly.V37:
@@ -47,8 +48,16 @@ class RsIdInfo(NamedTuple):
             error_msg = "Unrecognized reference assembly version"
             raise NotImplementedError(error_msg)
 
-    def get_relevant_v37_coordinates(self) -> Set[GeneCoordinate]:
-        return get_covered_coordinates(self.start_coordinate_v37, self.reference_allele_v37)
+    def get_reference_allele(self, reference_assembly: ReferenceAssembly) -> str:
+        if reference_assembly == ReferenceAssembly.V37:
+            return self.reference_allele_v37
+        elif reference_assembly == ReferenceAssembly.V38:
+            return self.reference_allele_v38
+        else:
+            error_msg = "Unrecognized reference assembly version"
+            raise NotImplementedError(error_msg)
 
-    def get_relevant_v38_coordinates(self) -> Set[GeneCoordinate]:
-        return get_covered_coordinates(self.start_coordinate_v38, self.reference_allele_v38)
+    def get_relevant_coordinates(self, reference_assembly: ReferenceAssembly) -> Set[GeneCoordinate]:
+        start_coordinate = self.get_start_coordinate(reference_assembly)
+        reference_allele = self.get_reference_allele(reference_assembly)
+        return get_covered_coordinates(start_coordinate, reference_allele)

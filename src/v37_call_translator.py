@@ -10,34 +10,50 @@ from config.panel import Panel
 
 class V37CallTranslator(object):
     @classmethod
-    def get_all_full_call_data(cls, v37_call_data: SimpleCallData, panel: Panel) -> FullCallData:
-        if v37_call_data.reference_assembly != ReferenceAssembly.V37:
+    def get_all_full_call_data(cls, simple_call_data: SimpleCallData, panel: Panel) -> FullCallData:
+        complete_simple_call_data = cls.__add_calls_for_uncalled_variants_in_panel(simple_call_data, panel)
+        if simple_call_data.reference_assembly != ReferenceAssembly.V37:
             raise NotImplementedError("WIP")
-        uncalled_v37_calls = cls.__get_v37_calls_not_found_in_patient(v37_call_data, panel)
-        all_v37_calls = v37_call_data.calls.union(uncalled_v37_calls)
-        all_full_calls = cls.__get_translated_v37_calls(all_v37_calls, panel)
+        all_full_calls = cls.__get_translated_v37_calls(complete_simple_call_data, panel)
         return FullCallData(all_full_calls)
 
     @classmethod
-    def __get_v37_calls_not_found_in_patient(cls, v37_call_data: SimpleCallData, panel: Panel) -> FrozenSet[SimpleCall]:
+    def __add_calls_for_uncalled_variants_in_panel(cls, simple_call_data: SimpleCallData, panel: Panel) -> SimpleCallData:
+        missing_calls = cls.__get_calls_for_panel_variants_without_calls(simple_call_data, panel)
+        complete_simple_call_data = SimpleCallData(
+            simple_call_data.calls.union(missing_calls),
+            simple_call_data.reference_assembly,
+        )
+        return complete_simple_call_data
+
+    @classmethod
+    def __get_calls_for_panel_variants_without_calls(
+            cls, simple_call_data: SimpleCallData, panel: Panel) -> FrozenSet[SimpleCall]:
         # assume ref call when no call is found. Set filter to NO_CALL
-        rs_ids_found_in_patient = {rs_id for call in v37_call_data.calls for rs_id in call.rs_ids if rs_id != "."}
+        reference_assembly = simple_call_data.reference_assembly
+        
+        rs_ids_found_in_patient = {
+            rs_id for call in simple_call_data.calls for rs_id in call.rs_ids if rs_id != "."
+        }
         coordinates_covered_by_found_calls = {
-            coordinate for call in v37_call_data.calls for coordinate in call.get_relevant_coordinates()
+            coordinate for call in simple_call_data.calls for coordinate in call.get_relevant_coordinates()
         }
 
         uncalled_calls = set()
         for gene_info in panel.get_gene_infos():
             for rs_id_info in gene_info.rs_id_infos:
-                v37_coordinates_partially_handled = bool(
-                    rs_id_info.get_relevant_v37_coordinates().intersection(coordinates_covered_by_found_calls)
+                coordinates_partially_handled = bool(
+                    rs_id_info.get_relevant_coordinates(reference_assembly).intersection(
+                        coordinates_covered_by_found_calls)
                 )
-                if rs_id_info.rs_id not in rs_ids_found_in_patient and not v37_coordinates_partially_handled:
-                    # Assuming REF/REF relative to v37
+                if rs_id_info.rs_id not in rs_ids_found_in_patient and not coordinates_partially_handled:
+                    # Assuming REF/REF relative to reference assembly
+                    start_coordinate = rs_id_info.get_start_coordinate(reference_assembly)
+                    reference_allele = rs_id_info.get_reference_allele(reference_assembly)
                     uncalled_ref_call = SimpleCall(
-                        rs_id_info.start_coordinate_v37,
-                        rs_id_info.reference_allele_v37,
-                        (rs_id_info.reference_allele_v37, rs_id_info.reference_allele_v37),
+                        start_coordinate,
+                        reference_allele,
+                        (reference_allele, reference_allele),
                         gene_info.gene,
                         (rs_id_info.rs_id,),
                         REF_CALL_ANNOTATION_STRING,
@@ -47,35 +63,42 @@ class V37CallTranslator(object):
         return frozenset(uncalled_calls)
 
     @classmethod
-    def __get_translated_v37_calls(cls, all_v37_calls: FrozenSet[SimpleCall], panel: Panel) -> FrozenSet[FullCall]:
+    def __get_translated_v37_calls(cls, complete_simple_call_data: SimpleCallData, panel: Panel) -> FrozenSet[FullCall]:
         handled_v37_coordinates: Set[GeneCoordinate] = set()
-        handled_v37_rs_ids: Set[str] = set()
-        full_calls_from_v37_calls = set()
-        for v37_call in all_v37_calls:
-            full_call = cls.__get_full_call_from_v37_call(v37_call, panel)
+        handled_rs_ids: Set[str] = set()
+        full_calls = set()
+        for simple_call in complete_simple_call_data.calls:
+            full_call = cls.__get_full_call_from_v37_call(simple_call, panel)
 
             for rs_id in full_call.rs_ids:
                 if rs_id != ".":
-                    if rs_id in handled_v37_rs_ids:
+                    if rs_id in handled_rs_ids:
                         error_msg = (f"Call for rs id that has already been handled:\n"
-                                     f"call={v37_call}\n"
-                                     f"handled_rs_ids={handled_v37_rs_ids}")
+                                     f"call={simple_call}\n"
+                                     f"handled_rs_ids={handled_rs_ids}")
                         raise ValueError(error_msg)
-                    handled_v37_rs_ids.add(rs_id)
+                    handled_rs_ids.add(rs_id)
 
             relevant_v37_coordinates = full_call.get_relevant_v37_coordinates()
-            if relevant_v37_coordinates.intersection(handled_v37_coordinates):
+            if relevant_v37_coordinates is not None:
+                if relevant_v37_coordinates.intersection(handled_v37_coordinates):
+                    warning_msg = (
+                        f"[WARN] Call involves at least one v37 position that has already been handled:\n"
+                        f"call={simple_call}\n"
+                        f"handled_coords={handled_v37_coordinates}"
+                    )
+                    print(warning_msg)
+                handled_v37_coordinates.update(relevant_v37_coordinates)
+            else:
                 warning_msg = (
-                    f"[WARN] Call involves at least one position that has already been handled:\n"
-                    f"call={v37_call}\n"
-                    f"handled_coords={handled_v37_coordinates}"
+                    f"[WARN] Could not determine relevant v37 coordinates for call:\n"
+                    f"call={simple_call}"
                 )
                 print(warning_msg)
-            handled_v37_coordinates.update(relevant_v37_coordinates)
 
-            full_calls_from_v37_calls.add(full_call)
+            full_calls.add(full_call)
 
-        return frozenset(full_calls_from_v37_calls)
+        return frozenset(full_calls)
 
     @classmethod
     def __get_full_call_from_v37_call(cls, v37_call: SimpleCall, panel: Panel) -> FullCall:

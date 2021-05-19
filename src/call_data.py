@@ -38,15 +38,17 @@ class SimpleCallData(NamedTuple):
 
 
 class AnnotatedAllele(object):
-    def __init__(self, allele: str, is_variant_vs_v37: bool, is_variant_vs_v38: Optional[bool]) -> None:
+    def __init__(self, allele: str, is_variant_vs_v37: Optional[bool], is_variant_vs_v38: Optional[bool]) -> None:
         self.__allele = allele
-        self.__is_variant_vs_v37 = is_variant_vs_v37
+        self.__is_variant_vs_v37 = is_variant_vs_v37  # is None if unknown
         self.__is_variant_vs_v38 = is_variant_vs_v38  # is None if unknown
 
     @classmethod
-    def from_alleles(cls, allele: str, reference_allele_v37: str,
+    def from_alleles(cls, allele: str, reference_allele_v37: Optional[str],
                      reference_allele_v38: Optional[str]) -> "AnnotatedAllele":
-        is_v37_variant = (allele != reference_allele_v37)
+        is_v37_variant = (
+            (allele != reference_allele_v37) if reference_allele_v37 is not None else None
+        )
         is_v38_variant = (
             (allele != reference_allele_v38) if reference_allele_v38 is not None else None
         )
@@ -75,7 +77,12 @@ class AnnotatedAllele(object):
 
     @property
     def is_variant_vs_v37(self) -> bool:
+        if self.__is_variant_vs_v37 is None:
+            raise ValueError("Cannot get is_variant_vs_v37 if it is None")
         return self.__is_variant_vs_v37
+
+    def is_annotated_vs_v37(self) -> bool:
+        return self.__is_variant_vs_v37 is not None
 
     @property
     def is_variant_vs_v38(self) -> bool:
@@ -89,8 +96,8 @@ class AnnotatedAllele(object):
 
 class FullCall(NamedTuple):
     # Call with both v37 and v38 data and annotation
-    start_coordinate_v37: GeneCoordinate
-    reference_allele_v37: str
+    start_coordinate_v37: Optional[GeneCoordinate]  # is None if unknown
+    reference_allele_v37: Optional[str]  # is None if unknown
     start_coordinate_v38: Optional[GeneCoordinate]  # is None if unknown
     reference_allele_v38: Optional[str]  # is None if unknown
     alleles: Tuple[str, str]
@@ -101,8 +108,12 @@ class FullCall(NamedTuple):
     variant_annotation_v38: str
     filter_v38: FullCallFilter
 
-    def get_relevant_v37_coordinates(self) -> Set[GeneCoordinate]:
-        return get_covered_coordinates(self.start_coordinate_v37, self.reference_allele_v37)
+    def get_relevant_v37_coordinates(self) -> Optional[Set[GeneCoordinate]]:
+        # Returns None if missing some information to determine these coordinates
+        if self.start_coordinate_v37 is None or self.reference_allele_v37 is None:
+            return None
+        else:
+            return get_covered_coordinates(self.start_coordinate_v37, self.reference_allele_v37)
 
     def get_annotated_alleles(self) -> Tuple[AnnotatedAllele, AnnotatedAllele]:
         annotated_alleles = self.__annotate_allele(self.alleles[0]), self.__annotate_allele(self.alleles[1])
