@@ -50,13 +50,12 @@ class HaplotypeCaller(object):
         variant_to_count: DefaultDict[Variant, int] = collections.defaultdict(int)
         for call in full_calls_for_gene:
             cls.__assert_handleable_call(call)
-            rs_id = call.rs_ids[0]
             for annotated_allele in call.get_annotated_alleles():
                 if not annotated_allele.is_annotated_vs(ReferenceAssembly.V38):
                     error_msg = f"Unknown variant: allele={annotated_allele}"
                     raise ValueError(error_msg)
                 if annotated_allele.is_variant_vs(ReferenceAssembly.V38):
-                    variant_to_count[Variant(rs_id, annotated_allele.allele)] += 1
+                    variant_to_count[Variant(call.rs_ids[0], annotated_allele.allele)] += 1
         return variant_to_count
 
     @classmethod
