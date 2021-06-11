@@ -89,18 +89,18 @@ class TestPgxReporter(unittest.TestCase):
         )
         self.assertEqual(result_expected, result)
 
-    def test_genotype_reporter_non_empty(self) -> None:
+    def test_genotype_reporter_non_empty_input_v37(self) -> None:
         all_full_calls = frozenset({
             FullCall(GeneCoordinate("1", 5), "A", GeneCoordinate("1", 25), "A", ("G", "C"),
                      "DPYD", (".",), "25A>C;25A>G", FullCallFilter.PASS, "25A>C;25A>G", FullCallFilter.PASS),
             FullCall(GeneCoordinate("1", 15), "C", None, None, ("C", "CAG"),
                      "DPYD", ("rs536",), "35A>C;35A>G", FullCallFilter.PASS, "35A>C;35A>G?", FullCallFilter.UNKNOWN),
             FullCall(GeneCoordinate("X", 15), "TT", GeneCoordinate("X", 40), "AA", ("TT", "TT"),
-                     "GENE", ("rs23",), "REF_CALL", FullCallFilter.NO_CALL, "627AA>TT", FullCallFilter.PASS),
+                     "GENE", ("rs23",), "REF_CALL", FullCallFilter.NO_CALL, "627AA>TT", FullCallFilter.INFERRED_PASS),
             FullCall(GeneCoordinate("2", 154663), "T", GeneCoordinate("2", 40565464), "T", ("T", "T"),
                      "BRAF", ("rs154", "rs8839"), "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL),
             FullCall(GeneCoordinate("15", 24113), "A", GeneCoordinate("15", 684633), "T", ("T", "T"),
-                     ".", ("rs462", "rs9820", "rs536"), "29482A>T", FullCallFilter.PASS, "REF_CALL", FullCallFilter.NO_CALL),
+                     ".", ("rs462", "rs9820", "rs536"), "29482A>T", FullCallFilter.PASS, "REF_CALL", FullCallFilter.PASS),
         })
         pgx_analysis = PgxAnalysis(FullCallData(all_full_calls), {})
         panel_id = "Panel_v0.2"
@@ -112,8 +112,36 @@ class TestPgxReporter(unittest.TestCase):
             "DPYD\t1\t5\t25\tA\tA\tC\tG\t.\t25A>C;25A>G\tPASS\t25A>C;25A>G\tPASS\tPanel_v0.2\tV1\n"
             "DPYD\t1\t15\tUNKNOWN\tC\tUNKNOWN\tC\tCAG\trs536\t35A>C;35A>G\tPASS\t35A>C;35A>G?\tUNKNOWN\tPanel_v0.2\tV1\n"
             "BRAF\t2\t154663\t40565464\tT\tT\tT\tT\trs154;rs8839\tREF_CALL\tNO_CALL\tREF_CALL\tNO_CALL\tPanel_v0.2\tV1\n"
-            ".\t15\t24113\t684633\tA\tT\tT\tT\trs462;rs9820;rs536\t29482A>T\tPASS\tREF_CALL\tNO_CALL\tPanel_v0.2\tV1\n"
-            "GENE\tX\t15\t40\tTT\tAA\tTT\tTT\trs23\tREF_CALL\tNO_CALL\t627AA>TT\tPASS\tPanel_v0.2\tV1\n"
+            ".\t15\t24113\t684633\tA\tT\tT\tT\trs462;rs9820;rs536\t29482A>T\tPASS\tREF_CALL\tPASS\tPanel_v0.2\tV1\n"
+            "GENE\tX\t15\t40\tTT\tAA\tTT\tTT\trs23\tREF_CALL\tNO_CALL\t627AA>TT\tINFERRED_PASS\tPanel_v0.2\tV1\n"
+        )
+        self.assertEqual(result_expected, result)
+
+    def test_genotype_reporter_non_empty_input_v38(self) -> None:
+        all_full_calls = frozenset({
+            FullCall(GeneCoordinate("1", 5), "A", GeneCoordinate("1", 25), "A", ("G", "C"),
+                     "DPYD", (".",), "25A>C;25A>G", FullCallFilter.PASS, "25A>C;25A>G", FullCallFilter.PASS),
+            FullCall(None, None, GeneCoordinate("1", 35), "C", ("C", "CAG"),
+                     "DPYD", ("rs536",), "35A>C;35A>G?", FullCallFilter.UNKNOWN, "35A>C;35A>G", FullCallFilter.PASS),
+            FullCall(GeneCoordinate("X", 15), "AA", GeneCoordinate("X", 40), "TT", ("TT", "TT"),
+                     "GENE", ("rs23",), "627AA>TT", FullCallFilter.INFERRED_PASS, "REF_CALL", FullCallFilter.NO_CALL),
+            FullCall(GeneCoordinate("2", 154663), "T", GeneCoordinate("2", 40565464), "T", ("T", "T"),
+                     "BRAF", ("rs154", "rs8839"), "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL),
+            FullCall(GeneCoordinate("15", 24113), "T", GeneCoordinate("15", 684633), "A", ("T", "T"),
+                     ".", ("rs462", "rs9820", "rs536"), "REF_CALL", FullCallFilter.PASS, "29482A>T", FullCallFilter.PASS),
+        })
+        pgx_analysis = PgxAnalysis(FullCallData(all_full_calls), {})
+        panel_id = "Panel_v0.2"
+        version = "V1"
+        result = GenotypeReporter.get_calls_tsv_text(pgx_analysis, panel_id, version)
+
+        result_expected = (
+            "gene\tchromosome\tposition_v37\tposition_v38\tref_v37\tref_v38\tallele1\tallele2\trsid\tvariant_annotation_v37\tfilter_v37\tvariant_annotation_v38\tfilter_v38\tpanel_version\trepo_version\n"
+            "DPYD\t1\t5\t25\tA\tA\tC\tG\t.\t25A>C;25A>G\tPASS\t25A>C;25A>G\tPASS\tPanel_v0.2\tV1\n"
+            "DPYD\t1\tUNKNOWN\t35\tUNKNOWN\tC\tC\tCAG\trs536\t35A>C;35A>G?\tUNKNOWN\t35A>C;35A>G\tPASS\tPanel_v0.2\tV1\n"
+            "BRAF\t2\t154663\t40565464\tT\tT\tT\tT\trs154;rs8839\tREF_CALL\tNO_CALL\tREF_CALL\tNO_CALL\tPanel_v0.2\tV1\n"
+            ".\t15\t24113\t684633\tT\tA\tT\tT\trs462;rs9820;rs536\tREF_CALL\tPASS\t29482A>T\tPASS\tPanel_v0.2\tV1\n"
+            "GENE\tX\t15\t40\tAA\tTT\tTT\tTT\trs23\t627AA>TT\tINFERRED_PASS\tREF_CALL\tNO_CALL\tPanel_v0.2\tV1\n"
         )
         self.assertEqual(result_expected, result)
 
@@ -128,10 +156,9 @@ class TestPgxReporter(unittest.TestCase):
         self.assertEqual(result_expected, result)
 
     def test_haplotype_reporter_non_empty(self) -> None:
-        empty_haplotype_set: Set[HaplotypeCall] = set()
-        gene_to_haplotype_calls = {
+        gene_to_haplotype_calls: Dict[str, Set[HaplotypeCall]] = {
             "DPYD": {HaplotypeCall("*2B", 2), HaplotypeCall("*3", 1), HaplotypeCall("*2A", 1)},
-            "FAKE": empty_haplotype_set,
+            "FAKE": set(),
             "FAKE2": {HaplotypeCall("*1", 1), HaplotypeCall("*4A", 1)},
         }
         pgx_analysis = PgxAnalysis(FullCallData(frozenset()), gene_to_haplotype_calls)
