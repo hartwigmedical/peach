@@ -185,52 +185,62 @@ class SimpleCallTranslator(object):
     @classmethod
     def __get_translation_to_other_assembly(
             cls, call: SimpleCall, panel: Panel, call_reference_assembly: ReferenceAssembly) -> Translation:
-        # determine translated start_coordinate and reference_allele
-        translated_start_coordinate: Optional[GeneCoordinate]
-        translated_reference_allele: Optional[str]
+        translated_start_coordinate = cls.__get_translated_start_coordinate(call, panel, call_reference_assembly)
+        translated_reference_allele = cls.__get_translated_reference_allele(call, panel, call_reference_assembly)
+        translated_filter, translated_variant_annotation = cls.__get_translated_filter_and_variant_annotation(
+            call, panel, call_reference_assembly, translated_reference_allele)
+        translation = Translation(
+            translated_start_coordinate, translated_reference_allele, translated_variant_annotation, translated_filter)
+        return translation
+
+    @classmethod
+    def __get_translated_start_coordinate(
+            cls, call: SimpleCall, panel: Panel, call_reference_assembly: ReferenceAssembly) -> Optional[GeneCoordinate]:
         if panel.contains_rs_id_matching_call(call, call_reference_assembly):
             rs_id_info = panel.get_matching_rs_id_info(
                 call.start_coordinate, call.reference_allele, call_reference_assembly)
             cls.__assert_rs_id_call_matches_info(call.rs_ids, (rs_id_info.rs_id,))
-
-            translated_start_coordinate = rs_id_info.get_start_coordinate(call_reference_assembly.opposite())
-            translated_reference_allele = rs_id_info.get_reference_allele(call_reference_assembly.opposite())
+            return rs_id_info.get_start_coordinate(call_reference_assembly.opposite())
         else:
             # unknown variant
-            translated_start_coordinate = None
-            translated_reference_allele = None
+            return None
 
-        reference_assembly_to_reference_allele = {
-            call_reference_assembly: call.reference_allele,
-            call_reference_assembly.opposite(): translated_reference_allele
-        }
-        annotated_alleles = (
-            AnnotatedAllele.from_alleles(call.alleles[0], reference_assembly_to_reference_allele),
-            AnnotatedAllele.from_alleles(call.alleles[1], reference_assembly_to_reference_allele),
-        )
-        # determine translated variant annotation and filter
+    @classmethod
+    def __get_translated_reference_allele(
+            cls, call: SimpleCall, panel: Panel, call_reference_assembly: ReferenceAssembly) -> Optional[str]:
+        if panel.contains_rs_id_matching_call(call, call_reference_assembly):
+            rs_id_info = panel.get_matching_rs_id_info(
+                call.start_coordinate, call.reference_allele, call_reference_assembly)
+            cls.__assert_rs_id_call_matches_info(call.rs_ids, (rs_id_info.rs_id,))
+            return rs_id_info.get_reference_allele(call_reference_assembly.opposite())
+        else:
+            # unknown variant
+            return None
+
+    @classmethod
+    def __get_translated_filter_and_variant_annotation(
+            cls,
+            call: SimpleCall,
+            panel: Panel,
+            call_reference_assembly: ReferenceAssembly,
+            translated_reference_allele: Optional[str],
+    ) -> Tuple[FullCallFilter, str]:
+        annotated_alleles = cls.__get_annotated_alleles(call, call_reference_assembly, translated_reference_allele)
         if panel.has_ref_seq_difference_annotation(
                 call.gene, call.start_coordinate, call.reference_allele, call_reference_assembly):
-            ref_call_to_opposite_assembly_due_to_ref_sequence_difference = all(
-                annotated.is_annotated_vs(call_reference_assembly)
-                and annotated.is_annotated_vs(call_reference_assembly.opposite())
-                and annotated.is_variant_vs(call_reference_assembly)
-                and not annotated.is_variant_vs(call_reference_assembly.opposite())
-                for annotated in annotated_alleles
+            annotate_as_ref = all(
+                cls.__is_ref_allele_to_opposite_assembly_due_to_ref_sequence_difference(
+                    annotated_allele, call_reference_assembly)
+                for annotated_allele in annotated_alleles
             )
-            all_variants_ref_to_a_reference_assembly = all(
-                (
-                    annotated.is_annotated_vs(call_reference_assembly)
-                    and not annotated.is_variant_vs(call_reference_assembly))
-                or (
-                    annotated.is_annotated_vs(call_reference_assembly.opposite())
-                    and not annotated.is_variant_vs(call_reference_assembly.opposite()))
-                for annotated in annotated_alleles
+            all_variants_are_ref_to_a_reference_assembly = all(
+                cls.__allele_is_ref_to_a_reference_assembly(annotated_allele, call_reference_assembly)
+                for annotated_allele in annotated_alleles
             )
-            if ref_call_to_opposite_assembly_due_to_ref_sequence_difference:
+            if annotate_as_ref:
                 translated_variant_annotation = REF_CALL_ANNOTATION_STRING
                 translated_filter = FullCallFilter.PASS
-            elif all_variants_ref_to_a_reference_assembly:
+            elif all_variants_are_ref_to_a_reference_assembly:
                 translated_variant_annotation = panel.get_ref_seq_difference_annotation(
                     call.gene, call.start_coordinate, call.reference_allele, call_reference_assembly)
                 if call.is_pass():
@@ -261,9 +271,38 @@ class SimpleCallTranslator(object):
                 f"found alleles=({annotated_alleles[0]}, {annotated_alleles[1]}), "
                 f"annotation={translated_variant_annotation}"
             )
-        translation = Translation(
-            translated_start_coordinate, translated_reference_allele, translated_variant_annotation, translated_filter)
-        return translation
+        return translated_filter, translated_variant_annotation
+
+    @classmethod
+    def __allele_is_ref_to_a_reference_assembly(
+            cls, annotated_allele: AnnotatedAllele, call_reference_assembly: ReferenceAssembly) -> bool:
+        is_ref_vs_call_reference_assembly = not annotated_allele.is_variant_vs(call_reference_assembly)
+        is_ref_vs_opposite_reference_assembly = not annotated_allele.is_variant_vs(call_reference_assembly.opposite())
+        return is_ref_vs_call_reference_assembly or is_ref_vs_opposite_reference_assembly
+
+    @classmethod
+    def __is_ref_allele_to_opposite_assembly_due_to_ref_sequence_difference(
+            cls, annotated_allele: AnnotatedAllele, call_reference_assembly: ReferenceAssembly) -> bool:
+        is_variant_vs_call_reference_assembly = annotated_allele.is_variant_vs(call_reference_assembly)
+        is_ref_vs_opposite_reference_assembly = not annotated_allele.is_variant_vs(call_reference_assembly.opposite())
+        return is_variant_vs_call_reference_assembly and is_ref_vs_opposite_reference_assembly
+
+    @classmethod
+    def __get_annotated_alleles(
+            cls,
+            call: SimpleCall,
+            call_reference_assembly: ReferenceAssembly,
+            translated_reference_allele: Optional[str],
+    ) -> Tuple[AnnotatedAllele, AnnotatedAllele]:
+        reference_assembly_to_reference_allele = {
+            call_reference_assembly: call.reference_allele,
+            call_reference_assembly.opposite(): translated_reference_allele
+        }
+        annotated_alleles = (
+            AnnotatedAllele.from_alleles(call.alleles[0], reference_assembly_to_reference_allele),
+            AnnotatedAllele.from_alleles(call.alleles[1], reference_assembly_to_reference_allele),
+        )
+        return annotated_alleles
 
     @classmethod
     def __get_full_call_filter(cls, direct_filter: SimpleCallFilter) -> FullCallFilter:
