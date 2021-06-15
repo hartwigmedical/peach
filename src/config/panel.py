@@ -88,7 +88,7 @@ class Panel(object):
             return True
         elif any(self.contains_rs_id(rs_id) for rs_id in call.rs_ids):
             error_msg = (
-                f"Match call with rs id info from panel on an rs id but not position:\n"
+                f"Match call with rs id info from panel on an rs id but not position and reference allele:\n"
                 f"rs ids: {call.rs_ids}, input file position: {call.start_coordinate}, reference assembly: {reference_assembly}"
             )
             raise ValueError(error_msg)
