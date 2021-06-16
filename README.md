@@ -74,7 +74,7 @@ Long&nbsp;Argument | Short Argument | Description
 --tool_version | -v | The version of PEACH. It is included in the output files.
 
 ### Optional Arguments
-Currently, the only optional argument is enables an experimental feature.
+Currently, the only optional argument enables an experimental feature.
 
 Long&nbsp;Argument | Short Argument | Options | Default | Description
 ---|---|---|---|---
