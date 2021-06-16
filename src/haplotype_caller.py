@@ -11,6 +11,8 @@ from config.variant import Variant
 
 
 class HaplotypeCaller(object):
+    HAPLOTYPE_CALLING_REFERENCE_ASSEMBLY = ReferenceAssembly.V38
+
     @classmethod
     def get_gene_to_haplotypes_call(cls, full_call_data: FullCallData, panel: Panel) -> Dict[str, Set[HaplotypeCall]]:
         gene_to_haplotype_calls = {}
@@ -51,10 +53,10 @@ class HaplotypeCaller(object):
         for call in full_calls_for_gene:
             cls.__assert_handleable_call(call)
             for annotated_allele in call.get_annotated_alleles():
-                if not annotated_allele.is_annotated_vs(ReferenceAssembly.V38):
+                if not annotated_allele.is_annotated_vs(cls.HAPLOTYPE_CALLING_REFERENCE_ASSEMBLY):
                     error_msg = f"Unknown variant: allele={annotated_allele}"
                     raise ValueError(error_msg)
-                if annotated_allele.is_variant_vs(ReferenceAssembly.V38):
+                if annotated_allele.is_variant_vs(cls.HAPLOTYPE_CALLING_REFERENCE_ASSEMBLY):
                     variant_to_count[Variant(call.rs_ids[0], annotated_allele.allele)] += 1
         return variant_to_count
 
