@@ -2,6 +2,7 @@ from typing import Dict, Any, Tuple, Optional
 
 import allel
 
+from config.tool_config import ToolConfig
 from base.constants import REF_CALL_ANNOTATION_STRING
 from base.filter import SimpleCallFilter
 from base.gene_coordinate import GeneCoordinate
@@ -30,14 +31,14 @@ class VcfReader(object):
     RS_ID_SEPARATOR = ";"
 
     @classmethod
-    def get_call_data(
-            cls, vcf: str, panel: Panel, sample_r_id: str, vcf_reference_assembly: ReferenceAssembly) -> SimpleCallData:
-        variants = cls.__get_variants_from_vcf(vcf)
+    def get_call_data(cls, tool_config: ToolConfig, panel: Panel) -> SimpleCallData:
+        variants = cls.__get_variants_from_vcf(tool_config.vcf_path)
         if variants is not None:
-            return cls.__get_call_data_from_variants(variants, panel, sample_r_id, vcf_reference_assembly)
+            return cls.__get_call_data_from_variants(
+                variants, panel, tool_config.sample_r_id, tool_config.vcf_reference_assembly)
         else:
             print("[WARN] No variants found in vcf")
-            return SimpleCallData(frozenset(), vcf_reference_assembly)
+            return SimpleCallData(frozenset(), tool_config.vcf_reference_assembly)
 
     @classmethod
     def __get_variants_from_vcf(cls, vcf: str) -> Optional[Dict[str, Any]]:

@@ -150,7 +150,7 @@ class HaplotypeReporter(object):
     DRUG_SEPARATOR = ";"
 
     @classmethod
-    def get_genotype_tsv_text(cls, pgx_analysis: PgxAnalysis, panel: Panel, panel_id: str, version: str) -> str:
+    def get_genotype_tsv_text(cls, pgx_analysis: PgxAnalysis, panel: Panel, version: str) -> str:
         gene_to_haplotype_calls = pgx_analysis.get_gene_to_haplotype_calls()
 
         genes_in_analysis = set(gene_to_haplotype_calls.keys())
@@ -182,7 +182,7 @@ class HaplotypeReporter(object):
                         panel.get_haplotype_function(gene, haplotype_call.haplotype_name),
                         gene_to_drug_info[gene][0],
                         gene_to_drug_info[gene][1],
-                        panel_id,
+                        panel.get_id(),
                         version,
                     ]))
             else:
@@ -192,7 +192,7 @@ class HaplotypeReporter(object):
                     UNKNOWN_FUNCTION_STRING,
                     gene_to_drug_info[gene][0],
                     gene_to_drug_info[gene][1],
-                    panel_id,
+                    panel.get_id(),
                     version,
                 ]))
         text = "\n".join(lines) + "\n"

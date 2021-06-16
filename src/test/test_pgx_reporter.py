@@ -73,8 +73,8 @@ class TestPgxReporter(unittest.TestCase):
             GeneInfo("FAKE2", "16", "*1", fake2_haplotypes, fake2_rs_id_infos,
                      fake2_drugs, fake2_rs_id_to_difference_annotations),
         })
-        name = "WideTestPanel"
-        version = "1.1"
+        name = "Panel"
+        version = "0.2"
         return Panel(name, version, gene_infos)
 
     def test_genotype_reporter_empty(self) -> None:
@@ -148,9 +148,8 @@ class TestPgxReporter(unittest.TestCase):
     def test_haplotype_reporter_empty(self) -> None:
         pgx_analysis = PgxAnalysis(FullCallData(frozenset()), {})
         panel = Panel("EmptyPanel", "0.3", frozenset())
-        panel_id = "Panel_v0.2"
         version = "V1"
-        result = HaplotypeReporter.get_genotype_tsv_text(pgx_analysis, panel, panel_id, version)
+        result = HaplotypeReporter.get_genotype_tsv_text(pgx_analysis, panel, version)
 
         result_expected = "gene\thaplotype\tfunction\tlinked_drugs\turl_prescription_info\tpanel_version\trepo_version\n"
         self.assertEqual(result_expected, result)
@@ -163,9 +162,8 @@ class TestPgxReporter(unittest.TestCase):
         }
         pgx_analysis = PgxAnalysis(FullCallData(frozenset()), gene_to_haplotype_calls)
         panel = self.__get_example_panel()
-        panel_id = "Panel_v0.2"
         version = "V1"
-        result = HaplotypeReporter.get_genotype_tsv_text(pgx_analysis, panel, panel_id, version)
+        result = HaplotypeReporter.get_genotype_tsv_text(pgx_analysis, panel, version)
 
         result_expected = (
             "gene\thaplotype\tfunction\tlinked_drugs\turl_prescription_info\tpanel_version\trepo_version\n"

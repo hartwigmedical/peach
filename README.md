@@ -67,10 +67,10 @@ If you have installed PEACH's requirements into a venv, then remember to source 
 Long&nbsp;Argument | Short Argument | Description
 ---|---|---
 --vcf | -i | Path to germline VCF file of sample. For instance the germline VCF output from PURPLE. Calls should be wrt v37.
---sample_r_id | -r | The ref sample ID of the run.
---sample_t_id | -t | The tumor sample ID of the run. Only used for the names of the output files.
 --panel | -p | Path to a JSON file that contains the variants and haplotypes to test on.
 --outputdir | -o | Directory to write the output to.
+--sample_t_id | -t | The tumor sample ID of the run. Only used for the names of the output files.
+--sample_r_id | -r | The ref sample ID of the run.
 --version | -v | The version of PEACH. It is included in the output files.
 
 ### Optional Arguments
