@@ -24,7 +24,7 @@ The two output files are:
   + [Calls TSV file](#calls-tsv-file)
 * [Algorithm](#algorithm)
   + [Preparation](#preparation)
-  + [Get Variant Calls V37](#get-variant-calls-v37)
+  + [Get_VCF Variant Calls](#get-vcf-variant-calls)
   + [Annotate Calls with Panel Information](#annotate-calls-with-panel-information)
   + [Infer Haplotypes](#infer-haplotypes)
   + [Examples](#examples)
@@ -66,15 +66,19 @@ If you have installed PEACH's requirements into a venv, then remember to source 
 ### Mandatory Arguments
 Long&nbsp;Argument | Short Argument | Description
 ---|---|---
---vcf | -i | Path to germline VCF file of sample. For instance the germline VCF output from PURPLE. Calls should be wrt v37.
+--vcf | -i | Path to germline VCF file of sample. For instance the germline VCF output from PURPLE. Calls should be wrt v37. Support for v38 calls is experimental.
 --panel | -p | Path to a JSON file that contains the variants and haplotypes to test on.
 --outputdir | -o | Directory to write the output to.
 --sample_t_id | -t | The tumor sample ID of the run. Only used for the names of the output files.
 --sample_r_id | -r | The ref sample ID of the run.
---version | -v | The version of PEACH. It is included in the output files.
+--tool_version | -v | The version of PEACH. It is included in the output files.
 
 ### Optional Arguments
-There are no optional arguments.
+Currently, the only optional argument is enables an experimental feature.
+
+Long&nbsp;Argument | Short Argument | Options | Default | Description
+---|---|---|---|---
+--vcf_reference_assembly_version | -a | V37, V38 | V37 | The version of the reference assembly wrt which the vcf has been constructed. Support for V38 is experimental. Default is V37.
 
 ## Input
 ### VCF
@@ -86,7 +90,7 @@ the subsections "Gene Name" and "HGVS.c". One of the samples in the VCF should h
 equal to the `sample_r_id` argument,
 and the "GT" sub-field for this sample should be included and filled in with diploid calls.
 
-The calls in the VCF should be with respect to a v37 reference genome.
+The calls in the VCF should be with respect to a v37 reference genome. Support for calls wrt v38 is experimental.
 
 ### JSON
 For an example of a valid panel JSON (with fake data), see 
@@ -129,31 +133,37 @@ Column | Example Value | Description
 ---|---|---
 gene | DPYD | Gene to which the variant is related.
 chromosome | 1 | Chromosome of variant.
-position_v37 | 98348885 | Position on chromosome wrt v37 reference genome.
-position_v38 | 97883329 | Position on chromosome wrt v38 reference genome. If v37 info could not be translated into its v38 equivalent, has value "UNKNOWN".
-ref_v37 | G | Reference allele wrt v37. 
-ref_v38 | A | Reference allele wrt v38. If v37 info could not be translated into its v38 equivalent, has value "UNKNOWN".
+position_v37 | 98348885 | Position on chromosome wrt v37 reference genome. If unknown, has value "UNKNOWN".
+position_v38 | 97883329 | Position on chromosome wrt v38 reference genome. If unknown, has value "UNKNOWN".
+ref_v37 | G | Reference allele wrt v37. If unknown, has value "UNKNOWN".
+ref_v38 | A | Reference allele wrt v38. If unknown, has value "UNKNOWN".
 allele1 | A | First of the called alleles. Order of alleles is lexicographical order.
 allele2 | A | Second of the called alleles. Order of alleles is lexicographical order.
 rsid | rs1801265 | Rs id(s) of variant. If more than one, then they are separated by ";". Taken from VCF if available. If not, taken from matching variant in panel JSON, if match exists. If not, has value ".".
-variant_annotation_v37 | 85C>T | Variant annotation wrt v37. See [Get Variant Calls V37](#get-variant-calls-v37) for details.
-filter_v37 | PASS | Has value PASS or NO_CALL. See [Get Variant Calls V37](#get-variant-calls-v37) for details.
-variant_annotation_v38 | REF_CALL | Variant annotation wrt v38. See [Annotate Calls with Panel Information](#annotate-calls-with-panel-information) for details.
-filter_v38 | NO_CALL | Has value PASS, NO_CALL, UNKNOWN or INFERRED_PASS. See [Annotate Calls with Panel Information](#annotate-calls-with-panel-information) for details.
+variant_annotation_v37 | 85C>T | Variant annotation wrt v37. See [Get_VCF Variant Calls](#get-vcf-variant-calls) and [Annotate Calls with Panel Information](#annotate-calls-with-panel-information) for details.
+filter_v37 | PASS | Has value PASS, NO_CALL, UNKNOWN or INFERRED_PASS. See [Get_VCF Variant Calls](#get-vcf-variant-calls) and [Annotate Calls with Panel Information](#annotate-calls-with-panel-information) for details.
+variant_annotation_v38 | REF_CALL | Variant annotation wrt v38. See [Get_VCF Variant Calls](#get-vcf-variant-calls) and [Annotate Calls with Panel Information](#annotate-calls-with-panel-information) for details.
+filter_v38 | NO_CALL | Has value PASS, NO_CALL, UNKNOWN or INFERRED_PASS. See [Get_VCF Variant Calls](#get-vcf-variant-calls) and [Annotate Calls with Panel Information](#annotate-calls-with-panel-information) for details.
 panel_version | DPYDpanel_v1.3 | Name and version of panel JSON. Both are taken from fields in the JSON.
 repo_version | 1.0 | Version of PEACH.
 
 ## Algorithm
 Haplotypes are commonly defined wrt a v38 reference genome. 
-Since PEACH accepts VCF files wrt v37 as input, this requires a translation of v37 calls to v38 calls.
+If the calls in the input VCF are wrt v37, then this requires a translation of v37 calls to v38 calls.
 PEACH extracts the required knowledge of the differences between these reference genomes from the information in the panel JSON.
+No matter wrt what reference genome version the calls in the input VCF have been defined, 
+PEACH always tries to translate these calls to the other reference genome by using the information in the panel JSON, 
+resulting in *full calls* with information for both versions. 
+For haplotype calling we use the v38 information from the full calls. 
+
+Define the *VCF RG version* as the reference genome version wrt which the calls in the VCF are defined. 
+Define the *non-VCF RG version* as the reference genome version that is not the VCF RG version.
 
 In broad strokes, PEACH does the following:
-* Extract relevant calls wrt from VCF, where relevance is determined by the panel JSON. 
-  These calls will be with respect to a v37 reference genome.
-* Use information from the panel JSON to translate this set of calls wrt v37 into the corresponding set of calls wrt v38, where possible.
+* Extract relevant calls from VCF, where relevance is determined by the panel JSON.
+* Use information from the panel JSON to translate these calls to the other reference genome, where possible, and construct full calls.
 * For each gene:
-  + Determine for each variant how often each alt allele occurs.
+  + Determine for each variant how often each alt allele occurs (alt wrt v38).
   + Determine the unique simplest combination of haplotypes that completely explains that combination of alt alleles and counts.
 If there is no unique simplest combination of haplotypes that completely explains the combination of alt alleles and counts, then declare "Unresolved Haplotype".
 * Create output files.
@@ -161,66 +171,69 @@ If there is no unique simplest combination of haplotypes that completely explain
 ### Preparation
 First, the panel JSON is loaded and checked for consistency. 
 
-### Get Variant Calls V37
+### Get VCF Variant Calls
 The calls for the sample `sample_r_id` are extracted from the VCF, and they are compared to the variants in the panel JSON file. 
 Calls are ignored when none of the following are true:
 * At least one of the rs id's of the call matches an rs id from the panel JSON.
-* At least one of the covered positions of the call matches at least one of the covered positions of the variants in the panel JSON.
+* At least one of the covered positions of the call matches at least one of the covered positions of the variants in the panel JSON 
+  for the VCF RG version.
 In this comparison, the *covered positions* of a call or variant are the positions of the bases in the reference allele.
 
-Let's call the remaining variants the *observed v37 calls*. 
+Let's call the remaining variants the *observed VCF calls*. 
 
-For each variant in the panel JSON for which there are no matching calls in the observed v37 call, 
-a call is created that is homozygously the reference allele, an *inferred v37 call*. 
-More specifically, a call is added for a panel variant when there are no observed v37 calls such that either:
+For each variant in the panel JSON for which there is no matching observed VCF call, 
+a call is created that is homozygously the reference allele, an *inferred VCF call*. 
+More specifically, a call is added for a panel variant when there are no observed VCF calls such that either:
 * The variant rs id matches one of the calls rs id's.
-* The covered positions of the variant (partially) match the covered positions of the call.
+* The covered positions of the variant (partially) match the covered positions of the call (for the VCF RG version).
 
-The observed and inferred v37 calls together form the list of calls that will be considered by PEACH, 
-which we will call the *combined v37 calls*.
+The observed and inferred VCF calls together form the list of calls that will be considered by PEACH, 
+which we will call the *combined VCF calls*.
 
-The annotation and filter of the combined v37 calls are determined in the following way:
+The annotation and filter of the combined VCF calls are determined in the following way:
 
-Condition | Variant Annotation V37 | Filter V37
+Condition | Variant Annotation VCF RG Version | Filter VCF RG Version
 ---|---|---
 Homozygous alt or heterozygous observed call. | From HGVS.c field in ANN in VCF | PASS  
 Homozygous reference observed call. | REF_CALL | PASS
 Inferred call. | REF_CALL | NO_CALL
 
 ### Annotate Calls with Panel Information
-For each of the combined v37 calls, an attempt is made to find a variant in the panel JSON that has the same v37 position and reference allele.
+For each of the combined VCF calls, an attempt is made to find a variant in the panel JSON that has the same VCF position and reference allele.
 
 If successful:
 * If the rs id of the call has not been set, then it is set to the value from the matching variant.
-* The reference allele and position wrt v38 are determined from the matching variant.
+* The reference allele and position wrt the non-VCF RG version are determined from the matching variant.
 
 If unsuccessful:
-* Set reference allele and position wrt v38 to "UNKNOWN".
+* Set reference allele and position wrt non-VCF RG version to "UNKNOWN".
 
-Also, the correct annotation and filter wrt v38 are determined according to the following table, 
+Also, the correct annotation and filter wrt the non-VCF RG version are determined according to the following table, 
 where an asterisk (*) indicates that any value is allowed:
 
-Matches variant in panel JSON | Type of call | Call is homozygous reference wrt v38 | Reference alleles v37 and v38 are identical | All alleles are reference with v37 or v38 | Variant Annotation V38 | Filter V38
+Matches variant in panel JSON | Type of call | Call is homozygous reference wrt non-VCF RG version | Reference alleles v37 and v38 are identical | All alleles are reference with v37 or v38 | Variant Annotation Non-VCF RG Version | Filter Non-VCF RG Version
 ---|---|---|---|---|---|---
-False|*|*|*|*|Variant Annotation V37 + "?"|UNKNOWN
+False|*|*|*|*|Variant Annotation VCF RG Version + "?"|UNKNOWN
 True|Inferred|True|*|*|REF_CALL|NO_CALL
 True|Inferred|False|*|*|From "refSeqDifferenceAnnotations" field in panel JSON|INFERRED_PASS
 True|Observed|True|*|*|REF_CALL|PASS
-True|Observed|False|True|*|Variant Annotation V37|PASS
+True|Observed|False|True|*|Variant Annotation VCF RG Version|PASS
 True|Observed|False|False|True|From "refSeqDifferenceAnnotations" field in panel JSON|PASS
-True|Observed|False|False|False|Variant Annotation V37 + "?"|UNKNOWN
+True|Observed|False|False|False|Variant Annotation VCF RG Version + "?"|UNKNOWN
 
 Note that an asterisk does not indicate that every value is actually possible. 
 For instance, calls that do not match any variants from the panel JSON can only be observed calls, not inferred calls.
-Furthermore, if there is no matching variant in the panel JSON, then PEACH does not know what the correct v38 reference allele is, 
+Furthermore, if there is no matching variant in the panel JSON, then PEACH does not know what the correct non-VCF RG version reference allele is, 
 so it would be unknown whether the reference alleles wrt v37 and v38 are identical. 
 
 Let's call these calls with both v37 and v38 details *full calls*.
 
 ### Infer Haplotypes
+For the haplotype calling PEACH only uses the v38 and general information from the full calls, not the v37 information.
+
 The goal is to find the simplest combination of haplotypes that explains the called variants. 
 
-Sometimes, more than one combination of haplotypes could explain these calls. 
+Sometimes, more than one combination of haplotypes could explain the calls. 
 As an example, consider the DPYD gene and two variants for that gene: c.1905+1G>A and c.1627A>G. 
 Separately, these variants form the haplotypes *2A and *5, and the haplotype *2B consists of both of these variants together.
 A haplotype can contain multiple variants if these variants have a tendency to be inherited together.
@@ -233,11 +246,15 @@ haplotypes in the combination, where homozygous haplotype calls are counted as 2
 PEACH will always attempt to call the unique haplotype combination of minimum length that explain all of the variant calls.
 If there are no haplotype combinations that explain all of the variant calls, 
 or if there is more than one combination of the same minimum length, 
-then the haplotype combination for that gene is called as "Unresolved Haplotype".
+then the haplotype combination for that gene is called as "Unresolved Haplotype". 
 
 The only valid haplotype combination of length 0 is the homozygous wild type haplotype,
 valid haplotype combinations of length 1 always include precisely one heterozygous wild type haplotype call,
 and valid haplotype combinations of length at least 2 do not contain any calls for the wild type haplotype.
+
+Note that when at least one of the VCF calls overlaps with but is not identical to 
+one of the variants in the panel JSON, then the haplotype combination "Unresolved Haplotype" will be called, 
+because this variant will be an observed VCF call that is not part of any haplotypes in the panel JSON.
 
 #### Haplotype Calling Algorithm 
 Haplotypes are called for each gene separately. First, collect the full calls that correspond to that gene. 
@@ -279,7 +296,7 @@ If there are no calls wrt v37 in the VCF, then the full calls are:
 Rs Id|Allele1|Allele2|Variant Annotation V37|Filter V37|Variant Annotation V38|Filter V38
 ---|---|---|---|---|---|---
 rs1|A|A|REF_CALL|NO_CALL|REF_CALL|NO_CALL
-rs2|TA|TA|REF_CALL|NO_CALL|c.6543GC>TA|INFERRED_CALL
+rs2|TA|TA|REF_CALL|NO_CALL|c.6543GC>TA|INFERRED_PASS
 rs3|GG|GG|REF_CALL|NO_CALL|REF_CALL|NO_CALL
 
 The only valid haplotype combination that explains these variants is *3_HOM, 
@@ -361,9 +378,11 @@ If you have installed PEACH's requirements into a venv, then remember to source 
     + Remove VCF filtering step. 
         + Remove VCFTools dependency.
         + Remove filtered vcf output file.
+    + Add experimental support for input VCF's for reference genomes with version v38. 
     + Change format of arguments to PEACH. 
         + Arguments are no longer positional. 
         + Remove arguments vcftools, recreate_bed and transcript_tsv, since they are no longer needed.
+        + Add optional parameter for experimental v38 VCF support.
     + Change format of panel JSON.
         + Change key "url_prescription_info" to "urlPrescriptionInfo" for consistency with other keys.
         + Add "annotationV37" key for reference sequence differences, for support of v38 reference genomes.

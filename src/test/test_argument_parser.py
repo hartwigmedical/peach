@@ -12,7 +12,7 @@ class TestArgumentParser(unittest.TestCase):
     def test_representative_example(self) -> None:
         arguments = [
             "--vcf", "vcf_file", "-t", "tumor_sample_id", "-r", "ref_sample_id", "-v", "script_version",
-            "-o", "output_directory", "-p", "panel_location",
+            "-o", "output_directory", "-p", "panel_location", "-a", "V37",
         ]
         actual_config = ArgumentParser.get_tool_config(arguments)
 
@@ -30,8 +30,8 @@ class TestArgumentParser(unittest.TestCase):
     def test_all_long_args(self) -> None:
         arguments = [
             "--vcf", "vcf_file", "--sample_t_id", "tumor_sample_id", "--sample_r_id", "ref_sample_id",
-            "--version", "script_version", "--outputdir", "output_directory", "--panel",
-            "panel_location",
+            "--tool_version", "script_version", "--outputdir", "output_directory", "--panel",
+            "panel_location", "--vcf_reference_assembly_version", "V38",
         ]
         actual_config = ArgumentParser.get_tool_config(arguments)
 
@@ -42,14 +42,14 @@ class TestArgumentParser(unittest.TestCase):
             "tumor_sample_id",
             "ref_sample_id",
             "script_version",
-            ReferenceAssembly.V37,
+            ReferenceAssembly.V38,
         )
         self.assertEqual(expected_config, actual_config)
 
     def test_all_short_args(self) -> None:
         arguments = [
             "-i", "vcf_file", "-t", "tumor_sample_id", "-r", "ref_sample_id",
-            "-v", "script_version", "-o", "output_directory", "-p", "panel_location",
+            "-v", "script_version", "-o", "output_directory", "-p", "panel_location", "-a", "V38",
         ]
         actual_config = ArgumentParser.get_tool_config(arguments)
 
@@ -60,7 +60,7 @@ class TestArgumentParser(unittest.TestCase):
             "tumor_sample_id",
             "ref_sample_id",
             "script_version",
-            ReferenceAssembly.V37,
+            ReferenceAssembly.V38,
         )
         self.assertEqual(expected_config, actual_config)
 
