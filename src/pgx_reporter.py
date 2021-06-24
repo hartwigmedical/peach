@@ -139,12 +139,13 @@ class GenotypeReporter(object):
 
 class HaplotypeReporter(object):
     GENOTYPE_TSV_COLUMNS = (
-        "gene", "haplotype", "function", "linked_drugs", "url_prescription_info", "panel_version", "repo_version")
+        "gene", "haplotype", "zygosity", "function", "linked_drugs", "url_prescription_info", "panel_version", "repo_version")
 
-    HAPLOTYPE_HOMOZYGOUS_SUFFIX = "_HOM"
-    HAPLOTYPE_HETEROZYGOUS_SUFFIX = "_HET"
+    HAPLOTYPE_HOMOZYGOUS_ZYGOSITY = "HOM"
+    HAPLOTYPE_HETEROZYGOUS_ZYGOSITY = "HET"
 
     UNRESOLVED_HAPLOTYPE_STRING = "Unresolved Haplotype"
+    NOT_APPLICABLE_ZYGOSITY_STRING = "N/A"
 
     TSV_SEPARATOR = "\t"
     DRUG_SEPARATOR = ";"
@@ -178,7 +179,8 @@ class HaplotypeReporter(object):
                 for haplotype_call in sorted(gene_to_haplotype_calls[gene], key=lambda call: call.haplotype_name):
                     lines.append(cls.TSV_SEPARATOR.join([
                         gene,
-                        cls.__get_haplotype_call_string(haplotype_call),
+                        haplotype_call.haplotype_name,
+                        cls.__get_zygosity(haplotype_call),
                         panel.get_haplotype_function(gene, haplotype_call.haplotype_name),
                         gene_to_drug_info[gene][0],
                         gene_to_drug_info[gene][1],
@@ -189,6 +191,7 @@ class HaplotypeReporter(object):
                 lines.append(cls.TSV_SEPARATOR.join([
                     gene,
                     cls.UNRESOLVED_HAPLOTYPE_STRING,
+                    cls.NOT_APPLICABLE_ZYGOSITY_STRING,
                     UNKNOWN_FUNCTION_STRING,
                     gene_to_drug_info[gene][0],
                     gene_to_drug_info[gene][1],
@@ -199,11 +202,11 @@ class HaplotypeReporter(object):
         return text
 
     @classmethod
-    def __get_haplotype_call_string(cls, haplotype_call: HaplotypeCall) -> str:
+    def __get_zygosity(cls, haplotype_call: HaplotypeCall) -> str:
         if haplotype_call.count == 2:
-            return haplotype_call.haplotype_name + cls.HAPLOTYPE_HOMOZYGOUS_SUFFIX
+            return cls.HAPLOTYPE_HOMOZYGOUS_ZYGOSITY
         elif haplotype_call.count == 1:
-            return haplotype_call.haplotype_name + cls.HAPLOTYPE_HETEROZYGOUS_SUFFIX
+            return cls.HAPLOTYPE_HETEROZYGOUS_ZYGOSITY
         else:
             error_msg = f"Invalid haplotype count: haplotype call={haplotype_call}"
             raise ValueError(error_msg)

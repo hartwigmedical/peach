@@ -151,7 +151,7 @@ class TestPgxReporter(unittest.TestCase):
         version = "V1"
         result = HaplotypeReporter.get_genotype_tsv_text(pgx_analysis, panel, version)
 
-        result_expected = "gene\thaplotype\tfunction\tlinked_drugs\turl_prescription_info\tpanel_version\trepo_version\n"
+        result_expected = "gene\thaplotype\tzygosity\tfunction\tlinked_drugs\turl_prescription_info\tpanel_version\trepo_version\n"
         self.assertEqual(result_expected, result)
 
     def test_haplotype_reporter_non_empty(self) -> None:
@@ -166,13 +166,13 @@ class TestPgxReporter(unittest.TestCase):
         result = HaplotypeReporter.get_genotype_tsv_text(pgx_analysis, panel, version)
 
         result_expected = (
-            "gene\thaplotype\tfunction\tlinked_drugs\turl_prescription_info\tpanel_version\trepo_version\n"
-            "DPYD\t*2A_HET\tNo Function\t5-Fluorouracil;Capecitabine\thttps://www.pharmgkb.org/chemical/PA128406956/guidelineAnnotation/PA166104939;https://www.pharmgkb.org/chemical/PA448771/guidelineAnnotation/PA166104963\tPanel_v0.2\tV1\n"
-            "DPYD\t*2B_HOM\tNo Function\t5-Fluorouracil;Capecitabine\thttps://www.pharmgkb.org/chemical/PA128406956/guidelineAnnotation/PA166104939;https://www.pharmgkb.org/chemical/PA448771/guidelineAnnotation/PA166104963\tPanel_v0.2\tV1\n"
-            "DPYD\t*3_HET\tNormal Function\t5-Fluorouracil;Capecitabine\thttps://www.pharmgkb.org/chemical/PA128406956/guidelineAnnotation/PA166104939;https://www.pharmgkb.org/chemical/PA448771/guidelineAnnotation/PA166104963\tPanel_v0.2\tV1\n"
-            "FAKE\tUnresolved Haplotype\tUnknown Function\tAspirin\thttps://www.pharmgkb.org/some_other_url\tPanel_v0.2\tV1\n"
-            "FAKE2\t*1_HET\tNormal Function\tAspirin\thttps://www.pharmgkb.org/some_other_url\tPanel_v0.2\tV1\n"
-            "FAKE2\t*4A_HET\tReduced Function\tAspirin\thttps://www.pharmgkb.org/some_other_url\tPanel_v0.2\tV1\n"
+            "gene\thaplotype\tzygosity\tfunction\tlinked_drugs\turl_prescription_info\tpanel_version\trepo_version\n"
+            "DPYD\t*2A\tHET\tNo Function\t5-Fluorouracil;Capecitabine\thttps://www.pharmgkb.org/chemical/PA128406956/guidelineAnnotation/PA166104939;https://www.pharmgkb.org/chemical/PA448771/guidelineAnnotation/PA166104963\tPanel_v0.2\tV1\n"
+            "DPYD\t*2B\tHOM\tNo Function\t5-Fluorouracil;Capecitabine\thttps://www.pharmgkb.org/chemical/PA128406956/guidelineAnnotation/PA166104939;https://www.pharmgkb.org/chemical/PA448771/guidelineAnnotation/PA166104963\tPanel_v0.2\tV1\n"
+            "DPYD\t*3\tHET\tNormal Function\t5-Fluorouracil;Capecitabine\thttps://www.pharmgkb.org/chemical/PA128406956/guidelineAnnotation/PA166104939;https://www.pharmgkb.org/chemical/PA448771/guidelineAnnotation/PA166104963\tPanel_v0.2\tV1\n"
+            "FAKE\tUnresolved Haplotype\tN/A\tUnknown Function\tAspirin\thttps://www.pharmgkb.org/some_other_url\tPanel_v0.2\tV1\n"
+            "FAKE2\t*1\tHET\tNormal Function\tAspirin\thttps://www.pharmgkb.org/some_other_url\tPanel_v0.2\tV1\n"
+            "FAKE2\t*4A\tHET\tReduced Function\tAspirin\thttps://www.pharmgkb.org/some_other_url\tPanel_v0.2\tV1\n"
         )
         self.assertEqual(result_expected, result)
 
