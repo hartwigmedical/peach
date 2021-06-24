@@ -119,7 +119,8 @@ Name: `[sample_t_id].peach.genotype.tsv`
 Column | Example Value | Description
 ---|---|---
 gene | DPYD | Gene for which this haplotype is called.
-haplotype | *1_HOM | Haplotype from JSON, including whether it is homozygous (HOM) or heterozygous (HET). If no haplotype could be called, has value "Unresolved Haplotype".
+haplotype | *1 | Called haplotype. If no haplotype could be called, has value "Unresolved Haplotype".
+zygosity | HOM | Whether haplotype call is homozygous (HOM) or heterozygous (HET). If no haplotype could be called, has value "N/A".
 function | No function | Functionality of this haplotype. Wild type has function "Normal Function". If no haplotype could be called, has value "Unknown Function".
 linked_drugs | 5-Fluoracil;Capecitabine | Drugs for which this haplotype is relevant, separated by ";".
 url_prescription_info | https://www.some_url.com/5-Fluoracil;https://www.some_other_url.com/Capecitabine | For each listed drug, a url with information on how to translate abnormal haplotype function into an appropriate treatment adjustment. Separated by ";".
@@ -386,6 +387,8 @@ If you have installed PEACH's requirements into a venv, then remember to source 
     + Change format of panel JSON.
         + Change key "url_prescription_info" to "urlPrescriptionInfo" for consistency with other keys.
         + Add "annotationV37" key for reference sequence differences, for support of v38 reference genomes.
+    + Adjust format of genotype TSV output file.
+        + Split "haplotype" column into "haplotype" and "zygosity".
     + Add script for running tests.
 * [1.0](https://github.com/hartwigmedical/peach/releases/tag/v1.0)
     + First release
