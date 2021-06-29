@@ -375,6 +375,8 @@ If you have installed PEACH's requirements into a venv, then remember to source 
 
 ## Version History and Download Links
 * Upcoming
+    + Nothing
+* [1.1](https://github.com/hartwigmedical/peach/releases/tag/v1.1)
     + Add shell script `peach` for running PEACH.
     + Remove VCF filtering step. 
         + Remove VCFTools dependency.
