@@ -14,22 +14,24 @@ from config.rs_id_info import RsIdInfo
 
 class GeneInfo(object):
     """This object is meant to be immutable"""
-    def __init__(self, gene: str, chromosome: str, wild_type_haplotype_name: str,
+    def __init__(self, gene: str, wild_type_haplotype_name: str,
                  haplotypes: FrozenSet[Haplotype], rs_id_infos: FrozenSet[RsIdInfo], drugs: FrozenSet[DrugInfo],
                  rs_id_to_ref_seq_difference_annotation: Dict[str, Annotation]) -> None:
         assert_no_overlap_haplotype_names(haplotypes, f"gene info for {gene}")
         assert_no_overlap_haplotype_variant_combinations(haplotypes, f"gene info for {gene}")
         assert_no_overlap_drug_names(drugs, f"GeneInfo json for {gene}")
         self.__assert_rs_id_infos_compatible(rs_id_infos)
-        self.__assert_rs_id_infos_match_chromosome(rs_id_infos, chromosome)
+        self.__assert_rs_id_infos_match_chromosome(rs_id_infos, gene)
         self.__assert_info_exists_for_all_rs_ids_in_haplotypes(haplotypes, rs_id_infos)
         self.__assert_variants_in_haplotypes_compatible_with_rs_id_infos(haplotypes, rs_id_infos)
         self.__assert_rs_ids_with_ref_seq_differences_match_annotations(
             rs_id_infos, rs_id_to_ref_seq_difference_annotation
         )
 
+        if not haplotypes:
+            print(f"[WARN] No alternate haplotypes configured for gene {gene}\n")
+
         self.__gene = gene
-        self.__chromosome = chromosome
         self.__wild_type_haplotype_name = wild_type_haplotype_name
         self.__haplotypes = haplotypes
         self.__rs_id_infos = rs_id_infos
@@ -40,7 +42,6 @@ class GeneInfo(object):
         return (
                 isinstance(other, GeneInfo)
                 and self.__gene == other.__gene
-                and self.__chromosome == other.__chromosome
                 and self.__wild_type_haplotype_name == other.__wild_type_haplotype_name
                 and self.__haplotypes == other.__haplotypes
                 and self.__rs_id_infos == other.__rs_id_infos
@@ -51,7 +52,6 @@ class GeneInfo(object):
     def __hash__(self) -> int:
         return hash((
             self.__gene,
-            self.__chromosome,
             self.__wild_type_haplotype_name,
             self.__haplotypes,
             self.__rs_id_infos,
@@ -63,7 +63,6 @@ class GeneInfo(object):
         return (
             f"GeneInfo("
             f"gene={self.__gene!r}, "
-            f"chromosome={self.__chromosome!r}, "
             f"wild_type_haplotype_name={self.__wild_type_haplotype_name!r}, "
             f"haplotypes={self.__haplotypes!r}, "
             f"rs_id_infos={self.__rs_id_infos!r}, "
@@ -75,10 +74,6 @@ class GeneInfo(object):
     @property
     def gene(self) -> str:
         return self.__gene
-
-    @property
-    def chromosome(self) -> str:
-        return self.__chromosome
 
     @property
     def wild_type_haplotype_name(self) -> str:
@@ -99,10 +94,11 @@ class GeneInfo(object):
     @classmethod
     def from_json(cls, data: Json) -> "GeneInfo":
         gene = str(data['gene'])
-        chromosome = str(data['chromosome'])
+        chromosome_v37 = str(data['chromosomeV37'])
+        chromosome_v38 = str(data['chromosomeV38'])
         wild_type_haplotype = str(data["wildTypeHaplotype"])
         rs_id_infos = frozenset({
-            RsIdInfo.from_json(rs_id_info_json, chromosome) for rs_id_info_json in data["variants"]
+            RsIdInfo.from_json(rs_id_info_json, chromosome_v37, chromosome_v38) for rs_id_info_json in data["variants"]
         })
         haplotypes = frozenset({Haplotype.from_json(haplotype_json) for haplotype_json in data["haplotypes"]})
         drugs = frozenset({DrugInfo.from_json(drug_json) for drug_json in data["drugs"]})
@@ -112,7 +108,6 @@ class GeneInfo(object):
         }
         gene_info = GeneInfo(
             gene,
-            chromosome,
             wild_type_haplotype,
             haplotypes,
             rs_id_infos,
@@ -182,22 +177,16 @@ class GeneInfo(object):
                 raise ValueError(error_msg)
 
     @staticmethod
-    def __assert_rs_id_infos_match_chromosome(rs_id_infos: FrozenSet[RsIdInfo], chromosome: str) -> None:
-        for info in rs_id_infos:
-            if info.start_coordinate_v37.chromosome != chromosome:
-                error_msg = (
-                    f"Rs id and gene disagree on chromosome, "
-                    f"'{info.start_coordinate_v37.chromosome}' vs '{chromosome}'. "
-                    f"Rs id info: {info}"
-                )
-                raise ValueError(error_msg)
-            if info.start_coordinate_v38.chromosome != chromosome:
-                error_msg = (
-                    f"Rs id and gene disagree on chromosome, "
-                    f"'{info.start_coordinate_v38.chromosome}' vs '{chromosome}'. "
-                    f"Rs id info: {info}"
-                )
-                raise ValueError(error_msg)
+    def __assert_rs_id_infos_match_chromosome(rs_id_infos: FrozenSet[RsIdInfo], gene: str) -> None:
+        v37_chromosomes = {info.start_coordinate_v37.chromosome for info in rs_id_infos}
+        v38_chromosomes = {info.start_coordinate_v38.chromosome for info in rs_id_infos}
+        if len(v37_chromosomes) > 1 or len(v38_chromosomes) > 1:
+            error_msg = (
+                f"Rs id infos for gene {gene} disagree on chromosome:\n"
+                f"v37 chromosomes: {v37_chromosomes}\n"
+                f"v38 chromosomes: {v38_chromosomes}"
+            )
+            raise ValueError(error_msg)
 
     @staticmethod
     def __assert_variants_in_haplotypes_compatible_with_rs_id_infos(

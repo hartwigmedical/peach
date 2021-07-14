@@ -4,7 +4,8 @@
   "genes": [
     {
       "gene": "DPYD",
-      "chromosome": "1",
+      "chromosomeV37": "1",
+      "chromosomeV38": "chr1",
       "wildTypeHaplotype": "*1",
       "haplotypes": [
         {
@@ -104,7 +105,8 @@
     },
     {
       "gene": "FAKE",
-      "chromosome": "5",
+      "chromosomeV37": "5",
+      "chromosomeV38": "chr5",
       "wildTypeHaplotype": "*1",
       "haplotypes": [
         {
@@ -138,7 +140,8 @@
     },
     {
       "gene": "FAKE2",
-      "chromosome": "16",
+      "chromosomeV37": "16",
+      "chromosomeV38": "chr16",
       "wildTypeHaplotype": "*1",
       "haplotypes": [
         {

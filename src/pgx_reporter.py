@@ -1,17 +1,19 @@
+import re
 from typing import Dict, Union
 
 import pandas as pd
 
 from base.constants import UNKNOWN_FUNCTION_STRING
-from base.util import get_chromosome_name_to_index
-from call_data import FullCall, HaplotypeCall
+from base.reference_assembly import ReferenceAssembly
+from call_data import HaplotypeCall
 from config.panel import Panel
 from pgx_analysis import PgxAnalysis
 
 
 class GenotypeReporter(object):
     GENE_COLUMN_NAME = "gene"
-    CHROMOSOME_COLUMN_NAME = "chromosome"
+    CHROMOSOME_V37_COLUMN_NAME = "chromosome_v37"
+    CHROMOSOME_V38_COLUMN_NAME = "chromosome_v38"
     POSITION_V37_COLUMN_NAME = "position_v37"
     POSITION_V38_COLUMN_NAME = "position_v38"
     REF_ALLELE_V37_COLUMN_NAME = "ref_v37"
@@ -26,8 +28,9 @@ class GenotypeReporter(object):
     PANEL_VERSION_COLUMN_NAME = "panel_version"
     TOOL_VERSION_COLUMN_NAME = "repo_version"
     NEW_CALLS_TSV_COLUMNS = (
-        GENE_COLUMN_NAME, CHROMOSOME_COLUMN_NAME,
-        POSITION_V37_COLUMN_NAME, POSITION_V38_COLUMN_NAME,
+        GENE_COLUMN_NAME,
+        CHROMOSOME_V37_COLUMN_NAME, POSITION_V37_COLUMN_NAME,
+        CHROMOSOME_V38_COLUMN_NAME, POSITION_V38_COLUMN_NAME,
         REF_ALLELE_V37_COLUMN_NAME, REF_ALLELE_V38_COLUMN_NAME,
         FIRST_ALLELE_COLUMN_NAME, SECOND_ALLELE_COLUMN_NAME, RS_IDS_COLUMN_NAME,
         ANNOTATION_V37_COLUMN_NAME, FILTER_V37_COLUMN_NAME, ANNOTATION_V38_COLUMN_NAME, FILTER_V38_COLUMN_NAME,
@@ -35,6 +38,7 @@ class GenotypeReporter(object):
     )
     CHROMOSOME_INDEX_NAME = "chromosome_index"
 
+    UNKNOWN_CHROMOSOME_STRING = "UNKNOWN"
     UNKNOWN_POSITION_STRING = "UNKNOWN"
     UNKNOWN_REF_ALLELE_STRING = "UNKNOWN"
 
@@ -42,16 +46,29 @@ class GenotypeReporter(object):
     RS_ID_SEPARATOR = ";"
 
     @classmethod
-    def get_calls_tsv_text(cls, pgx_analysis: PgxAnalysis, panel_id: str, version: str) -> str:
-        return str(cls.__get_panel_calls_df(pgx_analysis, panel_id, version).to_csv(sep=cls.TSV_SEPARATOR, index=False))
+    def get_calls_tsv_text(
+            cls, pgx_analysis: PgxAnalysis, panel_id: str, version: str, input_reference_assembly: ReferenceAssembly
+    ) -> str:
+        panel_calls_df = cls.__get_panel_calls_df(pgx_analysis, panel_id, version, input_reference_assembly)
+        return str(panel_calls_df.to_csv(sep=cls.TSV_SEPARATOR, index=False))
 
     @classmethod
-    def __get_panel_calls_df(cls, pgx_analysis: PgxAnalysis, panel_id: str, version: str) -> pd.DataFrame:
+    def __get_panel_calls_df(
+            cls, pgx_analysis: PgxAnalysis, panel_id: str, version: str, input_reference_assembly: ReferenceAssembly
+    ) -> pd.DataFrame:
         data_frame = pd.DataFrame(columns=cls.NEW_CALLS_TSV_COLUMNS)
         for full_call in pgx_analysis.get_all_full_calls():
-            chromosome = cls.__get_chromosome(full_call)
-
             sorted_alleles = sorted(full_call.alleles)
+            chromosome_v37: Union[str, int] = (
+                full_call.start_coordinate_v37.chromosome
+                if full_call.start_coordinate_v37 is not None
+                else cls.UNKNOWN_CHROMOSOME_STRING
+            )
+            chromosome_v38: Union[str, int] = (
+                full_call.start_coordinate_v38.chromosome
+                if full_call.start_coordinate_v38 is not None
+                else cls.UNKNOWN_CHROMOSOME_STRING
+            )
             position_v37: Union[str, int] = (
                 full_call.start_coordinate_v37.position
                 if full_call.start_coordinate_v37 is not None
@@ -75,8 +92,9 @@ class GenotypeReporter(object):
 
             new_id: Dict[str, Union[str, int]] = {
                 cls.GENE_COLUMN_NAME: full_call.gene,
-                cls.CHROMOSOME_COLUMN_NAME: chromosome,
+                cls.CHROMOSOME_V37_COLUMN_NAME: chromosome_v37,
                 cls.POSITION_V37_COLUMN_NAME: position_v37,
+                cls.CHROMOSOME_V38_COLUMN_NAME: chromosome_v38,
                 cls.POSITION_V38_COLUMN_NAME: position_v38,
                 cls.REF_ALLELE_V37_COLUMN_NAME: reference_allele_v37,
                 cls.REF_ALLELE_V38_COLUMN_NAME: reference_allele_v38,
@@ -95,46 +113,36 @@ class GenotypeReporter(object):
         if pd.isna(data_frame).any(axis=None):
             raise ValueError(f"This should never happen: Unhandled NaN values:\n{data_frame}")
 
-        data_frame = cls.__sort_call_data_frame(data_frame)
+        data_frame = cls.__sort_call_data_frame(data_frame, input_reference_assembly)
 
         return data_frame
 
     @classmethod
-    def __get_chromosome(cls, full_call: FullCall) -> str:
-        if full_call.start_coordinate_v37 is not None and full_call.start_coordinate_v38 is not None:
-            if full_call.start_coordinate_v37.chromosome == full_call.start_coordinate_v38.chromosome:
-                chromosome = full_call.start_coordinate_v37.chromosome
-            else:
-                error_msg = (
-                    f"Encountered call with different coordinates in different assemblies:\n"
-                    f"call={full_call}"
-                )
-                raise NotImplementedError(error_msg)
-        elif full_call.start_coordinate_v37 is not None and full_call.start_coordinate_v38 is None:
-            chromosome = full_call.start_coordinate_v37.chromosome
-        elif full_call.start_coordinate_v37 is None and full_call.start_coordinate_v38 is not None:
-            chromosome = full_call.start_coordinate_v38.chromosome
+    def __sort_call_data_frame(
+            cls, data_frame: pd.DataFrame, input_reference_assembly: ReferenceAssembly) -> pd.DataFrame:
+        if input_reference_assembly == ReferenceAssembly.V37:
+            column_for_chromosome_sorting = cls.CHROMOSOME_V37_COLUMN_NAME
+            column_for_position_sorting = cls.POSITION_V37_COLUMN_NAME
+        elif input_reference_assembly == ReferenceAssembly.V38:
+            column_for_chromosome_sorting = cls.CHROMOSOME_V38_COLUMN_NAME
+            column_for_position_sorting = cls.POSITION_V38_COLUMN_NAME
         else:
-            # Full call has no coordinates. This should not be possible
-            error_msg = (
-                f"Encountered call without coordinates:\n"
-                f"call={full_call}"
-            )
-            raise SyntaxError(error_msg)
-        return chromosome
+            error_msg = f"Unrecognized reference assembly: {input_reference_assembly}"
+            raise ValueError(error_msg)
 
-    @classmethod
-    def __sort_call_data_frame(cls, data_frame: pd.DataFrame) -> pd.DataFrame:
         data_frame.loc[:, cls.CHROMOSOME_INDEX_NAME] = (
-            data_frame.loc[:, cls.CHROMOSOME_COLUMN_NAME].map(get_chromosome_name_to_index())
+            data_frame.loc[:, column_for_chromosome_sorting].apply(lambda x: tuple(re.split(r"(\d+)", x)))
         )
+
         data_frame = data_frame.sort_values(
-            by=[cls.CHROMOSOME_INDEX_NAME, cls.GENE_COLUMN_NAME,
-                cls.POSITION_V37_COLUMN_NAME, cls.REF_ALLELE_V37_COLUMN_NAME,
-                cls.POSITION_V38_COLUMN_NAME, cls.REF_ALLELE_V38_COLUMN_NAME]
+            by=[cls.CHROMOSOME_INDEX_NAME, column_for_position_sorting, cls.GENE_COLUMN_NAME,
+                cls.REF_ALLELE_V37_COLUMN_NAME, cls.REF_ALLELE_V38_COLUMN_NAME]
         ).reset_index(drop=True)
         data_frame = data_frame.loc[:, cls.NEW_CALLS_TSV_COLUMNS]
         return data_frame
+
+
+
 
 
 class HaplotypeReporter(object):

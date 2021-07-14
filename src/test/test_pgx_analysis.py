@@ -30,10 +30,10 @@ class TestPgxAnalysis(unittest.TestCase):
             Haplotype("*3", "Normal Function", frozenset({dpyd_three_variant})),
         })
         dpyd_rs_id_infos = frozenset({
-            RsIdInfo("rs3918290", "C", "C", GeneCoordinate("1", 97915614), GeneCoordinate("1", 97450058)),
-            RsIdInfo("rs72549309", "GATGA", "GATGA", GeneCoordinate("1", 98205966), GeneCoordinate("1", 97740410)),
-            RsIdInfo("rs1801159", "T", "T", GeneCoordinate("1", 97981395), GeneCoordinate("1", 97515839)),
-            RsIdInfo("rs72549303", "TG", "TC", GeneCoordinate("1", 97915621), GeneCoordinate("1", 97450065)),
+            RsIdInfo("rs3918290", "C", "C", GeneCoordinate("1", 97915614), GeneCoordinate("chr1", 97450058)),
+            RsIdInfo("rs72549309", "GATGA", "GATGA", GeneCoordinate("1", 98205966), GeneCoordinate("chr1", 97740410)),
+            RsIdInfo("rs1801159", "T", "T", GeneCoordinate("1", 97981395), GeneCoordinate("chr1", 97515839)),
+            RsIdInfo("rs72549303", "TG", "TC", GeneCoordinate("1", 97915621), GeneCoordinate("chr1", 97450065)),
         })
         dpyd_drugs = frozenset({
             DrugInfo("5-Fluorouracil", "https://www.pharmgkb.org/chemical/PA128406956/guidelineAnnotation/PA166104939"),
@@ -47,7 +47,7 @@ class TestPgxAnalysis(unittest.TestCase):
             Haplotype("*4A", "Reduced Function", frozenset({fake_variant})),
         })
         fake_rs_id_infos = frozenset({
-            RsIdInfo("rs1212125", "T", "T", GeneCoordinate("5", 97915617), GeneCoordinate("5", 97450060)),
+            RsIdInfo("rs1212125", "T", "T", GeneCoordinate("5", 97915617), GeneCoordinate("chr5", 97450060)),
         })
         fake_drugs = frozenset({
             DrugInfo("Aspirin", "https://www.pharmgkb.org/some_other_url"),
@@ -58,7 +58,7 @@ class TestPgxAnalysis(unittest.TestCase):
             Haplotype("*4A", "Reduced Function", frozenset({fake2_variant})),
         })
         fake2_rs_id_infos = frozenset({
-            RsIdInfo("rs1212127", "C", "T", GeneCoordinate("16", 97915617), GeneCoordinate("16", 97450060)),
+            RsIdInfo("rs1212127", "C", "T", GeneCoordinate("16", 97915617), GeneCoordinate("chr16", 97450060)),
         })
         fake2_drugs = frozenset({
             DrugInfo("Aspirin", "https://www.pharmgkb.org/some_other_url"),
@@ -66,15 +66,15 @@ class TestPgxAnalysis(unittest.TestCase):
         fake2_rs_id_to_ref_seq_difference_annotations = {"rs1212127": Annotation("1324C>T", "1324T>C")}
 
         dpyd_gene_info = GeneInfo(
-            "DPYD", "1", "*1", dpyd_haplotypes, dpyd_rs_id_infos,
+            "DPYD", "*1", dpyd_haplotypes, dpyd_rs_id_infos,
             dpyd_drugs, dpyd_rs_id_to_ref_seq_difference_annotations,
         )
         fake_gene_info = GeneInfo(
-            "FAKE", "5", "*1", fake_haplotypes, fake_rs_id_infos,
+            "FAKE", "*1", fake_haplotypes, fake_rs_id_infos,
             fake_drugs, fake_rs_id_to_ref_seq_difference_annotations,
         )
         fake2_gene_info = GeneInfo(
-            "FAKE2", "16", "*1", fake2_haplotypes, fake2_rs_id_infos,
+            "FAKE2", "*1", fake2_haplotypes, fake2_rs_id_infos,
             fake2_drugs, fake2_rs_id_to_ref_seq_difference_annotations,
         )
         gene_infos = frozenset({dpyd_gene_info, fake_gene_info, fake2_gene_info})
@@ -100,11 +100,11 @@ class TestPgxAnalysis(unittest.TestCase):
             Haplotype("*10", "Normal Function", frozenset({dpyd_three_variant, dpyd_five_variant})),
         ]
         possible_rs_id_infos = [
-            RsIdInfo("rs3918290", "C", "C", GeneCoordinate("1", 97915614), GeneCoordinate("1", 97450058)),
-            RsIdInfo("rs72549309", "GATGA", "GATGA", GeneCoordinate("1", 98205966), GeneCoordinate("1", 97740410)),
-            RsIdInfo("rs1801159", "T", "T", GeneCoordinate("1", 97981395), GeneCoordinate("1", 97515839)),
-            RsIdInfo("rs72549303", "TG", "TC", GeneCoordinate("1", 97915621), GeneCoordinate("1", 97450065)),
-            RsIdInfo("rs2938101", "A", "A", GeneCoordinate("1", 97912838), GeneCoordinate("1", 97453984)),
+            RsIdInfo("rs3918290", "C", "C", GeneCoordinate("1", 97915614), GeneCoordinate("chr1", 97450058)),
+            RsIdInfo("rs72549309", "GATGA", "GATGA", GeneCoordinate("1", 98205966), GeneCoordinate("chr1", 97740410)),
+            RsIdInfo("rs1801159", "T", "T", GeneCoordinate("1", 97981395), GeneCoordinate("chr1", 97515839)),
+            RsIdInfo("rs72549303", "TG", "TC", GeneCoordinate("1", 97915621), GeneCoordinate("chr1", 97450065)),
+            RsIdInfo("rs2938101", "A", "A", GeneCoordinate("1", 97912838), GeneCoordinate("chr1", 97453984)),
         ]
 
         unknown_haplotypes = included_haplotypes.difference({haplotype.name for haplotype in possible_dpyd_haplotypes})
@@ -131,7 +131,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
         gene_infos = frozenset({
             GeneInfo(
-                "DPYD", "1", "*1", included_dpyd_haplotypes, included_dpyd_rs_id_infos,
+                "DPYD", "*1", included_dpyd_haplotypes, included_dpyd_rs_id_infos,
                 dpyd_drugs, dpyd_rs_id_to_difference_annotations,
             ),
         })
@@ -151,32 +151,32 @@ class TestPgxAnalysis(unittest.TestCase):
 
         all_full_calls_expected = frozenset({
             FullCall(
-                GeneCoordinate("1", 97915614), "C", GeneCoordinate("1", 97450058), "C",
+                GeneCoordinate("1", 97915614), "C", GeneCoordinate("chr1", 97450058), "C",
                 ("C", "C"), "DPYD", ("rs3918290",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("1", 97450065), "TC",
+                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("chr1", 97450065), "TC",
                 ("TG", "TG"), "DPYD", ("rs72549303",),
                 "REF_CALL", FullCallFilter.NO_CALL, "6744GA>CA", FullCallFilter.INFERRED_PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 97981395), "T", GeneCoordinate("1", 97515839), "T",
+                GeneCoordinate("1", 97981395), "T", GeneCoordinate("chr1", 97515839), "T",
                 ("T", "T"), "DPYD", ("rs1801159",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                GeneCoordinate("1", 98205966), "GATGA", GeneCoordinate("1", 97740410), "GATGA",
+                GeneCoordinate("1", 98205966), "GATGA", GeneCoordinate("chr1", 97740410), "GATGA",
                 ("GATGA", "GATGA"), "DPYD", ("rs72549309",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                GeneCoordinate("16", 97915617), "C", GeneCoordinate("16", 97450060), "T",
+                GeneCoordinate("16", 97915617), "C", GeneCoordinate("chr16", 97450060), "T",
                 ("C", "C"), "FAKE2", ("rs1212127",),
                 "REF_CALL", FullCallFilter.NO_CALL, "1324T>C", FullCallFilter.INFERRED_PASS,
             ),
             FullCall(
-                GeneCoordinate("5", 97915617), "T", GeneCoordinate("5", 97450060), "T",
+                GeneCoordinate("5", 97915617), "T", GeneCoordinate("chr5", 97450060), "T",
                 ("T", "T"), "FAKE", ("rs1212125",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
@@ -196,32 +196,32 @@ class TestPgxAnalysis(unittest.TestCase):
 
         all_full_calls_expected = frozenset({
             FullCall(
-                GeneCoordinate("1", 97915614), "C", GeneCoordinate("1", 97450058), "C",
+                GeneCoordinate("1", 97915614), "C", GeneCoordinate("chr1", 97450058), "C",
                 ("C", "C"), "DPYD", ("rs3918290",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("1", 97450065), "TC",
+                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("chr1", 97450065), "TC",
                 ("TC", "TC"), "DPYD", ("rs72549303",),
                 "6744CA>GA", FullCallFilter.INFERRED_PASS, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                GeneCoordinate("1", 97981395), "T", GeneCoordinate("1", 97515839), "T",
+                GeneCoordinate("1", 97981395), "T", GeneCoordinate("chr1", 97515839), "T",
                 ("T", "T"), "DPYD", ("rs1801159",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                GeneCoordinate("1", 98205966), "GATGA", GeneCoordinate("1", 97740410), "GATGA",
+                GeneCoordinate("1", 98205966), "GATGA", GeneCoordinate("chr1", 97740410), "GATGA",
                 ("GATGA", "GATGA"), "DPYD", ("rs72549309",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                GeneCoordinate("16", 97915617), "C", GeneCoordinate("16", 97450060), "T",
+                GeneCoordinate("16", 97915617), "C", GeneCoordinate("chr16", 97450060), "T",
                 ("T", "T"), "FAKE2", ("rs1212127",),
                 "1324C>T", FullCallFilter.INFERRED_PASS, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                GeneCoordinate("5", 97915617), "T", GeneCoordinate("5", 97450060), "T",
+                GeneCoordinate("5", 97915617), "T", GeneCoordinate("chr5", 97450060), "T",
                 ("T", "T"), "FAKE", ("rs1212125",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
@@ -250,32 +250,32 @@ class TestPgxAnalysis(unittest.TestCase):
         }
         all_full_calls_expected = frozenset({
             FullCall(
-                GeneCoordinate("1", 97915614), "C", GeneCoordinate("1", 97450058), "C",
+                GeneCoordinate("1", 97915614), "C", GeneCoordinate("chr1", 97450058), "C",
                 ("C", "C"), "DPYD", ("rs3918290",),
                 "REF_CALL", FullCallFilter.PASS, "REF_CALL", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("1", 97450065), "TC",
+                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("chr1", 97450065), "TC",
                 ("TC", "TC"), "DPYD", ("rs72549303",),
                 "6744CA>GA", FullCallFilter.PASS, "REF_CALL", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 97981395), "T", GeneCoordinate("1", 97515839), "T",
+                GeneCoordinate("1", 97981395), "T", GeneCoordinate("chr1", 97515839), "T",
                 ("T", "T"), "DPYD", ("rs1801159",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                GeneCoordinate("1", 98205966), "GATGA", GeneCoordinate("1", 97740410), "GATGA",
+                GeneCoordinate("1", 98205966), "GATGA", GeneCoordinate("chr1", 97740410), "GATGA",
                 ("GATGA", "GATGA"), "DPYD", ("rs72549309",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                GeneCoordinate("16", 97915617), "C", GeneCoordinate("16", 97450060), "T",
+                GeneCoordinate("16", 97915617), "C", GeneCoordinate("chr16", 97450060), "T",
                 ("T", "T"), "FAKE2", ("rs1212127",),
                 "1324C>T", FullCallFilter.PASS, "REF_CALL", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("5", 97915617), "T", GeneCoordinate("5", 97450060), "T",
+                GeneCoordinate("5", 97915617), "T", GeneCoordinate("chr5", 97450060), "T",
                 ("T", "T"), "FAKE", ("rs1212125",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
@@ -312,32 +312,32 @@ class TestPgxAnalysis(unittest.TestCase):
         }
         all_full_calls_expected = frozenset({
             FullCall(
-                GeneCoordinate("1", 97915614), "C", GeneCoordinate("1", 97450058), "C",
+                GeneCoordinate("1", 97915614), "C", GeneCoordinate("chr1", 97450058), "C",
                 ("C", "T"), "DPYD", ("rs3918290",),
                 "35G>A", FullCallFilter.PASS, "35G>A", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("1", 97450065), "TC",
+                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("chr1", 97450065), "TC",
                 ("TG", "TC"), "DPYD", ("rs72549303",),
                 "6744CA>GA", FullCallFilter.PASS, "6744GA>CA", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 97981395), "T", GeneCoordinate("1", 97515839), "T",
+                GeneCoordinate("1", 97981395), "T", GeneCoordinate("chr1", 97515839), "T",
                 ("T", "C"), "DPYD", ("rs1801159",),
                 "674A>G", FullCallFilter.PASS, "674A>G", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 98205966), "GATGA", GeneCoordinate("1", 97740410), "GATGA",
+                GeneCoordinate("1", 98205966), "GATGA", GeneCoordinate("chr1", 97740410), "GATGA",
                 ("GATGA", "GATGA"), "DPYD", ("rs72549309",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                GeneCoordinate("16", 97915617), "C", GeneCoordinate("16", 97450060), "T",
+                GeneCoordinate("16", 97915617), "C", GeneCoordinate("chr16", 97450060), "T",
                 ("C", "T"), "FAKE2", ("rs1212127",),
                 "1324C>T", FullCallFilter.PASS, "1324T>C", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("5", 97915617), "T", GeneCoordinate("5", 97450060), "T",
+                GeneCoordinate("5", 97915617), "T", GeneCoordinate("chr5", 97450060), "T",
                 ("T", "C"), "FAKE", ("rs1212125",),
                 "1005T>C", FullCallFilter.PASS, "1005T>C", FullCallFilter.PASS,
             ),
@@ -350,19 +350,19 @@ class TestPgxAnalysis(unittest.TestCase):
         panel = self.__get_wide_example_panel()
         simple_call_data = SimpleCallData(frozenset({
             SimpleCall(
-                GeneCoordinate("16", 97450060), "T", ("C", "T"),
+                GeneCoordinate("chr16", 97450060), "T", ("C", "T"),
                 "FAKE2", ("rs1212127",), "1324T>C", SimpleCallFilter.PASS),
             SimpleCall(
-                GeneCoordinate("5", 97450060), "T", ("T", "C"),
+                GeneCoordinate("chr5", 97450060), "T", ("T", "C"),
                 "FAKE", ("rs1212125",), "1005T>C", SimpleCallFilter.PASS),
             SimpleCall(
-                GeneCoordinate("1", 97450065), "TC", ("TG", "TC"),
+                GeneCoordinate("chr1", 97450065), "TC", ("TG", "TC"),
                 "DPYD", ("rs72549303",), "6744GA>CA", SimpleCallFilter.PASS),
             SimpleCall(
-                GeneCoordinate("1", 97450058), "C", ("C", "T"),
+                GeneCoordinate("chr1", 97450058), "C", ("C", "T"),
                 "DPYD", ("rs3918290",), "35G>A", SimpleCallFilter.PASS),
             SimpleCall(
-                GeneCoordinate("1", 97515839), "T", ("T", "C"),
+                GeneCoordinate("chr1", 97515839), "T", ("T", "C"),
                 "DPYD", ("rs1801159",), "674A>G", SimpleCallFilter.PASS),
         }), ReferenceAssembly.V38)
         pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
@@ -374,32 +374,32 @@ class TestPgxAnalysis(unittest.TestCase):
         }
         all_full_calls_expected = frozenset({
             FullCall(
-                GeneCoordinate("1", 97915614), "C", GeneCoordinate("1", 97450058), "C",
+                GeneCoordinate("1", 97915614), "C", GeneCoordinate("chr1", 97450058), "C",
                 ("C", "T"), "DPYD", ("rs3918290",),
                 "35G>A", FullCallFilter.PASS, "35G>A", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("1", 97450065), "TC",
+                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("chr1", 97450065), "TC",
                 ("TG", "TC"), "DPYD", ("rs72549303",),
                 "6744CA>GA", FullCallFilter.PASS, "6744GA>CA", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 97981395), "T", GeneCoordinate("1", 97515839), "T",
+                GeneCoordinate("1", 97981395), "T", GeneCoordinate("chr1", 97515839), "T",
                 ("T", "C"), "DPYD", ("rs1801159",),
                 "674A>G", FullCallFilter.PASS, "674A>G", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 98205966), "GATGA", GeneCoordinate("1", 97740410), "GATGA",
+                GeneCoordinate("1", 98205966), "GATGA", GeneCoordinate("chr1", 97740410), "GATGA",
                 ("GATGA", "GATGA"), "DPYD", ("rs72549309",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                GeneCoordinate("16", 97915617), "C", GeneCoordinate("16", 97450060), "T",
+                GeneCoordinate("16", 97915617), "C", GeneCoordinate("chr16", 97450060), "T",
                 ("C", "T"), "FAKE2", ("rs1212127",),
                 "1324C>T", FullCallFilter.PASS, "1324T>C", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("5", 97915617), "T", GeneCoordinate("5", 97450060), "T",
+                GeneCoordinate("5", 97915617), "T", GeneCoordinate("chr5", 97450060), "T",
                 ("T", "C"), "FAKE", ("rs1212125",),
                 "1005T>C", FullCallFilter.PASS, "1005T>C", FullCallFilter.PASS,
             ),
@@ -425,17 +425,17 @@ class TestPgxAnalysis(unittest.TestCase):
         }
         all_full_calls_expected = frozenset({
             FullCall(
-                GeneCoordinate("1", 97912838), "A", GeneCoordinate("1", 97453984), "A",
+                GeneCoordinate("1", 97912838), "A", GeneCoordinate("chr1", 97453984), "A",
                 ("AGT", "AGT"), "DPYD", ("rs2938101",),
                 "293A>AGT", FullCallFilter.PASS, "293A>AGT", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 97915614), "C", GeneCoordinate("1", 97450058), "C",
+                GeneCoordinate("1", 97915614), "C", GeneCoordinate("chr1", 97450058), "C",
                 ("C", "T"), "DPYD", ("rs3918290",),
                 "9213C>T", FullCallFilter.PASS, "9213C>T", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("1", 97450065), "TC",
+                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("chr1", 97450065), "TC",
                 ("TG", "TG"), "DPYD", ("rs72549303",),
                 "REF_CALL", FullCallFilter.NO_CALL, "6744GA>CA", FullCallFilter.INFERRED_PASS,
             ),
@@ -448,13 +448,13 @@ class TestPgxAnalysis(unittest.TestCase):
         panel = self.__get_narrow_example_panel({"*2A", "*5", "*2B"})
         simple_call_data = SimpleCallData(frozenset({
             SimpleCall(
-                GeneCoordinate("1", 97450058), "C", ("T", "T"),
+                GeneCoordinate("chr1", 97450058), "C", ("T", "T"),
                 "DPYD", ("rs3918290",), "9213C>T", SimpleCallFilter.PASS),
             SimpleCall(
-                GeneCoordinate("1", 97515839), "T", ("C", "C"),
+                GeneCoordinate("chr1", 97515839), "T", ("C", "C"),
                 "DPYD", ("rs1801159",), "293T>C", SimpleCallFilter.PASS),
             SimpleCall(
-                GeneCoordinate("1", 97450065), "TC", ("TC", "TC"),
+                GeneCoordinate("chr1", 97450065), "TC", ("TC", "TC"),
                 "DPYD", ("rs72549303",), "REF_CALL", SimpleCallFilter.PASS),
         }), ReferenceAssembly.V38)
         pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
@@ -462,17 +462,17 @@ class TestPgxAnalysis(unittest.TestCase):
         gene_to_haplotype_calls_expected = {"DPYD": {HaplotypeCall("*2B", 2)}}
         all_full_calls_expected = frozenset({
             FullCall(
-                GeneCoordinate("1", 97915614), "C", GeneCoordinate("1", 97450058), "C",
+                GeneCoordinate("1", 97915614), "C", GeneCoordinate("chr1", 97450058), "C",
                 ("T", "T"), "DPYD", ("rs3918290",),
                 "9213C>T", FullCallFilter.PASS, "9213C>T", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("1", 97450065), "TC",
+                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("chr1", 97450065), "TC",
                 ("TC", "TC"), "DPYD", ("rs72549303",),
                 "6744CA>GA", FullCallFilter.PASS, "REF_CALL", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 97981395), "T", GeneCoordinate("1", 97515839), "T",
+                GeneCoordinate("1", 97981395), "T", GeneCoordinate("chr1", 97515839), "T",
                 ("C", "C"), "DPYD", ("rs1801159",),
                 "293T>C", FullCallFilter.PASS, "293T>C", FullCallFilter.PASS,
             ),
@@ -499,17 +499,17 @@ class TestPgxAnalysis(unittest.TestCase):
         gene_to_haplotype_calls_expected = {"DPYD": {HaplotypeCall("*2B", 1), HaplotypeCall("*1", 1)}}
         all_full_calls_expected = frozenset({
             FullCall(
-                GeneCoordinate("1", 97915614), "C", GeneCoordinate("1", 97450058), "C",
+                GeneCoordinate("1", 97915614), "C", GeneCoordinate("chr1", 97450058), "C",
                 ("C", "T"), "DPYD", ("rs3918290",),
                 "9213C>T", FullCallFilter.PASS, "9213C>T", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("1", 97450065), "TC",
+                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("chr1", 97450065), "TC",
                 ("TC", "TC"), "DPYD", ("rs72549303",),
                 "6744CA>GA", FullCallFilter.PASS, "REF_CALL", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 97981395), "T", GeneCoordinate("1", 97515839), "T",
+                GeneCoordinate("1", 97981395), "T", GeneCoordinate("chr1", 97515839), "T",
                 ("T", "C"), "DPYD", ("rs1801159",),
                 "293T>C", FullCallFilter.PASS, "293T>C", FullCallFilter.PASS,
             ),
@@ -525,13 +525,13 @@ class TestPgxAnalysis(unittest.TestCase):
         panel = self.__get_narrow_example_panel({"*2A", "*5", "*2B"})
         simple_call_data = SimpleCallData(frozenset({
             SimpleCall(
-                GeneCoordinate("1", 97450058), "C", ("T", "T"),
+                GeneCoordinate("chr1", 97450058), "C", ("T", "T"),
                 "DPYD", ("rs3918290",), "9213C>T", SimpleCallFilter.PASS),
             SimpleCall(
-                GeneCoordinate("1", 97515839), "T", ("T", "C"),
+                GeneCoordinate("chr1", 97515839), "T", ("T", "C"),
                 "DPYD", ("rs1801159",), "293T>C", SimpleCallFilter.PASS),
             SimpleCall(
-                GeneCoordinate("1", 97450065), "TC", ("TC", "TC"),
+                GeneCoordinate("chr1", 97450065), "TC", ("TC", "TC"),
                 "DPYD", ("rs72549303",), "REF_CALL", SimpleCallFilter.PASS),
         }), ReferenceAssembly.V38)
         pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
@@ -539,17 +539,17 @@ class TestPgxAnalysis(unittest.TestCase):
         gene_to_haplotype_calls_expected = {"DPYD": {HaplotypeCall("*2B", 1), HaplotypeCall("*2A", 1)}}
         all_full_calls_expected = frozenset({
             FullCall(
-                GeneCoordinate("1", 97915614), "C", GeneCoordinate("1", 97450058), "C",
+                GeneCoordinate("1", 97915614), "C", GeneCoordinate("chr1", 97450058), "C",
                 ("T", "T"), "DPYD", ("rs3918290",),
                 "9213C>T", FullCallFilter.PASS, "9213C>T", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("1", 97450065), "TC",
+                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("chr1", 97450065), "TC",
                 ("TC", "TC"), "DPYD", ("rs72549303",),
                 "6744CA>GA", FullCallFilter.PASS, "REF_CALL", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 97981395), "T", GeneCoordinate("1", 97515839), "T",
+                GeneCoordinate("1", 97981395), "T", GeneCoordinate("chr1", 97515839), "T",
                 ("T", "C"), "DPYD", ("rs1801159",),
                 "293T>C", FullCallFilter.PASS, "293T>C", FullCallFilter.PASS,
             ),
@@ -581,22 +581,22 @@ class TestPgxAnalysis(unittest.TestCase):
         }
         all_full_calls_expected = frozenset({
             FullCall(
-                GeneCoordinate("1", 97912838), "A", GeneCoordinate("1", 97453984), "A",
+                GeneCoordinate("1", 97912838), "A", GeneCoordinate("chr1", 97453984), "A",
                 ("AGT", "AGT"), "DPYD", ("rs2938101",),
                 "301A>AGT", FullCallFilter.PASS, "301A>AGT", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 97915614), "C", GeneCoordinate("1", 97450058), "C",
+                GeneCoordinate("1", 97915614), "C", GeneCoordinate("chr1", 97450058), "C",
                 ("T", "T"), "DPYD", ("rs3918290",),
                 "9213C>T", FullCallFilter.PASS, "9213C>T", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("1", 97450065), "TC",
+                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("chr1", 97450065), "TC",
                 ("TG", "TC"), "DPYD", ("rs72549303",),
                 "6744CA>GA", FullCallFilter.PASS, "6744GA>CA", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 97981395), "T", GeneCoordinate("1", 97515839), "T",
+                GeneCoordinate("1", 97981395), "T", GeneCoordinate("chr1", 97515839), "T",
                 ("T", "C"), "DPYD", ("rs1801159",),
                 "293T>C", FullCallFilter.PASS, "293T>C", FullCallFilter.PASS,
             ),
@@ -609,13 +609,13 @@ class TestPgxAnalysis(unittest.TestCase):
         panel = self.__get_narrow_example_panel({"*2A", "*5", "*2B", "*3", "*9", "*10"})
         simple_call_data = SimpleCallData(frozenset({
             SimpleCall(
-                GeneCoordinate("1", 97450058), "C", ("T", "T"),
+                GeneCoordinate("chr1", 97450058), "C", ("T", "T"),
                 "DPYD", ("rs3918290",), "9213C>T", SimpleCallFilter.PASS),
             SimpleCall(
-                GeneCoordinate("1", 97515839), "T", ("C", "C"),
+                GeneCoordinate("chr1", 97515839), "T", ("C", "C"),
                 "DPYD", ("rs1801159",), "293T>C", SimpleCallFilter.PASS),
             SimpleCall(
-                GeneCoordinate("1", 97450065), "TC", ("TG", "TG"),
+                GeneCoordinate("chr1", 97450065), "TC", ("TG", "TG"),
                 "DPYD", ("rs72549303",), "6744GA>CA", SimpleCallFilter.PASS),
         }), ReferenceAssembly.V38)
         pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
@@ -625,17 +625,17 @@ class TestPgxAnalysis(unittest.TestCase):
         }
         all_full_calls_expected = frozenset({
             FullCall(
-                GeneCoordinate("1", 97915614), "C", GeneCoordinate("1", 97450058), "C",
+                GeneCoordinate("1", 97915614), "C", GeneCoordinate("chr1", 97450058), "C",
                 ("T", "T"), "DPYD", ("rs3918290",),
                 "9213C>T", FullCallFilter.PASS, "9213C>T", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("1", 97450065), "TC",
+                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("chr1", 97450065), "TC",
                 ("TG", "TG"), "DPYD", ("rs72549303",),
                 "REF_CALL", FullCallFilter.PASS, "6744GA>CA", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 97981395), "T", GeneCoordinate("1", 97515839), "T",
+                GeneCoordinate("1", 97981395), "T", GeneCoordinate("chr1", 97515839), "T",
                 ("C", "C"), "DPYD", ("rs1801159",),
                 "293T>C", FullCallFilter.PASS, "293T>C", FullCallFilter.PASS,
             ),
@@ -666,17 +666,17 @@ class TestPgxAnalysis(unittest.TestCase):
         gene_to_haplotype_calls_expected: Dict[str, Set[HaplotypeCall]] = {"DPYD": set()}
         all_full_calls_expected = frozenset({
             FullCall(
-                GeneCoordinate("1", 97915614), "C", GeneCoordinate("1", 97450058), "C",
+                GeneCoordinate("1", 97915614), "C", GeneCoordinate("chr1", 97450058), "C",
                 ("C", "T"), "DPYD", ("rs3918290",),
                 "9213C>T", FullCallFilter.PASS, "9213C>T", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("1", 97450065), "TC",
+                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("chr1", 97450065), "TC",
                 ("TG", "TC"), "DPYD", ("rs72549303",),
                 "6744CA>GA", FullCallFilter.PASS, "6744GA>CA", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 97981395), "T", GeneCoordinate("1", 97515839), "T",
+                GeneCoordinate("1", 97981395), "T", GeneCoordinate("chr1", 97515839), "T",
                 ("T", "C"), "DPYD", ("rs1801159",),
                 "293T>C", FullCallFilter.PASS, "293T>C", FullCallFilter.PASS,
             ),
@@ -709,22 +709,22 @@ class TestPgxAnalysis(unittest.TestCase):
                 "9213CT>GT", FullCallFilter.PASS, "9213CT>GT?", FullCallFilter.UNKNOWN,
             ),
             FullCall(
-                GeneCoordinate("1", 97915614), "C", GeneCoordinate("1", 97450058), "C",
+                GeneCoordinate("1", 97915614), "C", GeneCoordinate("chr1", 97450058), "C",
                 ("C", "C"), "DPYD", ("rs3918290",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("1", 97450065), "TC",
+                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("chr1", 97450065), "TC",
                 ("TG", "TG"), "DPYD", ("rs72549303",),
                 "REF_CALL", FullCallFilter.NO_CALL, "6744GA>CA", FullCallFilter.INFERRED_PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 97981395), "T", GeneCoordinate("1", 97515839), "T",
+                GeneCoordinate("1", 97981395), "T", GeneCoordinate("chr1", 97515839), "T",
                 ("T", "T"), "DPYD", ("rs1801159",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                GeneCoordinate("1", 98205966), "GATGA", GeneCoordinate("1", 97740410), "GATGA",
+                GeneCoordinate("1", 98205966), "GATGA", GeneCoordinate("chr1", 97740410), "GATGA",
                 ("GATGA", "GATGA"), "DPYD", ("rs72549309",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
@@ -734,12 +734,12 @@ class TestPgxAnalysis(unittest.TestCase):
                 "384C>T", FullCallFilter.PASS, "384C>T?", FullCallFilter.UNKNOWN,
             ),
             FullCall(
-                GeneCoordinate("16", 97915617), "C", GeneCoordinate("16", 97450060), "T",
+                GeneCoordinate("16", 97915617), "C", GeneCoordinate("chr16", 97450060), "T",
                 ("C", "C"), "FAKE2", ("rs1212127",),
                 "REF_CALL", FullCallFilter.NO_CALL, "1324T>C", FullCallFilter.INFERRED_PASS,
             ),
             FullCall(
-                GeneCoordinate("5", 97915617), "T", GeneCoordinate("5", 97450060), "T",
+                GeneCoordinate("5", 97915617), "T", GeneCoordinate("chr5", 97450060), "T",
                 ("T", "C"), "FAKE", ("rs1212125",),
                 "1005T>C", FullCallFilter.PASS, "1005T>C", FullCallFilter.PASS,
             ),
@@ -752,13 +752,13 @@ class TestPgxAnalysis(unittest.TestCase):
         panel = self.__get_wide_example_panel()
         simple_call_data = SimpleCallData(frozenset({
             SimpleCall(
-                GeneCoordinate("16", 39593405), "A", ("A", "G"),
+                GeneCoordinate("chr16", 39593405), "A", ("A", "G"),
                 "FAKE2", ("rs1949223",), "384C>T", SimpleCallFilter.PASS),  # unknown
             SimpleCall(
-                GeneCoordinate("5", 97450060), "T", ("T", "C"),
+                GeneCoordinate("chr5", 97450060), "T", ("T", "C"),
                 "FAKE", ("rs1212125",), "1005T>C", SimpleCallFilter.PASS),
             SimpleCall(
-                GeneCoordinate("1", 2488242), "AC", ("AC", "AG"),
+                GeneCoordinate("chr1", 2488242), "AC", ("AC", "AG"),
                 "DPYD", (".",), "9213CT>GT", SimpleCallFilter.PASS),  # unknown
         }), ReferenceAssembly.V38)
         pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
@@ -767,42 +767,42 @@ class TestPgxAnalysis(unittest.TestCase):
             "DPYD": set(), "FAKE": {HaplotypeCall("*4A", 1), HaplotypeCall("*1", 1)}, "FAKE2": set()}
         all_full_calls_expected = frozenset({
             FullCall(
-                None, None, GeneCoordinate("1", 2488242), "AC",
+                None, None, GeneCoordinate("chr1", 2488242), "AC",
                 ("AC", "AG"), "DPYD", (".",),
                 "9213CT>GT?", FullCallFilter.UNKNOWN, "9213CT>GT", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 97915614), "C", GeneCoordinate("1", 97450058), "C",
+                GeneCoordinate("1", 97915614), "C", GeneCoordinate("chr1", 97450058), "C",
                 ("C", "C"), "DPYD", ("rs3918290",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("1", 97450065), "TC",
+                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("chr1", 97450065), "TC",
                 ("TC", "TC"), "DPYD", ("rs72549303",),
                 "6744CA>GA", FullCallFilter.INFERRED_PASS, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                GeneCoordinate("1", 97981395), "T", GeneCoordinate("1", 97515839), "T",
+                GeneCoordinate("1", 97981395), "T", GeneCoordinate("chr1", 97515839), "T",
                 ("T", "T"), "DPYD", ("rs1801159",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                GeneCoordinate("1", 98205966), "GATGA", GeneCoordinate("1", 97740410), "GATGA",
+                GeneCoordinate("1", 98205966), "GATGA", GeneCoordinate("chr1", 97740410), "GATGA",
                 ("GATGA", "GATGA"), "DPYD", ("rs72549309",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                None, None, GeneCoordinate("16", 39593405), "A",
+                None, None, GeneCoordinate("chr16", 39593405), "A",
                 ("A", "G"), "FAKE2", ("rs1949223",),
                 "384C>T?", FullCallFilter.UNKNOWN, "384C>T", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("16", 97915617), "C", GeneCoordinate("16", 97450060), "T",
+                GeneCoordinate("16", 97915617), "C", GeneCoordinate("chr16", 97450060), "T",
                 ("T", "T"), "FAKE2", ("rs1212127",),
                 "1324C>T", FullCallFilter.INFERRED_PASS, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                GeneCoordinate("5", 97915617), "T", GeneCoordinate("5", 97450060), "T",
+                GeneCoordinate("5", 97915617), "T", GeneCoordinate("chr5", 97450060), "T",
                 ("T", "C"), "FAKE", ("rs1212125",),
                 "1005T>C", FullCallFilter.PASS, "1005T>C", FullCallFilter.PASS,
             ),
@@ -839,18 +839,18 @@ class TestPgxAnalysis(unittest.TestCase):
 
         good_calls = {
             SimpleCall(
-                GeneCoordinate("16", 97450060), "T", ("C", "T"),
+                GeneCoordinate("chr16", 97450060), "T", ("C", "T"),
                 "FAKE2", ("rs1212127",), "1324T>C", SimpleCallFilter.PASS),
             SimpleCall(
-                GeneCoordinate("1", 97450065), "TC", ("TG", "TC"),
+                GeneCoordinate("chr1", 97450065), "TC", ("TG", "TC"),
                 "DPYD", ("rs72549303",), "6744CA>GA", SimpleCallFilter.PASS),
             SimpleCall(
-                GeneCoordinate("1", 97515839), "T", ("T", "C"),
+                GeneCoordinate("chr1", 97515839), "T", ("T", "C"),
                 "DPYD", ("rs1801159",), "674A>G", SimpleCallFilter.PASS),
         }
 
         bad_call = SimpleCall(
-            GeneCoordinate("5", 97450060), "T", ("T", "C"),
+            GeneCoordinate("chr5", 97450060), "T", ("T", "C"),
             "FAKE", ("rs27384",), "1005T>C", SimpleCallFilter.PASS
         )
 
@@ -899,16 +899,16 @@ class TestPgxAnalysis(unittest.TestCase):
 
         good_calls = {
             SimpleCall(
-                GeneCoordinate("16", 97450060), "T", ("C", "T"),
+                GeneCoordinate("chr16", 97450060), "T", ("C", "T"),
                 "FAKE2", ("rs1212127",), "1324T>C", SimpleCallFilter.PASS),
             SimpleCall(
-                GeneCoordinate("5", 97450060), "T", ("T", "C"),
+                GeneCoordinate("chr5", 97450060), "T", ("T", "C"),
                 "FAKE", ("rs1212125",), "1005T>C", SimpleCallFilter.PASS),
             SimpleCall(
-                GeneCoordinate("1", 97450065), "TC", ("TG", "TC"),
+                GeneCoordinate("chr1", 97450065), "TC", ("TG", "TC"),
                 "DPYD", ("rs72549303",), "6744GA>CA", SimpleCallFilter.PASS),
             SimpleCall(
-                GeneCoordinate("1", 97515839), "T", ("T", "C"),
+                GeneCoordinate("chr1", 97515839), "T", ("T", "C"),
                 "DPYD", ("rs1801159",), "674A>G", SimpleCallFilter.PASS),
         }
         bad_call = SimpleCall(
@@ -985,17 +985,17 @@ class TestPgxAnalysis(unittest.TestCase):
         unexpected_base_gene_to_haplotype_calls_expected: Dict[str, Set[HaplotypeCall]] = {"DPYD": set()}
         unexpected_base_all_full_calls_expected = frozenset({
             FullCall(
-                GeneCoordinate("1", 97915614), "C", GeneCoordinate("1", 97450058), "C",
+                GeneCoordinate("1", 97915614), "C", GeneCoordinate("chr1", 97450058), "C",
                 ("T", "A"), "DPYD", ("rs3918290",),
                 "9213C>T", FullCallFilter.PASS, "9213C>T", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("1", 97450065), "TC",
+                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("chr1", 97450065), "TC",
                 ("TC", "TC"), "DPYD", ("rs72549303",),
                 "6744CA>GA", FullCallFilter.PASS, "REF_CALL", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 97981395), "T", GeneCoordinate("1", 97515839), "T",
+                GeneCoordinate("1", 97981395), "T", GeneCoordinate("chr1", 97515839), "T",
                 ("T", "T"), "DPYD", ("rs1801159",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
@@ -1011,15 +1011,15 @@ class TestPgxAnalysis(unittest.TestCase):
         reference_assembly = ReferenceAssembly.V38
 
         normal_call = SimpleCall(
-            GeneCoordinate("1", 97450058), "C", ("T", "C"),
+            GeneCoordinate("chr1", 97450058), "C", ("T", "C"),
             "DPYD", ("rs3918290",), "9213C>T", SimpleCallFilter.PASS,
         )
         unexpected_base_call = SimpleCall(
-            GeneCoordinate("1", 97450058), "C", ("T", "A"),
+            GeneCoordinate("chr1", 97450058), "C", ("T", "A"),
             "DPYD", ("rs3918290",), "9213C>T", SimpleCallFilter.PASS,
         )
         other_call = SimpleCall(
-            GeneCoordinate("1", 97515839), "T", ("C", "C"),
+            GeneCoordinate("chr1", 97515839), "T", ("C", "C"),
             "DPYD", ("rs1801159",), "674A>G", SimpleCallFilter.PASS,
         )
         good_call_data = SimpleCallData(
@@ -1040,17 +1040,17 @@ class TestPgxAnalysis(unittest.TestCase):
         unexpected_base_gene_to_haplotype_calls_expected: Dict[str, Set[HaplotypeCall]] = {"DPYD": set()}
         unexpected_base_all_full_calls_expected = frozenset({
             FullCall(
-                GeneCoordinate("1", 97915614), "C", GeneCoordinate("1", 97450058), "C",
+                GeneCoordinate("1", 97915614), "C", GeneCoordinate("chr1", 97450058), "C",
                 ("T", "A"), "DPYD", ("rs3918290",),
                 "9213C>T", FullCallFilter.PASS, "9213C>T", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("1", 97450065), "TC",
+                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("chr1", 97450065), "TC",
                 ("TC", "TC"), "DPYD", ("rs72549303",),
                 "6744CA>GA", FullCallFilter.INFERRED_PASS, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                GeneCoordinate("1", 97981395), "T", GeneCoordinate("1", 97515839), "T",
+                GeneCoordinate("1", 97981395), "T", GeneCoordinate("chr1", 97515839), "T",
                 ("C", "C"), "DPYD", ("rs1801159",),
                 "674A>G", FullCallFilter.PASS, "674A>G", FullCallFilter.PASS,
             ),
@@ -1082,17 +1082,17 @@ class TestPgxAnalysis(unittest.TestCase):
         gene_to_haplotype_calls_expected: Dict[str, Set[HaplotypeCall]] = {"DPYD": set()}
         all_full_calls_expected = frozenset({
             FullCall(
-                GeneCoordinate("1", 97915614), "C", GeneCoordinate("1", 97450058), "C",
+                GeneCoordinate("1", 97915614), "C", GeneCoordinate("chr1", 97450058), "C",
                 ("T", "T"), "DPYD", ("rs3918290",),
                 "9213C>T", FullCallFilter.PASS, "9213C>T", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("1", 97450065), "TC",
+                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("chr1", 97450065), "TC",
                 ("TC", "TC"), "DPYD", ("rs72549303",),
                 "6744CA>GA", FullCallFilter.PASS, "REF_CALL", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 97981395), "T", GeneCoordinate("1", 97515839), "T",
+                GeneCoordinate("1", 97981395), "T", GeneCoordinate("chr1", 97515839), "T",
                 ("T", "C"), "DPYD", ("rs1801159",),
                 "293T>C", FullCallFilter.PASS, "293T>C", FullCallFilter.PASS,
             ),
@@ -1108,13 +1108,13 @@ class TestPgxAnalysis(unittest.TestCase):
         panel = self.__get_narrow_example_panel({"*2A", "*5", "*2B"})
         simple_call_data = SimpleCallData(frozenset({
             SimpleCall(
-                GeneCoordinate("1", 97450057), "GC", ("CT", "CT"),
+                GeneCoordinate("chr1", 97450057), "GC", ("CT", "CT"),
                 "DPYD", (".",), "9212GC>CT", SimpleCallFilter.PASS),  # unknown
             SimpleCall(
-                GeneCoordinate("1", 97515839), "T", ("C", "C"),
+                GeneCoordinate("chr1", 97515839), "T", ("C", "C"),
                 "DPYD", ("rs1801159",), "293T>C", SimpleCallFilter.PASS),
             SimpleCall(
-                GeneCoordinate("1", 97450065), "TC", ("TC", "TC"),
+                GeneCoordinate("chr1", 97450065), "TC", ("TC", "TC"),
                 "DPYD", ("rs72549303",), "REF_CALL", SimpleCallFilter.PASS),
         }), ReferenceAssembly.V38)
         pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
@@ -1122,17 +1122,17 @@ class TestPgxAnalysis(unittest.TestCase):
         gene_to_haplotype_calls_expected: Dict[str, Set[HaplotypeCall]] = {"DPYD": set()}
         all_full_calls_expected = frozenset({
             FullCall(
-                None, None, GeneCoordinate("1", 97450057), "GC",
+                None, None, GeneCoordinate("chr1", 97450057), "GC",
                 ("CT", "CT"), "DPYD", (".",),
                 "9212GC>CT?", FullCallFilter.UNKNOWN, "9212GC>CT", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("1", 97450065), "TC",
+                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("chr1", 97450065), "TC",
                 ("TC", "TC"), "DPYD", ("rs72549303",),
                 "6744CA>GA", FullCallFilter.PASS, "REF_CALL", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 97981395), "T", GeneCoordinate("1", 97515839), "T",
+                GeneCoordinate("1", 97981395), "T", GeneCoordinate("chr1", 97515839), "T",
                 ("C", "C"), "DPYD", ("rs1801159",),
                 "293T>C", FullCallFilter.PASS, "293T>C", FullCallFilter.PASS,
             ),
@@ -1167,12 +1167,12 @@ class TestPgxAnalysis(unittest.TestCase):
                 "9212CG>TC", FullCallFilter.PASS, "9212CG>TC?", FullCallFilter.UNKNOWN,
             ),
             FullCall(
-                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("1", 97450065), "TC",
+                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("chr1", 97450065), "TC",
                 ("TC", "TC"), "DPYD", ("rs72549303",),
                 "6744CA>GA", FullCallFilter.PASS, "REF_CALL", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 97981395), "T", GeneCoordinate("1", 97515839), "T",
+                GeneCoordinate("1", 97981395), "T", GeneCoordinate("chr1", 97515839), "T",
                 ("C", "C"), "DPYD", ("rs1801159",),
                 "293T>C", FullCallFilter.PASS, "293T>C", FullCallFilter.PASS,
             ),
@@ -1198,32 +1198,32 @@ class TestPgxAnalysis(unittest.TestCase):
         }
         all_full_calls_expected = frozenset({
             FullCall(
-                GeneCoordinate("1", 97915614), "C", GeneCoordinate("1", 97450058), "C",
+                GeneCoordinate("1", 97915614), "C", GeneCoordinate("chr1", 97450058), "C",
                 ("C", "C"), "DPYD", ("rs3918290",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("1", 97450065), "TC",
+                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("chr1", 97450065), "TC",
                 ("TG", "TG"), "DPYD", ("rs72549303",),
                 "REF_CALL", FullCallFilter.PASS, "6744GA>CA", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 97981395), "T", GeneCoordinate("1", 97515839), "T",
+                GeneCoordinate("1", 97981395), "T", GeneCoordinate("chr1", 97515839), "T",
                 ("T", "T"), "DPYD", ("rs1801159",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                GeneCoordinate("1", 98205966), "GATGA", GeneCoordinate("1", 97740410), "GATGA",
+                GeneCoordinate("1", 98205966), "GATGA", GeneCoordinate("chr1", 97740410), "GATGA",
                 ("GATGA", "GATGA"), "DPYD", ("rs72549309",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                GeneCoordinate("16", 97915617), "C", GeneCoordinate("16", 97450060), "T",
+                GeneCoordinate("16", 97915617), "C", GeneCoordinate("chr16", 97450060), "T",
                 ("C", "C"), "FAKE2", ("rs1212127",),
                 "REF_CALL", FullCallFilter.PASS, "1324T>C", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("5", 97915617), "T", GeneCoordinate("5", 97450060), "T",
+                GeneCoordinate("5", 97915617), "T", GeneCoordinate("chr5", 97450060), "T",
                 ("T", "T"), "FAKE", ("rs1212125",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
@@ -1236,10 +1236,10 @@ class TestPgxAnalysis(unittest.TestCase):
         panel = self.__get_wide_example_panel()
         simple_call_data = SimpleCallData(frozenset({
             SimpleCall(
-                GeneCoordinate("16", 97450060), "T", ("T", "T"),
+                GeneCoordinate("chr16", 97450060), "T", ("T", "T"),
                 "FAKE2", ("rs1212127",), "REF_CALL", SimpleCallFilter.PASS),
             SimpleCall(
-                GeneCoordinate("1", 97450065), "TC", ("TC", "TC"),
+                GeneCoordinate("chr1", 97450065), "TC", ("TC", "TC"),
                 "DPYD", ("rs72549303",), "REF_CALL", SimpleCallFilter.PASS),
         }), ReferenceAssembly.V38)
         pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
@@ -1249,32 +1249,32 @@ class TestPgxAnalysis(unittest.TestCase):
         }
         all_full_calls_expected = frozenset({
             FullCall(
-                GeneCoordinate("1", 97915614), "C", GeneCoordinate("1", 97450058), "C",
+                GeneCoordinate("1", 97915614), "C", GeneCoordinate("chr1", 97450058), "C",
                 ("C", "C"), "DPYD", ("rs3918290",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("1", 97450065), "TC",
+                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("chr1", 97450065), "TC",
                 ("TC", "TC"), "DPYD", ("rs72549303",),
                 "6744CA>GA", FullCallFilter.PASS, "REF_CALL", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 97981395), "T", GeneCoordinate("1", 97515839), "T",
+                GeneCoordinate("1", 97981395), "T", GeneCoordinate("chr1", 97515839), "T",
                 ("T", "T"), "DPYD", ("rs1801159",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                GeneCoordinate("1", 98205966), "GATGA", GeneCoordinate("1", 97740410), "GATGA",
+                GeneCoordinate("1", 98205966), "GATGA", GeneCoordinate("chr1", 97740410), "GATGA",
                 ("GATGA", "GATGA"), "DPYD", ("rs72549309",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                GeneCoordinate("16", 97915617), "C", GeneCoordinate("16", 97450060), "T",
+                GeneCoordinate("16", 97915617), "C", GeneCoordinate("chr16", 97450060), "T",
                 ("T", "T"), "FAKE2", ("rs1212127",),
                 "1324C>T", FullCallFilter.PASS, "REF_CALL", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("5", 97915617), "T", GeneCoordinate("5", 97450060), "T",
+                GeneCoordinate("5", 97915617), "T", GeneCoordinate("chr5", 97450060), "T",
                 ("T", "T"), "FAKE", ("rs1212125",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
@@ -1287,10 +1287,10 @@ class TestPgxAnalysis(unittest.TestCase):
         panel = self.__get_wide_example_panel()
         simple_call_data = SimpleCallData(frozenset({
             SimpleCall(
-                GeneCoordinate("16", 97450060), "T", ("C", "C"),
+                GeneCoordinate("chr16", 97450060), "T", ("C", "C"),
                 "FAKE2", ("rs1212127",), "1324T>C", SimpleCallFilter.PASS),
             SimpleCall(
-                GeneCoordinate("1", 97450065), "TC", ("TG", "TG"),
+                GeneCoordinate("chr1", 97450065), "TC", ("TG", "TG"),
                 "DPYD", ("rs72549303",), "6744GA>CA", SimpleCallFilter.PASS),
         }), ReferenceAssembly.V38)
         pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
@@ -1300,32 +1300,32 @@ class TestPgxAnalysis(unittest.TestCase):
         }
         all_full_calls_expected = frozenset({
             FullCall(
-                GeneCoordinate("1", 97915614), "C", GeneCoordinate("1", 97450058), "C",
+                GeneCoordinate("1", 97915614), "C", GeneCoordinate("chr1", 97450058), "C",
                 ("C", "C"), "DPYD", ("rs3918290",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("1", 97450065), "TC",
+                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("chr1", 97450065), "TC",
                 ("TG", "TG"), "DPYD", ("rs72549303",),
                 "REF_CALL", FullCallFilter.PASS, "6744GA>CA", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 97981395), "T", GeneCoordinate("1", 97515839), "T",
+                GeneCoordinate("1", 97981395), "T", GeneCoordinate("chr1", 97515839), "T",
                 ("T", "T"), "DPYD", ("rs1801159",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                GeneCoordinate("1", 98205966), "GATGA", GeneCoordinate("1", 97740410), "GATGA",
+                GeneCoordinate("1", 98205966), "GATGA", GeneCoordinate("chr1", 97740410), "GATGA",
                 ("GATGA", "GATGA"), "DPYD", ("rs72549309",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                GeneCoordinate("16", 97915617), "C", GeneCoordinate("16", 97450060), "T",
+                GeneCoordinate("16", 97915617), "C", GeneCoordinate("chr16", 97450060), "T",
                 ("C", "C"), "FAKE2", ("rs1212127",),
                 "REF_CALL", FullCallFilter.PASS, "1324T>C", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("5", 97915617), "T", GeneCoordinate("5", 97450060), "T",
+                GeneCoordinate("5", 97915617), "T", GeneCoordinate("chr5", 97450060), "T",
                 ("T", "T"), "FAKE", ("rs1212125",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
@@ -1351,32 +1351,32 @@ class TestPgxAnalysis(unittest.TestCase):
         }
         all_full_calls_expected = frozenset({
             FullCall(
-                GeneCoordinate("1", 97915614), "C", GeneCoordinate("1", 97450058), "C",
+                GeneCoordinate("1", 97915614), "C", GeneCoordinate("chr1", 97450058), "C",
                 ("C", "C"), "DPYD", ("rs3918290",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("1", 97450065), "TC",
+                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("chr1", 97450065), "TC",
                 ("TG", "TC"), "DPYD", ("rs72549303",),
                 "6744CA>GA", FullCallFilter.PASS, "6744GA>CA", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 97981395), "T", GeneCoordinate("1", 97515839), "T",
+                GeneCoordinate("1", 97981395), "T", GeneCoordinate("chr1", 97515839), "T",
                 ("T", "T"), "DPYD", ("rs1801159",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                GeneCoordinate("1", 98205966), "GATGA", GeneCoordinate("1", 97740410), "GATGA",
+                GeneCoordinate("1", 98205966), "GATGA", GeneCoordinate("chr1", 97740410), "GATGA",
                 ("GATGA", "GATGA"), "DPYD", ("rs72549309",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                GeneCoordinate("16", 97915617), "C", GeneCoordinate("16", 97450060), "T",
+                GeneCoordinate("16", 97915617), "C", GeneCoordinate("chr16", 97450060), "T",
                 ("C", "T"), "FAKE2", ("rs1212127",),
                 "1324C>T", FullCallFilter.PASS, "1324T>C", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("5", 97915617), "T", GeneCoordinate("5", 97450060), "T",
+                GeneCoordinate("5", 97915617), "T", GeneCoordinate("chr5", 97450060), "T",
                 ("T", "T"), "FAKE", ("rs1212125",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
@@ -1388,9 +1388,9 @@ class TestPgxAnalysis(unittest.TestCase):
         """At reference sequence differences: heterozygous between ref v37 and v38, and no rs_id provided"""
         panel = self.__get_wide_example_panel()
         simple_call_data = SimpleCallData(frozenset({
-            SimpleCall(GeneCoordinate("16", 97450060), "T", ("C", "T"),
+            SimpleCall(GeneCoordinate("chr16", 97450060), "T", ("C", "T"),
                        "FAKE2", (".",), "1324T>C", SimpleCallFilter.PASS),
-            SimpleCall(GeneCoordinate("1", 97450065), "TC", ("TG", "TC"),
+            SimpleCall(GeneCoordinate("chr1", 97450065), "TC", ("TG", "TC"),
                        "DPYD", (".",), "6744GA>CA", SimpleCallFilter.PASS),
         }), ReferenceAssembly.V38)
         pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
@@ -1402,32 +1402,32 @@ class TestPgxAnalysis(unittest.TestCase):
         }
         all_full_calls_expected = frozenset({
             FullCall(
-                GeneCoordinate("1", 97915614), "C", GeneCoordinate("1", 97450058), "C",
+                GeneCoordinate("1", 97915614), "C", GeneCoordinate("chr1", 97450058), "C",
                 ("C", "C"), "DPYD", ("rs3918290",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("1", 97450065), "TC",
+                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("chr1", 97450065), "TC",
                 ("TG", "TC"), "DPYD", ("rs72549303",),
                 "6744CA>GA", FullCallFilter.PASS, "6744GA>CA", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 97981395), "T", GeneCoordinate("1", 97515839), "T",
+                GeneCoordinate("1", 97981395), "T", GeneCoordinate("chr1", 97515839), "T",
                 ("T", "T"), "DPYD", ("rs1801159",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                GeneCoordinate("1", 98205966), "GATGA", GeneCoordinate("1", 97740410), "GATGA",
+                GeneCoordinate("1", 98205966), "GATGA", GeneCoordinate("chr1", 97740410), "GATGA",
                 ("GATGA", "GATGA"), "DPYD", ("rs72549309",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                GeneCoordinate("16", 97915617), "C", GeneCoordinate("16", 97450060), "T",
+                GeneCoordinate("16", 97915617), "C", GeneCoordinate("chr16", 97450060), "T",
                 ("C", "T"), "FAKE2", ("rs1212127",),
                 "1324C>T", FullCallFilter.PASS, "1324T>C", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("5", 97915617), "T", GeneCoordinate("5", 97450060), "T",
+                GeneCoordinate("5", 97915617), "T", GeneCoordinate("chr5", 97450060), "T",
                 ("T", "T"), "FAKE", ("rs1212125",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
@@ -1443,10 +1443,10 @@ class TestPgxAnalysis(unittest.TestCase):
         panel = self.__get_wide_example_panel()
         simple_call_data = SimpleCallData(frozenset({
             SimpleCall(
-                GeneCoordinate("16", 97450060), "T", ("C", "A"),
+                GeneCoordinate("chr16", 97450060), "T", ("C", "A"),
                 "FAKE2", ("rs1212127",), "1324T>A", SimpleCallFilter.PASS),  # with ref v37
             SimpleCall(
-                GeneCoordinate("1", 97450065), "TC", ("AC", "TC"),
+                GeneCoordinate("chr1", 97450065), "TC", ("AC", "TC"),
                 "DPYD", ("rs72549303",), "6744CT>GT;6744CT>GC", SimpleCallFilter.PASS),  # with ref v38
         }), ReferenceAssembly.V38)
         pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
@@ -1456,32 +1456,32 @@ class TestPgxAnalysis(unittest.TestCase):
         }
         all_full_calls_expected = frozenset({
             FullCall(
-                GeneCoordinate("1", 97915614), "C", GeneCoordinate("1", 97450058), "C",
+                GeneCoordinate("1", 97915614), "C", GeneCoordinate("chr1", 97450058), "C",
                 ("C", "C"), "DPYD", ("rs3918290",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("1", 97450065), "TC",
+                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("chr1", 97450065), "TC",
                 ("AC", "TC"), "DPYD", ("rs72549303",),
                 "6744CT>GT;6744CT>GC?", FullCallFilter.UNKNOWN, "6744CT>GT;6744CT>GC", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 97981395), "T", GeneCoordinate("1", 97515839), "T",
+                GeneCoordinate("1", 97981395), "T", GeneCoordinate("chr1", 97515839), "T",
                 ("T", "T"), "DPYD", ("rs1801159",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                GeneCoordinate("1", 98205966), "GATGA", GeneCoordinate("1", 97740410), "GATGA",
+                GeneCoordinate("1", 98205966), "GATGA", GeneCoordinate("chr1", 97740410), "GATGA",
                 ("GATGA", "GATGA"), "DPYD", ("rs72549309",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                GeneCoordinate("16", 97915617), "C", GeneCoordinate("16", 97450060), "T",
+                GeneCoordinate("16", 97915617), "C", GeneCoordinate("chr16", 97450060), "T",
                 ("C", "A"), "FAKE2", ("rs1212127",),
                 "1324T>A?", FullCallFilter.UNKNOWN, "1324T>A", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("5", 97915617), "T", GeneCoordinate("5", 97450060), "T",
+                GeneCoordinate("5", 97915617), "T", GeneCoordinate("chr5", 97450060), "T",
                 ("T", "T"), "FAKE", ("rs1212125",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
@@ -1507,32 +1507,32 @@ class TestPgxAnalysis(unittest.TestCase):
         }
         all_full_calls_expected = frozenset({
             FullCall(
-                GeneCoordinate("1", 97915614), "C", GeneCoordinate("1", 97450058), "C",
+                GeneCoordinate("1", 97915614), "C", GeneCoordinate("chr1", 97450058), "C",
                 ("C", "C"), "DPYD", ("rs3918290",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("1", 97450065), "TC",
+                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("chr1", 97450065), "TC",
                 ("AC", "AG"), "DPYD", ("rs72549303",),
                 "6744CT>GT;6744CT>GC", FullCallFilter.PASS, "6744CT>GT;6744CT>GC?", FullCallFilter.UNKNOWN,
             ),
             FullCall(
-                GeneCoordinate("1", 97981395), "T", GeneCoordinate("1", 97515839), "T",
+                GeneCoordinate("1", 97981395), "T", GeneCoordinate("chr1", 97515839), "T",
                 ("T", "T"), "DPYD", ("rs1801159",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                GeneCoordinate("1", 98205966), "GATGA", GeneCoordinate("1", 97740410), "GATGA",
+                GeneCoordinate("1", 98205966), "GATGA", GeneCoordinate("chr1", 97740410), "GATGA",
                 ("GATGA", "GATGA"), "DPYD", ("rs72549309",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                GeneCoordinate("16", 97915617), "C", GeneCoordinate("16", 97450060), "T",
+                GeneCoordinate("16", 97915617), "C", GeneCoordinate("chr16", 97450060), "T",
                 ("A", "G"), "FAKE2", ("rs1212127",),
                 "1324C>A;1324C>G", FullCallFilter.PASS, "1324C>A;1324C>G?", FullCallFilter.UNKNOWN,
             ),
             FullCall(
-                GeneCoordinate("5", 97915617), "T", GeneCoordinate("5", 97450060), "T",
+                GeneCoordinate("5", 97915617), "T", GeneCoordinate("chr5", 97450060), "T",
                 ("T", "T"), "FAKE", ("rs1212125",),
                 "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
@@ -1545,16 +1545,16 @@ class TestPgxAnalysis(unittest.TestCase):
         panel = self.__get_narrow_example_panel({"*2A", "*5", "*2B"})
         simple_call_data = SimpleCallData(frozenset({
             SimpleCall(
-                GeneCoordinate("1", 97450058), "C", ("T", "T"),
+                GeneCoordinate("chr1", 97450058), "C", ("T", "T"),
                 "DPYD", ("rs3918290",), "9212C>T", SimpleCallFilter.PASS),
             SimpleCall(
-                GeneCoordinate("1", 97450058), "CG", ("CG", "TC"),
+                GeneCoordinate("chr1", 97450058), "CG", ("CG", "TC"),
                 "DPYD", (".",), "9212CG>TC", SimpleCallFilter.PASS),  # unknown
             SimpleCall(
-                GeneCoordinate("1", 97515839), "T", ("C", "C"),
+                GeneCoordinate("chr1", 97515839), "T", ("C", "C"),
                 "DPYD", ("rs1801159",), "293T>C", SimpleCallFilter.PASS),
             SimpleCall(
-                GeneCoordinate("1", 97450065), "TC", ("TC", "TC"),
+                GeneCoordinate("chr1", 97450065), "TC", ("TC", "TC"),
                 "DPYD", ("rs72549303",), "REF_CALL", SimpleCallFilter.PASS),
         }), ReferenceAssembly.V38)
         pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
@@ -1562,22 +1562,22 @@ class TestPgxAnalysis(unittest.TestCase):
         gene_to_haplotype_calls_expected: Dict[str, Set[HaplotypeCall]] = {"DPYD": set()}
         all_full_calls_expected = frozenset({
             FullCall(
-                GeneCoordinate("1", 97915614), "C", GeneCoordinate("1", 97450058), "C",
+                GeneCoordinate("1", 97915614), "C", GeneCoordinate("chr1", 97450058), "C",
                 ("T", "T"), "DPYD", ("rs3918290",),
                 "9212C>T", FullCallFilter.PASS, "9212C>T", FullCallFilter.PASS,
             ),
             FullCall(
-                None, None, GeneCoordinate("1", 97450058), "CG",
+                None, None, GeneCoordinate("chr1", 97450058), "CG",
                 ("CG", "TC"), "DPYD", (".",),
                 "9212CG>TC?", FullCallFilter.UNKNOWN, "9212CG>TC", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("1", 97450065), "TC",
+                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("chr1", 97450065), "TC",
                 ("TC", "TC"), "DPYD", ("rs72549303",),
                 "6744CA>GA", FullCallFilter.PASS, "REF_CALL", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 97981395), "T", GeneCoordinate("1", 97515839), "T",
+                GeneCoordinate("1", 97981395), "T", GeneCoordinate("chr1", 97515839), "T",
                 ("C", "C"), "DPYD", ("rs1801159",),
                 "293T>C", FullCallFilter.PASS, "293T>C", FullCallFilter.PASS,
             ),
@@ -1607,12 +1607,12 @@ class TestPgxAnalysis(unittest.TestCase):
         gene_to_haplotype_calls_expected: Dict[str, Set[HaplotypeCall]] = {"DPYD": set()}
         all_full_calls_expected = frozenset({
             FullCall(
-                GeneCoordinate("1", 97915614), "C", GeneCoordinate("1", 97450058), "C",
+                GeneCoordinate("1", 97915614), "C", GeneCoordinate("chr1", 97450058), "C",
                 ("T", "T"), "DPYD", ("rs3918290",),
                 "9212C>T", FullCallFilter.PASS, "9212C>T", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("1", 97450065), "TC",
+                GeneCoordinate("1", 97915621), "TG", GeneCoordinate("chr1", 97450065), "TC",
                 ("TG", "AC"), "DPYD", ("rs72549303",),
                 "6744CA>GT", FullCallFilter.PASS, '6744CA>GT?', FullCallFilter.UNKNOWN,
             ),
@@ -1622,7 +1622,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 "6744C>G", FullCallFilter.PASS, "6744C>G?", FullCallFilter.UNKNOWN,
             ),
             FullCall(
-                GeneCoordinate("1", 97981395), "T", GeneCoordinate("1", 97515839), "T",
+                GeneCoordinate("1", 97981395), "T", GeneCoordinate("chr1", 97515839), "T",
                 ("C", "C"), "DPYD", ("rs1801159",),
                 "293T>C", FullCallFilter.PASS, "293T>C", FullCallFilter.PASS,
             ),

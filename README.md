@@ -133,8 +133,9 @@ Name: `[sample_t_id].peach.calls.tsv`
 Column | Example Value | Description
 ---|---|---
 gene | DPYD | Gene to which the variant is related.
-chromosome | 1 | Chromosome of variant.
+chromosome_v37 | 1 | Chromosome of variant wrt v37 reference genome.
 position_v37 | 98348885 | Position on chromosome wrt v37 reference genome. If unknown, has value "UNKNOWN".
+chromosome_v38 | 1 | Chromosome of variant wrt v38 reference genome.
 position_v38 | 97883329 | Position on chromosome wrt v38 reference genome. If unknown, has value "UNKNOWN".
 ref_v37 | G | Reference allele wrt v37. If unknown, has value "UNKNOWN".
 ref_v38 | A | Reference allele wrt v38. If unknown, has value "UNKNOWN".
@@ -375,7 +376,7 @@ If you have installed PEACH's requirements into a venv, then remember to source 
 
 ## Version History and Download Links
 * Upcoming
-    + Nothing
+    + Allow for different chromosome names wrt v37 and v38 in the input json and the genotype output file.
 * [1.1](https://github.com/hartwigmedical/peach/releases/tag/v1.1)
     + Add shell script `peach` for running PEACH.
     + Remove VCF filtering step. 

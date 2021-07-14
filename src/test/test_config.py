@@ -31,11 +31,11 @@ class TestLoadConfig(unittest.TestCase):
             Haplotype("*3", "Normal Function", frozenset({dpyd_three_variant})),
         })
         dpyd_rs_id_infos_expected = frozenset({
-            RsIdInfo("rs3918290", "C", "C", GeneCoordinate("1", 97915614), GeneCoordinate("1", 97450058)),
-            RsIdInfo("rs72549309", "GATGA", "GATGA", GeneCoordinate("1", 98205966), GeneCoordinate("1", 97740410)),
-            RsIdInfo("rs1801159", "T", "T", GeneCoordinate("1", 97981395), GeneCoordinate("1", 97515839)),
-            RsIdInfo("rs72549303", "TG", "TC", GeneCoordinate("1", 97915621), GeneCoordinate("1", 97450065)),
-            RsIdInfo("rs1801265", "G", "A", GeneCoordinate("1", 98348885), GeneCoordinate("1", 97883329)),
+            RsIdInfo("rs3918290", "C", "C", GeneCoordinate("1", 97915614), GeneCoordinate("chr1", 97450058)),
+            RsIdInfo("rs72549309", "GATGA", "GATGA", GeneCoordinate("1", 98205966), GeneCoordinate("chr1", 97740410)),
+            RsIdInfo("rs1801159", "T", "T", GeneCoordinate("1", 97981395), GeneCoordinate("chr1", 97515839)),
+            RsIdInfo("rs72549303", "TG", "TC", GeneCoordinate("1", 97915621), GeneCoordinate("chr1", 97450065)),
+            RsIdInfo("rs1801265", "G", "A", GeneCoordinate("1", 98348885), GeneCoordinate("chr1", 97883329)),
         })
         dpyd_drugs_expected = frozenset({
             DrugInfo("5-Fluorouracil", "https://www.source_url.org/5-Fluorouracil"),
@@ -49,7 +49,7 @@ class TestLoadConfig(unittest.TestCase):
             Haplotype("*4A", "Reduced Function", frozenset({fake_variant})),
         })
         fake_rs_id_infos_expected = frozenset({
-            RsIdInfo("rs1212125", "T", "T", GeneCoordinate("5", 97915617), GeneCoordinate("5", 97450060)),
+            RsIdInfo("rs1212125", "T", "T", GeneCoordinate("5", 97915617), GeneCoordinate("chr5", 97450060)),
         })
         fake_drugs_expected = frozenset({
             DrugInfo("Aspirin", "https://www.source_url.org/Aspirin"),
@@ -60,7 +60,7 @@ class TestLoadConfig(unittest.TestCase):
             Haplotype("*4A", "Reduced Function", frozenset({fake2_variant})),
         })
         fake2_rs_id_infos_expected = frozenset({
-            RsIdInfo("rs1212127", "C", "T", GeneCoordinate("16", 97915617), GeneCoordinate("16", 97450060)),
+            RsIdInfo("rs1212127", "C", "T", GeneCoordinate("16", 97915617), GeneCoordinate("chr16", 97450060)),
         })
         fake2_drugs_expected = frozenset({
             DrugInfo("Aspirin", "https://www.source_url.org/Aspirin"),
@@ -69,13 +69,13 @@ class TestLoadConfig(unittest.TestCase):
 
         gene_infos_expected = frozenset({
             GeneInfo(
-                "DPYD", "1", "*1", dpyd_haplotypes_expected, dpyd_rs_id_infos_expected,
+                "DPYD", "*1", dpyd_haplotypes_expected, dpyd_rs_id_infos_expected,
                 dpyd_drugs_expected, dpyd_rs_id_to_difference_annotations),
             GeneInfo(
-                "FAKE", "5", "*1", fake_haplotypes_expected, fake_rs_id_infos_expected,
+                "FAKE", "*1", fake_haplotypes_expected, fake_rs_id_infos_expected,
                 fake_drugs_expected, fake_rs_id_to_difference_annotations),
             GeneInfo(
-                "FAKE2", "16", "*1", fake2_haplotypes_expected, fake2_rs_id_infos_expected,
+                "FAKE2", "*1", fake2_haplotypes_expected, fake2_rs_id_infos_expected,
                 fake2_drugs_expected, fake2_rs_id_to_difference_annotations),
         })
         name_expected = "fake_panel"
@@ -94,7 +94,8 @@ class TestLoadConfig(unittest.TestCase):
     def test_gene_info_with_overlapping_haplotype_names(self) -> None:
         """Error when haplotype name used multiple times for gene"""
         gene = "FAKE"
-        chromosome = "X"
+        chromosome_v37 = "X"
+        chromosome_v38 = "chrX"
         reference_haplotype_name = "*1"
         drugs: FrozenSet[DrugInfo] = frozenset()
         rs_id_to_ref_seq_difference_annotation: Dict[str, Annotation] = dict()
@@ -105,10 +106,10 @@ class TestLoadConfig(unittest.TestCase):
         rs_id_infos = frozenset([
             RsIdInfo(
                 variant1.rs_id, "C", "C",
-                GeneCoordinate(chromosome, 4994545), GeneCoordinate(chromosome, 2993823)),
+                GeneCoordinate(chromosome_v37, 4994545), GeneCoordinate(chromosome_v38, 2993823)),
             RsIdInfo(
                 variant2.rs_id, "G", "G",
-                GeneCoordinate(chromosome, 3993842), GeneCoordinate(chromosome, 2949923)),
+                GeneCoordinate(chromosome_v37, 3993842), GeneCoordinate(chromosome_v38, 2949923)),
         ])
 
         haplotypes1 = frozenset([
@@ -121,17 +122,18 @@ class TestLoadConfig(unittest.TestCase):
         ])
 
         GeneInfo(
-            gene, chromosome, reference_haplotype_name, haplotypes1, rs_id_infos,
+            gene, reference_haplotype_name, haplotypes1, rs_id_infos,
             drugs, rs_id_to_ref_seq_difference_annotation)
         with self.assertRaises(ValueError):
             GeneInfo(
-                gene, chromosome, reference_haplotype_name, haplotypes2, rs_id_infos,
+                gene, reference_haplotype_name, haplotypes2, rs_id_infos,
                 drugs, rs_id_to_ref_seq_difference_annotation)
 
     def test_gene_info_with_overlapping_haplotype_variants(self) -> None:
         """Error when different haplotypes have the exact same variant combination"""
         gene = "FAKE"
-        chromosome = "X"
+        chromosome_v37 = "X"
+        chromosome_v38 = "chrX"
         reference_haplotype_name = "*1"
         drugs: FrozenSet[DrugInfo] = frozenset()
         rs_id_to_ref_seq_difference_annotation: Dict[str, Annotation] = dict()
@@ -143,13 +145,13 @@ class TestLoadConfig(unittest.TestCase):
         rs_id_infos = frozenset([
             RsIdInfo(
                 variant1.rs_id, "C", "C",
-                GeneCoordinate(chromosome, 4994545), GeneCoordinate(chromosome, 2993823)),
+                GeneCoordinate(chromosome_v37, 4994545), GeneCoordinate(chromosome_v38, 2993823)),
             RsIdInfo(
                 variant2.rs_id, "G", "G",
-                GeneCoordinate(chromosome, 3993842), GeneCoordinate(chromosome, 2949923)),
+                GeneCoordinate(chromosome_v37, 3993842), GeneCoordinate(chromosome_v38, 2949923)),
             RsIdInfo(
                 variant3.rs_id, "A", "A",
-                GeneCoordinate(chromosome, 293923), GeneCoordinate(chromosome, 138812)),
+                GeneCoordinate(chromosome_v37, 293923), GeneCoordinate(chromosome_v38, 138812)),
         ])
 
         haplotypes1 = frozenset([
@@ -162,17 +164,16 @@ class TestLoadConfig(unittest.TestCase):
         ])
 
         GeneInfo(
-            gene, chromosome, reference_haplotype_name, haplotypes1, rs_id_infos,
+            gene, reference_haplotype_name, haplotypes1, rs_id_infos,
             drugs, rs_id_to_ref_seq_difference_annotation)
         with self.assertRaises(ValueError):
             GeneInfo(
-                gene, chromosome, reference_haplotype_name, haplotypes2, rs_id_infos,
+                gene, reference_haplotype_name, haplotypes2, rs_id_infos,
                 drugs, rs_id_to_ref_seq_difference_annotation)
 
     def test_gene_info_with_overlapping_drug_names(self) -> None:
         """Error when drug name used multiple times for gene"""
         gene = "FAKE"
-        chromosome = "X"
         reference_haplotype_name = "*1"
         haplotypes: FrozenSet[Haplotype] = frozenset()
         rs_id_infos: FrozenSet[RsIdInfo] = frozenset()
@@ -184,17 +185,18 @@ class TestLoadConfig(unittest.TestCase):
         overlapping_drugs = frozenset([druginfo1, druginfo2])
 
         GeneInfo(
-            gene, chromosome, reference_haplotype_name, haplotypes, rs_id_infos,
+            gene, reference_haplotype_name, haplotypes, rs_id_infos,
             drugs, rs_id_to_ref_seq_difference_annotation)
         with self.assertRaises(ValueError):
             GeneInfo(
-                gene, chromosome, reference_haplotype_name, haplotypes, rs_id_infos,
+                gene, reference_haplotype_name, haplotypes, rs_id_infos,
                 overlapping_drugs, rs_id_to_ref_seq_difference_annotation)
 
     def test_gene_info_with_overlapping_rs_id_infos(self) -> None:
         """Error when gene info has rs id infos for which the relevant coordinates overlap"""
         gene = "FAKE"
-        chromosome = "X"
+        chromosome_v37 = "X"
+        chromosome_v38 = "chrX"
         reference_haplotype_name = "*1"
         haplotypes: FrozenSet[Haplotype] = frozenset()
         drugs: FrozenSet[DrugInfo] = frozenset()
@@ -202,65 +204,75 @@ class TestLoadConfig(unittest.TestCase):
 
         rs_id_info1 = RsIdInfo(
             "rs294924", "A", "A",
-            GeneCoordinate(chromosome, 499593), GeneCoordinate(chromosome, 399483))
+            GeneCoordinate(chromosome_v37, 499593), GeneCoordinate(chromosome_v38, 399483))
         rs_id_info2 = RsIdInfo(
             "rs294927", "AA", "AA",
-            GeneCoordinate(chromosome, 499592), GeneCoordinate(chromosome, 399482))
+            GeneCoordinate(chromosome_v37, 499592), GeneCoordinate(chromosome_v38, 399482))
         single_rs_id_info = frozenset([rs_id_info1])
         overlapping_rs_id_infos = frozenset([rs_id_info1, rs_id_info2])
 
         GeneInfo(
-            gene, chromosome, reference_haplotype_name, haplotypes, single_rs_id_info,
+            gene, reference_haplotype_name, haplotypes, single_rs_id_info,
             drugs, rs_id_to_ref_seq_difference_annotation)
         with self.assertRaises(ValueError):
             GeneInfo(
-                gene, chromosome, reference_haplotype_name, haplotypes, overlapping_rs_id_infos,
+                gene, reference_haplotype_name, haplotypes, overlapping_rs_id_infos,
                 drugs, rs_id_to_ref_seq_difference_annotation)
 
     def test_gene_info_with_rs_id_infos_for_different_chromosome(self) -> None:
         """Error when gene info has rs id infos for which the relevant coordinates have a different chromosome"""
         gene = "FAKE"
-        chromosome = "X"
+        chromosome_v37 = "X"
+        chromosome_v38 = "chrX"
         reference_haplotype_name = "*1"
         haplotypes: FrozenSet[Haplotype] = frozenset()
         drugs: FrozenSet[DrugInfo] = frozenset()
         rs_id_to_ref_seq_difference_annotation: Dict[str, Annotation] = dict()
 
-        other_chromosome = "1"
+        other_chromosome_v37 = "1"
+        other_chromosome_v38 = "1"
 
         rs_id_info1 = RsIdInfo(
             "rs294924", "A", "A",
-            GeneCoordinate(chromosome, 499593), GeneCoordinate(chromosome, 399483))
+            GeneCoordinate(chromosome_v37, 499593), GeneCoordinate(chromosome_v38, 399483))
         rs_id_info2 = RsIdInfo(
             "rs294924", "A", "A",
-            GeneCoordinate(other_chromosome, 499593), GeneCoordinate(chromosome, 399483))
+            GeneCoordinate(other_chromosome_v37, 499593), GeneCoordinate(chromosome_v38, 399483))
         rs_id_info3 = RsIdInfo(
             "rs294924", "A", "A",
-            GeneCoordinate(chromosome, 499593), GeneCoordinate(other_chromosome, 399483))
+            GeneCoordinate(chromosome_v37, 499593), GeneCoordinate(other_chromosome_v38, 399483))
         rs_id_info4 = RsIdInfo(
             "rs294924", "A", "A",
-            GeneCoordinate(other_chromosome, 499593), GeneCoordinate(other_chromosome, 399483))
+            GeneCoordinate(other_chromosome_v37, 499593), GeneCoordinate(other_chromosome_v38, 399483))
 
         GeneInfo(
-            gene, chromosome, reference_haplotype_name, haplotypes, frozenset([rs_id_info1]),
+            gene, reference_haplotype_name, haplotypes, frozenset([rs_id_info1]),
+            drugs, rs_id_to_ref_seq_difference_annotation)
+        GeneInfo(
+            gene, reference_haplotype_name, haplotypes, frozenset([rs_id_info2]),
+            drugs, rs_id_to_ref_seq_difference_annotation)
+        GeneInfo(
+            gene, reference_haplotype_name, haplotypes, frozenset([rs_id_info3]),
+            drugs, rs_id_to_ref_seq_difference_annotation)
+        GeneInfo(
+            gene, reference_haplotype_name, haplotypes, frozenset([rs_id_info4]),
             drugs, rs_id_to_ref_seq_difference_annotation)
         with self.assertRaises(ValueError):
             GeneInfo(
-                gene, chromosome, reference_haplotype_name, haplotypes, frozenset([rs_id_info2]),
+                gene, reference_haplotype_name, haplotypes, frozenset([rs_id_info1, rs_id_info2]),
                 drugs, rs_id_to_ref_seq_difference_annotation)
         with self.assertRaises(ValueError):
             GeneInfo(
-                gene, chromosome, reference_haplotype_name, haplotypes, frozenset([rs_id_info3]),
+                gene, reference_haplotype_name, haplotypes, frozenset([rs_id_info1, rs_id_info3]),
                 drugs, rs_id_to_ref_seq_difference_annotation)
         with self.assertRaises(ValueError):
             GeneInfo(
-                gene, chromosome, reference_haplotype_name, haplotypes, frozenset([rs_id_info4]),
+                gene, reference_haplotype_name, haplotypes, frozenset([rs_id_info1, rs_id_info2, rs_id_info3, rs_id_info4]),
                 drugs, rs_id_to_ref_seq_difference_annotation)
 
     def test_gene_info_with_rs_id_in_haplotype_without_info(self) -> None:
         """Error when haplotype uses rs id for which there is no RsIdInfo object"""
         gene = "FAKE"
-        chromosome = "X"
         reference_haplotype_name = "*1"
         rs_id_infos: FrozenSet[RsIdInfo] = frozenset()
         drugs: FrozenSet[DrugInfo] = frozenset()
@@ -272,17 +284,18 @@ class TestLoadConfig(unittest.TestCase):
         ])
 
         GeneInfo(
-            gene, chromosome, reference_haplotype_name, empty_haplotypes, rs_id_infos,
+            gene, reference_haplotype_name, empty_haplotypes, rs_id_infos,
             drugs, rs_id_to_ref_seq_difference_annotation)
         with self.assertRaises(ValueError):
             GeneInfo(
-                gene, chromosome, reference_haplotype_name, non_empty_haplotypes, rs_id_infos,
+                gene, reference_haplotype_name, non_empty_haplotypes, rs_id_infos,
                 drugs, rs_id_to_ref_seq_difference_annotation)
 
     def test_gene_info_with_variant_that_is_ref_v38(self) -> None:
         """Error when gene info has variant where variant allele is the ref allele"""
         gene = "FAKE"
-        chromosome = "X"
+        chromosome_v37 = "X"
+        chromosome_v38 = "chrX"
         reference_haplotype_name = "*1"
         drugs: FrozenSet[DrugInfo] = frozenset()
 
@@ -292,22 +305,23 @@ class TestLoadConfig(unittest.TestCase):
         haplotypes = frozenset([Haplotype("*3", "No Function", frozenset([Variant("rs294924", "G")]))])
 
         rs_id_infos1 = frozenset(
-            [RsIdInfo(rs_id, "A", "C", GeneCoordinate(chromosome, 499593), GeneCoordinate(chromosome, 399483))])
+            [RsIdInfo(rs_id, "A", "C", GeneCoordinate(chromosome_v37, 499593), GeneCoordinate(chromosome_v38, 399483))])
         rs_id_infos2 = frozenset(
-            [RsIdInfo(rs_id, "A", "G", GeneCoordinate(chromosome, 499593), GeneCoordinate(chromosome, 399483))])
+            [RsIdInfo(rs_id, "A", "G", GeneCoordinate(chromosome_v37, 499593), GeneCoordinate(chromosome_v38, 399483))])
 
         GeneInfo(
-            gene, chromosome, reference_haplotype_name, haplotypes, rs_id_infos1,
+            gene, reference_haplotype_name, haplotypes, rs_id_infos1,
             drugs, rs_id_to_ref_seq_difference_annotation)
         with self.assertRaises(ValueError):
             GeneInfo(
-                gene, chromosome, reference_haplotype_name, haplotypes, rs_id_infos2,
+                gene, reference_haplotype_name, haplotypes, rs_id_infos2,
                 drugs, rs_id_to_ref_seq_difference_annotation)
 
     def test_gene_info_with_ref_seq_difference_without_annotation(self) -> None:
         """Error when a ref seq difference does not have an annotation"""
         gene = "FAKE"
-        chromosome = "X"
+        chromosome_v37 = "X"
+        chromosome_v38 = "chrX"
         reference_haplotype_name = "*1"
         haplotypes: FrozenSet[Haplotype] = frozenset()
         drugs: FrozenSet[DrugInfo] = frozenset()
@@ -315,21 +329,20 @@ class TestLoadConfig(unittest.TestCase):
 
         empty_rs_id_infos: FrozenSet[RsIdInfo] = frozenset()
         non_empty_rs_id_infos = frozenset([
-            RsIdInfo("rs294924", "A", "C", GeneCoordinate(chromosome, 499593), GeneCoordinate(chromosome, 399483))
+            RsIdInfo("rs294924", "A", "C", GeneCoordinate(chromosome_v37, 499593), GeneCoordinate(chromosome_v38, 399483))
         ])
 
         GeneInfo(
-            gene, chromosome, reference_haplotype_name, haplotypes, empty_rs_id_infos,
+            gene, reference_haplotype_name, haplotypes, empty_rs_id_infos,
             drugs, rs_id_to_ref_seq_difference_annotation)
         with self.assertRaises(ValueError):
             GeneInfo(
-                gene, chromosome, reference_haplotype_name, haplotypes, non_empty_rs_id_infos,
+                gene, reference_haplotype_name, haplotypes, non_empty_rs_id_infos,
                 drugs, rs_id_to_ref_seq_difference_annotation)
 
     def test_gene_info_with_extra_ref_seq_difference_annotation(self) -> None:
         """Error when a ref seq difference annotation does not match known a known ref seq difference"""
         gene = "FAKE"
-        chromosome = "X"
         reference_haplotype_name = "*1"
         haplotypes: FrozenSet[Haplotype] = frozenset()
         rs_id_infos: FrozenSet[RsIdInfo] = frozenset()
@@ -339,11 +352,11 @@ class TestLoadConfig(unittest.TestCase):
         non_empty_rs_id_to_ref_seq_difference_annotation = {"rs2493023": Annotation("3445T>A", "3445A>T")}
 
         GeneInfo(
-            gene, chromosome, reference_haplotype_name, haplotypes, rs_id_infos,
+            gene, reference_haplotype_name, haplotypes, rs_id_infos,
             drugs, empty_rs_id_to_ref_seq_difference_annotation)
         with self.assertRaises(ValueError):
             GeneInfo(
-                gene, chromosome, reference_haplotype_name, haplotypes, rs_id_infos,
+                gene, reference_haplotype_name, haplotypes, rs_id_infos,
                 drugs, non_empty_rs_id_to_ref_seq_difference_annotation)
 
     def test_haplotype_with_repeat_rs_ids(self) -> None:
@@ -376,26 +389,25 @@ class TestLoadConfig(unittest.TestCase):
         version = "1.0"
 
         gene1 = "FAKE"
-        chromosome1 = "X"
         gene2 = "OTHER"
-        chromosome2 = "15"
 
         reference_haplotype_name = "*1"
+        other_reference_haplotype_name = "*1_something else"
         haplotypes: FrozenSet[Haplotype] = frozenset()
         rs_id_infos: FrozenSet[RsIdInfo] = frozenset()
         drugs: FrozenSet[DrugInfo] = frozenset()
         rs_id_to_ref_seq_difference_annotation: Dict[str, Annotation] = dict()
 
         gene_info1 = GeneInfo(
-            gene1, chromosome1, reference_haplotype_name, haplotypes,
+            gene1, reference_haplotype_name, haplotypes,
             rs_id_infos, drugs, rs_id_to_ref_seq_difference_annotation,
         )
         gene_info2 = GeneInfo(
-            gene2, chromosome2, reference_haplotype_name, haplotypes,
+            gene2, reference_haplotype_name, haplotypes,
             rs_id_infos, drugs, rs_id_to_ref_seq_difference_annotation,
         )
         gene_info3 = GeneInfo(
-            gene1, chromosome2, reference_haplotype_name, haplotypes,
+            gene1, other_reference_haplotype_name, haplotypes,
             rs_id_infos, drugs, rs_id_to_ref_seq_difference_annotation,
         )
         gene_infos_without_repeat = frozenset([gene_info1, gene_info2])
@@ -413,7 +425,8 @@ class TestLoadConfig(unittest.TestCase):
         gene1 = "FAKE"
         gene2 = "OTHER"
 
-        chromosome = "X"
+        chromosome_v37 = "X"
+        chromosome_v38 = "chrX"
         reference_haplotype_name = "*1"
         haplotypes: FrozenSet[Haplotype] = frozenset()
         drugs: FrozenSet[DrugInfo] = frozenset()
@@ -421,30 +434,30 @@ class TestLoadConfig(unittest.TestCase):
 
         rs_id_info1 = RsIdInfo(
             "rs294924", "AT", "AT",
-            GeneCoordinate(chromosome, 499593), GeneCoordinate(chromosome, 399483),
+            GeneCoordinate(chromosome_v37, 499593), GeneCoordinate(chromosome_v38, 399483),
         )
         rs_id_info2 = RsIdInfo(
             "rs3949923", "C", "C",
-            GeneCoordinate(chromosome, 293993), GeneCoordinate(chromosome, 1388323),
+            GeneCoordinate(chromosome_v37, 293993), GeneCoordinate(chromosome_v38, 1388323),
         )
         rs_id_info3 = RsIdInfo(
             "rs12993", "GG", "GG",
-            GeneCoordinate(chromosome, 499592), GeneCoordinate(chromosome, 399482),
+            GeneCoordinate(chromosome_v37, 499592), GeneCoordinate(chromosome_v38, 399482),
         )
 
         rs_id_infos1 = frozenset([rs_id_info1])
         rs_id_infos2 = frozenset([rs_id_info1, rs_id_info2])
         rs_id_infos3 = frozenset([rs_id_info3])
         gene_info1 = GeneInfo(
-            gene1, chromosome, reference_haplotype_name, haplotypes,
+            gene1, reference_haplotype_name, haplotypes,
             rs_id_infos1, drugs, rs_id_to_ref_seq_difference_annotation,
         )
         gene_info2 = GeneInfo(
-            gene2, chromosome, reference_haplotype_name, haplotypes,
+            gene2, reference_haplotype_name, haplotypes,
             rs_id_infos2, drugs, rs_id_to_ref_seq_difference_annotation,
         )
         gene_info3 = GeneInfo(
-            gene2, chromosome, reference_haplotype_name, haplotypes,
+            gene2, reference_haplotype_name, haplotypes,
             rs_id_infos3, drugs, rs_id_to_ref_seq_difference_annotation,
         )
 
