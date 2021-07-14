@@ -116,8 +116,8 @@ class TestPgxReporter(unittest.TestCase):
             "DPYD\t1\t1\tUNKNOWN\tUNKNOWN\tC\tUNKNOWN\tC\tCAG\trs664\t1A>C;1A>G\tPASS\t1A>C;1A>G?\tUNKNOWN\tPanel_v0.2\tV1\n"
             "DPYD\t1\t5\tchr1\t25\tA\tA\tC\tG\t.\t25A>C;25A>G\tPASS\t25A>C;25A>G\tPASS\tPanel_v0.2\tV1\n"
             "DPYD\t1\t15\tUNKNOWN\tUNKNOWN\tC\tUNKNOWN\tC\tCAG\trs536\t35A>C;35A>G\tPASS\t35A>C;35A>G?\tUNKNOWN\tPanel_v0.2\tV1\n"
-            ".\t15\t24113\tchr15\t684633\tA\tT\tT\tT\trs462;rs9820;rs536\t29482A>T\tPASS\tREF_CALL\tPASS\tPanel_v0.2\tV1\n"
             "BRAF\t2\t154663\tchr2\t40565464\tT\tT\tT\tT\trs154;rs8839\tREF_CALL\tNO_CALL\tREF_CALL\tNO_CALL\tPanel_v0.2\tV1\n"
+            ".\t15\t24113\tchr15\t684633\tA\tT\tT\tT\trs462;rs9820;rs536\t29482A>T\tPASS\tREF_CALL\tPASS\tPanel_v0.2\tV1\n"
             "GENE\tX\t15\tchrX\t40\tTT\tAA\tTT\tTT\trs23\tREF_CALL\tNO_CALL\t627AA>TT\tINFERRED_PASS\tPanel_v0.2\tV1\n"
         )
         self.assertEqual(result_expected, result)
@@ -148,8 +148,8 @@ class TestPgxReporter(unittest.TestCase):
             "DPYD\tUNKNOWN\tUNKNOWN\tchr1\t15\tUNKNOWN\tC\tC\tCAG\trs353\t3A>C;3A>G?\tUNKNOWN\t3A>C;3A>G\tPASS\tPanel_v0.2\tV1\n"
             "DPYD\t1\t5\tchr1\t25\tA\tA\tC\tG\t.\t25A>C;25A>G\tPASS\t25A>C;25A>G\tPASS\tPanel_v0.2\tV1\n"
             "DPYD\tUNKNOWN\tUNKNOWN\tchr1\t35\tUNKNOWN\tC\tC\tCAG\trs536\t35A>C;35A>G?\tUNKNOWN\t35A>C;35A>G\tPASS\tPanel_v0.2\tV1\n"
-            ".\t15\t24113\tchr15\t684633\tT\tA\tT\tT\trs462;rs9820;rs536\tREF_CALL\tPASS\t29482A>T\tPASS\tPanel_v0.2\tV1\n"
             "BRAF\t2\t154663\tchr2\t40565464\tT\tT\tT\tT\trs154;rs8839\tREF_CALL\tNO_CALL\tREF_CALL\tNO_CALL\tPanel_v0.2\tV1\n"
+            ".\t15\t24113\tchr15\t684633\tT\tA\tT\tT\trs462;rs9820;rs536\tREF_CALL\tPASS\t29482A>T\tPASS\tPanel_v0.2\tV1\n"
             "GENE\tX\t15\tchrX\t40\tAA\tTT\tTT\tTT\trs23\t627AA>TT\tINFERRED_PASS\tREF_CALL\tNO_CALL\tPanel_v0.2\tV1\n"
         )
         self.assertEqual(result_expected, result)

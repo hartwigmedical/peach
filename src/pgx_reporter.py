@@ -130,9 +130,8 @@ class GenotypeReporter(object):
             error_msg = f"Unrecognized reference assembly: {input_reference_assembly}"
             raise ValueError(error_msg)
 
-        data_frame.loc[:, cls.CHROMOSOME_INDEX_NAME] = (
-            data_frame.loc[:, column_for_chromosome_sorting].apply(lambda x: tuple(re.split(r"(\d+)", x)))
-        )
+        data_frame.loc[:, cls.CHROMOSOME_INDEX_NAME] = data_frame.loc[:, column_for_chromosome_sorting].apply(
+            lambda x: tuple(int(y) if y.isnumeric() else y for y in re.split(r"(\d+)", x)))
 
         data_frame = data_frame.sort_values(
             by=[cls.CHROMOSOME_INDEX_NAME, column_for_position_sorting, cls.GENE_COLUMN_NAME,
@@ -140,9 +139,6 @@ class GenotypeReporter(object):
         ).reset_index(drop=True)
         data_frame = data_frame.loc[:, cls.NEW_CALLS_TSV_COLUMNS]
         return data_frame
-
-
-
 
 
 class HaplotypeReporter(object):
