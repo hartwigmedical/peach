@@ -375,8 +375,9 @@ To run PEACH's test suite, including mypy, run the script `test_peach`.
 If you have installed PEACH's requirements into a venv, then remember to source the venv before running `test_peach`.
 
 ## Version History and Download Links
-* Upcoming
-    + Allow for different chromosome names wrt v37 and v38 in the input json and the genotype output file.
+* 1.2
+    + Allow for different chromosome names wrt v37 and v38 
+        + Includes changes to the panel JSON and the genotype output file.
     + Improve clarity and consistency of logging.
 * [1.1](https://github.com/hartwigmedical/peach/releases/tag/v1.1)
     + Add shell script `peach` for running PEACH.
