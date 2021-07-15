@@ -18,7 +18,7 @@ class HaplotypeCaller(object):
     def get_gene_to_haplotypes_call(cls, full_call_data: FullCallData, panel: Panel) -> Dict[str, Set[HaplotypeCall]]:
         gene_to_haplotype_calls = {}
         for gene_info in panel.get_gene_infos():
-            logging.info("PROCESSING GENE " + gene_info.gene)
+            logging.info(f"Calling haplotypes for {gene_info.gene}")
             gene_to_haplotype_calls[gene_info.gene] = cls.__get_haplotypes_call(full_call_data, gene_info)
         return gene_to_haplotype_calls
 

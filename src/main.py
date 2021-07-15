@@ -15,7 +15,7 @@ def main(tool_config: ToolConfig) -> None:
     """ Run pharmacogenomics analysis on sample """
     set_up_logging()
 
-    logging.info(f"## START PHARMACOGENOMICS ANALYSIS FOR {tool_config.sample_t_id}")
+    logging.info(f"PEACH STARTING FOR {tool_config.sample_t_id}")
 
     # Check if output dir exists, create if it does not
     if not os.path.exists(tool_config.output_dir):
@@ -46,12 +46,12 @@ def main(tool_config: ToolConfig) -> None:
 
     # TODO: add genes CYP2D6, CYP3A4, CYP3A5
 
-    logging.info(f"## PHARMACOGENOMICS ANALYSIS FINISHED FOR {tool_config.sample_t_id}")
+    logging.info(f"PEACH FINISHED FOR {tool_config.sample_t_id}")
 
 
 def set_up_logging() -> None:
     logging.basicConfig(
-        format='%(asctime)s %(levelname)-8s %(message)s',
+        format='%(asctime)s - [%(levelname)-8s] - %(message)s',
         level=logging.INFO,
         datefmt='%Y-%m-%d %H:%M:%S')
 
