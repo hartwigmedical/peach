@@ -4,7 +4,6 @@ import os
 import sys
 
 from argument_parser import ArgumentParser
-from base.reference_assembly import ReferenceAssembly
 from config.tool_config import ToolConfig
 from config.panel import Panel
 from pgx_analysis import PgxAnalyser, PgxAnalysis
@@ -14,7 +13,9 @@ from vcf_reader import VcfReader
 
 def main(tool_config: ToolConfig) -> None:
     """ Run pharmacogenomics analysis on sample """
-    print("\n[INFO] ## START PHARMACOGENOMICS ANALYSIS")
+    set_up_logging()
+
+    logging.info(f"## START PHARMACOGENOMICS ANALYSIS FOR {tool_config.sample_t_id}")
 
     # Check if output dir exists, create if it does not
     if not os.path.exists(tool_config.output_dir):
@@ -25,24 +26,34 @@ def main(tool_config: ToolConfig) -> None:
             pass
 
     # Get configuration
+    logging.info("Creating panel config from JSON")
     panel = load_panel(tool_config.panel_path)
 
     if panel.is_empty():
         raise ValueError("No panel is given, so no analysis can be performed.")
 
     # Get data for patient
+    logging.info("Reading call data from VCF")
     vcf_call_data = VcfReader.get_call_data(tool_config, panel)
 
     # Compute output from input data
     pgx_analysis = PgxAnalyser.create_pgx_analysis(vcf_call_data, panel)
 
     # Output
+    logging.info("Creating output files")
     print_calls_to_file(pgx_analysis, tool_config, panel.get_id())
     print_genotypes_to_file(pgx_analysis, panel, tool_config)
 
     # TODO: add genes CYP2D6, CYP3A4, CYP3A5
 
-    print("[INFO] ## PHARMACOGENOMICS ANALYSIS FINISHED\n")
+    logging.info(f"## PHARMACOGENOMICS ANALYSIS FINISHED FOR {tool_config.sample_t_id}")
+
+
+def set_up_logging() -> None:
+    logging.basicConfig(
+        format='%(asctime)s %(levelname)-8s %(message)s',
+        level=logging.INFO,
+        datefmt='%Y-%m-%d %H:%M:%S')
 
 
 def load_panel(panel_path: str) -> Panel:

@@ -1,3 +1,4 @@
+import logging
 from typing import Set, Tuple, Optional, FrozenSet, NamedTuple
 
 from base.constants import REF_CALL_ANNOTATION_STRING
@@ -90,31 +91,31 @@ class SimpleCallTranslator(object):
             if relevant_v37_coordinates is not None:
                 if relevant_v37_coordinates.intersection(handled_v37_coordinates):
                     warning_msg = (
-                        f"[WARN] Call involves at least one v37 position that has already been handled:\n"
+                        f"Call involves at least one v37 position that has already been handled:\n"
                         f"call={simple_call}\n"
                         f"handled_coords={handled_v37_coordinates}")
-                    print(warning_msg)
+                    logging.warning(warning_msg)
                 handled_v37_coordinates.update(relevant_v37_coordinates)
             else:
                 warning_msg = (
-                    f"[WARN] Could not determine relevant v37 coordinates for call:\n"
+                    f"Could not determine relevant v37 coordinates for call:\n"
                     f"call={simple_call}")
-                print(warning_msg)
+                logging.warning(warning_msg)
 
             relevant_v38_coordinates = full_call.get_relevant_v38_coordinates()
             if relevant_v38_coordinates is not None:
                 if relevant_v38_coordinates.intersection(handled_v38_coordinates):
                     warning_msg = (
-                        f"[WARN] Call involves at least one v38 position that has already been handled:\n"
+                        f"Call involves at least one v38 position that has already been handled:\n"
                         f"call={simple_call}\n"
                         f"handled_coords={handled_v38_coordinates}")
-                    print(warning_msg)
+                    logging.warning(warning_msg)
                 handled_v38_coordinates.update(relevant_v38_coordinates)
             else:
                 warning_msg = (
-                    f"[WARN] Could not determine relevant v38 coordinates for call:\n"
+                    f"Could not determine relevant v38 coordinates for call:\n"
                     f"call={simple_call}")
-                print(warning_msg)
+                logging.warning(warning_msg)
 
             full_calls.add(full_call)
 
@@ -250,8 +251,8 @@ class SimpleCallTranslator(object):
             else:
                 translated_variant_annotation = call.variant_annotation + "?"
                 translated_filter = FullCallFilter.UNKNOWN
-                print(
-                    f"[WARN] Unexpected allele in ref seq difference location. Check whether annotation is correct: "
+                logging.warning(
+                    f"Unexpected allele in ref seq difference location. Check whether annotation is correct: "
                     f"found alleles=({annotated_alleles[0]}, {annotated_alleles[1]}), "
                     f"annotation={translated_variant_annotation}"
                 )
@@ -266,8 +267,8 @@ class SimpleCallTranslator(object):
             # unknown variant, no ref seq difference involved
             translated_variant_annotation = call.variant_annotation + "?"
             translated_filter = FullCallFilter.UNKNOWN
-            print(
-                f"[WARN] Unknown variant. Check whether annotation is correct: "
+            logging.warning(
+                f"Unknown variant. Check whether annotation is correct: "
                 f"found alleles=({annotated_alleles[0]}, {annotated_alleles[1]}), "
                 f"annotation={translated_variant_annotation}"
             )

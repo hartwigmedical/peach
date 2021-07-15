@@ -1,3 +1,4 @@
+import logging
 from typing import Dict, Any, Tuple, Optional
 
 import allel
@@ -37,7 +38,7 @@ class VcfReader(object):
             return cls.__get_call_data_from_variants(
                 variants, panel, tool_config.sample_r_id, tool_config.vcf_reference_assembly)
         else:
-            print("[WARN] No variants found in vcf")
+            logging.warning("No variants found in vcf")
             return SimpleCallData(frozenset(), tool_config.vcf_reference_assembly)
 
     @classmethod
@@ -70,8 +71,8 @@ class VcfReader(object):
                     continue
                 filtered_calls.add(cls.__get_call_from_variants(call_index, sample_r_id, variants))
 
-        print("[INFO] Matches on RS id: " + str(match_on_rsid))
-        print("[INFO] Matches on location: " + str(match_on_location))
+        logging.info("VCF matches on RS id: " + str(match_on_rsid))
+        logging.info("VCF matches on location: " + str(match_on_location))
 
         return SimpleCallData(frozenset(filtered_calls), vcf_reference_assembly)
 

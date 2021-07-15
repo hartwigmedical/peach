@@ -1,4 +1,5 @@
 import itertools
+import logging
 from typing import List, Dict, Collection, FrozenSet
 
 from base.constants import NORMAL_FUNCTION_STRING
@@ -29,7 +30,7 @@ class GeneInfo(object):
         )
 
         if not haplotypes:
-            print(f"[WARN] No alternate haplotypes configured for gene {gene}\n")
+            logging.warning(f"No alternate haplotypes configured for gene {gene}\n")
 
         self.__gene = gene
         self.__wild_type_haplotype_name = wild_type_haplotype_name

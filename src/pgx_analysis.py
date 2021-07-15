@@ -1,3 +1,4 @@
+import logging
 from copy import deepcopy
 from typing import Dict, Set, FrozenSet
 
@@ -37,6 +38,8 @@ class PgxAnalysis(object):
 class PgxAnalyser(object):
     @classmethod
     def create_pgx_analysis(cls, vcf_call_data: SimpleCallData, panel: Panel) -> PgxAnalysis:
+        logging.info(f"Annotating call data for reference assembly {vcf_call_data.reference_assembly.opposite()}")
         full_call_data = SimpleCallTranslator.get_all_full_call_data(vcf_call_data, panel)
+        logging.info(f"Calling haplotypes")
         gene_to_haplotype_calls = HaplotypeCaller.get_gene_to_haplotypes_call(full_call_data, panel)
         return PgxAnalysis(full_call_data, gene_to_haplotype_calls)

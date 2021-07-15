@@ -1,4 +1,5 @@
 import collections
+import logging
 from copy import deepcopy
 from typing import Dict, Set, DefaultDict, FrozenSet, Tuple
 
@@ -17,7 +18,7 @@ class HaplotypeCaller(object):
     def get_gene_to_haplotypes_call(cls, full_call_data: FullCallData, panel: Panel) -> Dict[str, Set[HaplotypeCall]]:
         gene_to_haplotype_calls = {}
         for gene_info in panel.get_gene_infos():
-            print("[INFO] PROCESSING GENE " + gene_info.gene)
+            logging.info("PROCESSING GENE " + gene_info.gene)
             gene_to_haplotype_calls[gene_info.gene] = cls.__get_haplotypes_call(full_call_data, gene_info)
         return gene_to_haplotype_calls
 
@@ -43,7 +44,7 @@ class HaplotypeCaller(object):
             return haplotype_calls
     
         except Exception as e:
-            print(f"[ERROR] Cannot resolve haplotype for gene {gene_info.gene}. Error: {e}")
+            logging.error(f"Cannot resolve haplotype for gene {gene_info.gene}. Error: {e}")
             return set()
 
     @classmethod
