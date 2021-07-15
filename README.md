@@ -377,6 +377,7 @@ If you have installed PEACH's requirements into a venv, then remember to source 
 ## Version History and Download Links
 * Upcoming
     + Allow for different chromosome names wrt v37 and v38 in the input json and the genotype output file.
+    + Improve clarity and consistency of logging.
 * [1.1](https://github.com/hartwigmedical/peach/releases/tag/v1.1)
     + Add shell script `peach` for running PEACH.
     + Remove VCF filtering step. 
