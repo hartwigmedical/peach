@@ -383,7 +383,7 @@ If you have installed PEACH's requirements into a venv, then remember to source 
     + Add shell script `peach` for running PEACH.
     + Remove VCF filtering step. 
         + Remove VCFTools dependency.
-        + Remove filtered vcf output file.
+        + Remove filtered-VCF output file.
     + Add experimental support for input VCF's for reference genomes with version v38. 
     + Change format of arguments to PEACH. 
         + Arguments are no longer positional. 
