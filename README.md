@@ -375,7 +375,7 @@ To run PEACH's test suite, including mypy, run the script `test_peach`.
 If you have installed PEACH's requirements into a venv, then remember to source the venv before running `test_peach`.
 
 ## Version History and Download Links
-* 1.3
+* [1.3](https://github.com/hartwigmedical/peach/releases/tag/v1.3)
     + Update sciki-allel version to fix pip-install failure.
 * [1.2](https://github.com/hartwigmedical/peach/releases/tag/v1.2)
     + Allow for different chromosome names wrt v37 and v38 
