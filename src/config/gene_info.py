@@ -172,9 +172,7 @@ class GeneInfo(object):
     def __assert_rs_ids_with_ref_seq_differences_match_annotations(
         rs_id_infos: FrozenSet[RsIdInfo], rs_id_to_ref_seq_difference_annotation: Dict[str, Annotation]
     ) -> None:
-        rs_ids_from_infos = {
-            info.rs_id for info in rs_id_infos if info.has_reference_sequence_difference()
-        }
+        rs_ids_from_infos = {info.rs_id for info in rs_id_infos if info.has_reference_sequence_difference()}
         rs_ids_from_annotation = set(rs_id_to_ref_seq_difference_annotation.keys())
         if rs_ids_from_infos != rs_ids_from_annotation:
             rs_ids_with_only_info = rs_ids_from_infos.difference(rs_ids_from_annotation)

@@ -95,7 +95,8 @@ class FullCall(NamedTuple):
 
     def __annotate_allele(self, allele: str) -> AnnotatedAllele:
         reference_assembly_to_reference_allele = {
-            ReferenceAssembly.V37: self.reference_site_v37, ReferenceAssembly.V38: self.reference_site_v38,
+            ReferenceAssembly.V37: self.reference_site_v37,
+            ReferenceAssembly.V38: self.reference_site_v38,
         }
         return AnnotatedAllele.from_reference_sites(allele, reference_assembly_to_reference_allele)
 

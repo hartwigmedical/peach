@@ -43,7 +43,9 @@ class SimpleCallTranslator(object):
 
         rs_ids_found_in_patient = {rs_id for call in simple_call_data.calls for rs_id in call.rs_ids if rs_id != "."}
         ref_coordinates_covered_by_found_calls = {
-            coordinate for call in simple_call_data.calls for coordinate in call.reference_site.get_covered_coordinates()
+            coordinate
+            for call in simple_call_data.calls
+            for coordinate in call.reference_site.get_covered_coordinates()
         }
 
         uncalled_calls = set()
@@ -186,14 +188,12 @@ class SimpleCallTranslator(object):
         translated_filter, translated_variant_annotation = cls.__get_translated_filter_and_variant_annotation(
             call, panel, call_reference_assembly, translated_reference_site
         )
-        translation = Translation(
-            translated_reference_site, translated_variant_annotation, translated_filter
-        )
+        translation = Translation(translated_reference_site, translated_variant_annotation, translated_filter)
         return translation
 
     @classmethod
     def __get_translated_reference_site(
-            cls, call: SimpleCall, panel: Panel, call_reference_assembly: ReferenceAssembly
+        cls, call: SimpleCall, panel: Panel, call_reference_assembly: ReferenceAssembly
     ) -> Optional[ReferenceSite]:
         if panel.contains_rs_id_matching_call(call, call_reference_assembly):
             rs_id_info = panel.get_matching_rs_id_info(call.reference_site, call_reference_assembly)
@@ -212,9 +212,7 @@ class SimpleCallTranslator(object):
         translated_reference_site: Optional[ReferenceSite],
     ) -> Tuple[FullCallFilter, str]:
         annotated_alleles = cls.__get_annotated_alleles(call, call_reference_assembly, translated_reference_site)
-        if panel.has_ref_seq_difference_annotation(
-            call.gene, call.reference_site, call_reference_assembly
-        ):
+        if panel.has_ref_seq_difference_annotation(call.gene, call.reference_site, call_reference_assembly):
             annotate_as_ref = all(
                 cls.__is_ref_allele_to_opposite_assembly_due_to_ref_sequence_difference(
                     annotated_allele, call_reference_assembly
@@ -283,7 +281,7 @@ class SimpleCallTranslator(object):
         cls,
         call: SimpleCall,
         call_reference_assembly: ReferenceAssembly,
-            translated_reference_site: Optional[ReferenceSite],
+        translated_reference_site: Optional[ReferenceSite],
     ) -> Tuple[AnnotatedAllele, AnnotatedAllele]:
         reference_assembly_to_reference_site = {
             call_reference_assembly: call.reference_site,

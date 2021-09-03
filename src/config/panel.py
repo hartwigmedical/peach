@@ -54,9 +54,7 @@ class Panel(object):
     def has_ref_seq_difference_annotation(
         self, gene: str, reference_site: ReferenceSite, reference_assembly: ReferenceAssembly
     ) -> bool:
-        rs_id_is_known = self.contains_rs_id_with_reference_site(
-            reference_site, reference_assembly
-        )
+        rs_id_is_known = self.contains_rs_id_with_reference_site(reference_site, reference_assembly)
         if not rs_id_is_known:
             return False
         else:
@@ -72,7 +70,9 @@ class Panel(object):
     def get_gene_infos(self) -> Set[GeneInfo]:
         return set(self.__gene_infos)
 
-    def contains_rs_id_with_start_coordinate(self, coordinate: GeneCoordinate, reference_assembly: ReferenceAssembly) -> bool:
+    def contains_rs_id_with_start_coordinate(
+        self, coordinate: GeneCoordinate, reference_assembly: ReferenceAssembly
+    ) -> bool:
         for info in self.__get_rs_id_infos():
             if info.get_reference_site(reference_assembly).start_coordinate == coordinate:
                 return True
@@ -87,9 +87,7 @@ class Panel(object):
         return False
 
     def contains_rs_id_matching_call(self, call: SimpleCall, reference_assembly: ReferenceAssembly) -> bool:
-        if self.contains_rs_id_with_reference_site(
-            call.reference_site, reference_assembly
-        ):
+        if self.contains_rs_id_with_reference_site(call.reference_site, reference_assembly):
             return True
         elif any(self.contains_rs_id(rs_id) for rs_id in call.rs_ids):
             error_msg = (
@@ -101,9 +99,7 @@ class Panel(object):
         else:
             return False
 
-    def get_matching_rs_id_info(
-        self, reference_site: ReferenceSite, reference_assembly: ReferenceAssembly
-    ) -> RsIdInfo:
+    def get_matching_rs_id_info(self, reference_site: ReferenceSite, reference_assembly: ReferenceAssembly) -> RsIdInfo:
         matching_rs_id_infos = []
         for info in self.__get_rs_id_infos():
             if info.get_reference_site(reference_assembly) == reference_site:

@@ -9,7 +9,7 @@ class ReferenceSite(NamedTuple):
 
     def get_covered_coordinates(self) -> Set[GeneCoordinate]:
         covered_coordinates = {
-            GeneCoordinate(self.start_coordinate.chromosome, self.start_coordinate.position + i) for i in
-            range(len(self.allele))
+            GeneCoordinate(self.start_coordinate.chromosome, self.start_coordinate.position + i)
+            for i in range(len(self.allele))
         }
         return covered_coordinates

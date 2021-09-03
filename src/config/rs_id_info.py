@@ -30,11 +30,15 @@ class RsIdInfo(NamedTuple):
         if self.rs_id == other.rs_id:
             return self == other
         else:
-            v37_coordinates_overlap = self.get_reference_site(ReferenceAssembly.V37).get_covered_coordinates().intersection(
-                other.get_reference_site(ReferenceAssembly.V37).get_covered_coordinates()
+            v37_coordinates_overlap = (
+                self.get_reference_site(ReferenceAssembly.V37)
+                .get_covered_coordinates()
+                .intersection(other.get_reference_site(ReferenceAssembly.V37).get_covered_coordinates())
             )
-            v38_coordinates_overlap = self.get_reference_site(ReferenceAssembly.V38).get_covered_coordinates().intersection(
-                other.get_reference_site(ReferenceAssembly.V38).get_covered_coordinates()
+            v38_coordinates_overlap = (
+                self.get_reference_site(ReferenceAssembly.V38)
+                .get_covered_coordinates()
+                .intersection(other.get_reference_site(ReferenceAssembly.V38).get_covered_coordinates())
             )
             return not v37_coordinates_overlap and not v38_coordinates_overlap
 
