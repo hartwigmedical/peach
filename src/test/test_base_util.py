@@ -2,7 +2,8 @@ import unittest
 from typing import List, Tuple, Dict, Set
 
 from base.gene_coordinate import GeneCoordinate
-from base.util import get_key_to_multiple_values, get_covered_coordinates, replace_file_extension_of_path
+from base.reference_site import ReferenceSite
+from base.util import get_key_to_multiple_values, replace_file_extension_of_path
 
 
 class TestBaseUtil(unittest.TestCase):
@@ -24,22 +25,22 @@ class TestBaseUtil(unittest.TestCase):
         self.assertEqual(result_expected, result)
 
     def test_get_covered_coordinates_empty(self) -> None:
-        start_coordinate = GeneCoordinate("X", 17)
-        result = get_covered_coordinates(start_coordinate, "")
+        reference = ReferenceSite(GeneCoordinate("X", 17), "")
+        result = reference.get_covered_coordinates()
 
         result_expected: Set[GeneCoordinate] = set()
         self.assertEqual(result_expected, result)
 
     def test_get_covered_coordinates_single(self) -> None:
-        start_coordinate = GeneCoordinate("X", 17)
-        result = get_covered_coordinates(start_coordinate, "A")
+        reference = ReferenceSite(GeneCoordinate("X", 17), "A")
+        result = reference.get_covered_coordinates()
 
-        result_expected = {start_coordinate}
+        result_expected = {GeneCoordinate("X", 17)}
         self.assertEqual(result_expected, result)
 
     def test_get_covered_coordinates_multiple(self) -> None:
-        start_coordinate = GeneCoordinate("X", 17)
-        result = get_covered_coordinates(start_coordinate, "AGTA")
+        reference = ReferenceSite(GeneCoordinate("X", 17), "AGTA")
+        result = reference.get_covered_coordinates()
 
         result_expected = {
             GeneCoordinate("X", 17),

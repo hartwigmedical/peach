@@ -4,6 +4,7 @@ from typing import Set, FrozenSet
 from base.gene_coordinate import GeneCoordinate
 from base.json_alias import Json
 from base.reference_assembly import ReferenceAssembly
+from base.reference_site import ReferenceSite
 from call_data import SimpleCall
 from config.gene_info import GeneInfo, assert_no_overlap_gene_names
 from config.rs_id_info import RsIdInfo
@@ -51,52 +52,49 @@ class Panel(object):
         return self.__version
 
     def has_ref_seq_difference_annotation(
-        self, gene: str, coordinate: GeneCoordinate, reference_allele: str, reference_assembly: ReferenceAssembly
+        self, gene: str, reference_site: ReferenceSite, reference_assembly: ReferenceAssembly
     ) -> bool:
-        rs_id_is_known = self.contains_rs_id_with_coordinate_and_reference_allele(
-            coordinate, reference_allele, reference_assembly
+        rs_id_is_known = self.contains_rs_id_with_reference_site(
+            reference_site, reference_assembly
         )
         if not rs_id_is_known:
             return False
         else:
-            rs_id = self.get_matching_rs_id_info(coordinate, reference_allele, reference_assembly).rs_id
+            rs_id = self.get_matching_rs_id_info(reference_site, reference_assembly).rs_id
             return self.__get_gene_info(gene).has_ref_sequence_difference_annotation(rs_id)
 
     def get_ref_seq_difference_annotation(
-        self, gene: str, coordinate: GeneCoordinate, reference_allele: str, reference_assembly: ReferenceAssembly
+        self, gene: str, reference_site: ReferenceSite, reference_assembly: ReferenceAssembly
     ) -> str:
-        rs_id = self.get_matching_rs_id_info(coordinate, reference_allele, reference_assembly).rs_id
+        rs_id = self.get_matching_rs_id_info(reference_site, reference_assembly).rs_id
         return self.__get_gene_info(gene).get_ref_sequence_difference_annotation(rs_id, reference_assembly.opposite())
 
     def get_gene_infos(self) -> Set[GeneInfo]:
         return set(self.__gene_infos)
 
-    def contains_rs_id_with_coordinate(self, coordinate: GeneCoordinate, reference_assembly: ReferenceAssembly) -> bool:
+    def contains_rs_id_with_start_coordinate(self, coordinate: GeneCoordinate, reference_assembly: ReferenceAssembly) -> bool:
         for info in self.__get_rs_id_infos():
-            if info.get_start_coordinate(reference_assembly) == coordinate:
+            if info.get_reference_site(reference_assembly).start_coordinate == coordinate:
                 return True
         return False
 
-    def contains_rs_id_with_coordinate_and_reference_allele(
-        self, coordinate: GeneCoordinate, reference_allele: str, reference_assembly: ReferenceAssembly
+    def contains_rs_id_with_reference_site(
+        self, reference_site: ReferenceSite, reference_assembly: ReferenceAssembly
     ) -> bool:
         for info in self.__get_rs_id_infos():
-            if (
-                info.get_start_coordinate(reference_assembly) == coordinate
-                and info.get_reference_allele(reference_assembly) == reference_allele
-            ):
+            if info.get_reference_site(reference_assembly) == reference_site:
                 return True
         return False
 
     def contains_rs_id_matching_call(self, call: SimpleCall, reference_assembly: ReferenceAssembly) -> bool:
-        if self.contains_rs_id_with_coordinate_and_reference_allele(
-            call.start_coordinate, call.reference_allele, reference_assembly
+        if self.contains_rs_id_with_reference_site(
+            call.reference_site, reference_assembly
         ):
             return True
         elif any(self.contains_rs_id(rs_id) for rs_id in call.rs_ids):
             error_msg = (
                 f"Match call with rs id info from panel on an rs id but not position and reference allele:\n"
-                f"rs ids: {call.rs_ids}, input file position: {call.start_coordinate}, "
+                f"rs ids: {call.rs_ids}, input file position: {call.reference_site.start_coordinate}, "
                 f"reference assembly: {reference_assembly}"
             )
             raise ValueError(error_msg)
@@ -104,14 +102,11 @@ class Panel(object):
             return False
 
     def get_matching_rs_id_info(
-        self, coordinate: GeneCoordinate, reference_allele: str, reference_assembly: ReferenceAssembly
+        self, reference_site: ReferenceSite, reference_assembly: ReferenceAssembly
     ) -> RsIdInfo:
         matching_rs_id_infos = []
         for info in self.__get_rs_id_infos():
-            if (
-                info.get_start_coordinate(reference_assembly) == coordinate
-                and info.get_reference_allele(reference_assembly) == reference_allele
-            ):
+            if info.get_reference_site(reference_assembly) == reference_site:
                 matching_rs_id_infos.append(info)
 
         if matching_rs_id_infos and len(matching_rs_id_infos) == 1:

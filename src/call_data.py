@@ -3,22 +3,18 @@ from typing import NamedTuple, Tuple, Optional, Set, FrozenSet, Dict
 
 from base.filter import FullCallFilter, SimpleCallFilter
 from base.gene_coordinate import GeneCoordinate
+from base.reference_site import ReferenceSite
 from base.reference_assembly import ReferenceAssembly
-from base.util import get_covered_coordinates
 
 
 class SimpleCall(NamedTuple):
     # Call with data and annotation for only a single reference assembly version. So only v37 or v38
-    start_coordinate: GeneCoordinate
-    reference_allele: str
+    reference_site: ReferenceSite
     alleles: Tuple[str, str]  # The order is (ref, alt) when there is one of each
     gene: str
     rs_ids: Tuple[str, ...]
     variant_annotation: str
     filter: SimpleCallFilter
-
-    def get_relevant_coordinates(self) -> Set[GeneCoordinate]:
-        return get_covered_coordinates(self.start_coordinate, self.reference_allele)
 
     def is_pass(self) -> bool:
         if self.filter == SimpleCallFilter.PASS:
@@ -44,13 +40,13 @@ class AnnotatedAllele(object):
         self.__reference_assembly_to_is_variant = deepcopy(reference_assembly_to_is_variant)
 
     @classmethod
-    def from_alleles(
-        cls, allele: str, reference_assembly_to_reference_allele: Dict[ReferenceAssembly, Optional[str]]
+    def from_reference_sites(
+        cls, allele: str, reference_assembly_to_reference_site: Dict[ReferenceAssembly, Optional[ReferenceSite]]
     ) -> "AnnotatedAllele":
         reference_assembly_to_is_variant: Dict[ReferenceAssembly, bool] = {}
-        for reference_assembly, reference_allele in reference_assembly_to_reference_allele.items():
-            if reference_allele is not None:
-                reference_assembly_to_is_variant[reference_assembly] = allele != reference_allele
+        for reference_assembly, reference_site in reference_assembly_to_reference_site.items():
+            if reference_site is not None:
+                reference_assembly_to_is_variant[reference_assembly] = allele != reference_site.allele
         return AnnotatedAllele(allele, reference_assembly_to_is_variant)
 
     def __eq__(self, other: object) -> bool:  # pragma: no cover
@@ -84,10 +80,8 @@ class AnnotatedAllele(object):
 
 class FullCall(NamedTuple):
     # Call with both v37 and v38 data and annotation
-    start_coordinate_v37: Optional[GeneCoordinate]  # is None if unknown
-    reference_allele_v37: Optional[str]  # is None if unknown
-    start_coordinate_v38: Optional[GeneCoordinate]  # is None if unknown
-    reference_allele_v38: Optional[str]  # is None if unknown
+    reference_site_v37: Optional[ReferenceSite]  # is None if unknown
+    reference_site_v38: Optional[ReferenceSite]  # is None if unknown
     alleles: Tuple[str, str]
     gene: str
     rs_ids: Tuple[str, ...]
@@ -96,29 +90,14 @@ class FullCall(NamedTuple):
     variant_annotation_v38: str
     filter_v38: FullCallFilter
 
-    def get_relevant_v37_coordinates(self) -> Optional[Set[GeneCoordinate]]:
-        # Returns None if missing some information to determine these coordinates
-        if self.start_coordinate_v37 is None or self.reference_allele_v37 is None:
-            return None
-        else:
-            return get_covered_coordinates(self.start_coordinate_v37, self.reference_allele_v37)
-
-    def get_relevant_v38_coordinates(self) -> Optional[Set[GeneCoordinate]]:
-        # Returns None if missing some information to determine these coordinates
-        if self.start_coordinate_v38 is None or self.reference_allele_v38 is None:
-            return None
-        else:
-            return get_covered_coordinates(self.start_coordinate_v38, self.reference_allele_v38)
-
     def get_annotated_alleles(self) -> Tuple[AnnotatedAllele, AnnotatedAllele]:
         return self.__annotate_allele(self.alleles[0]), self.__annotate_allele(self.alleles[1])
 
     def __annotate_allele(self, allele: str) -> AnnotatedAllele:
         reference_assembly_to_reference_allele = {
-            ReferenceAssembly.V37: self.reference_allele_v37,
-            ReferenceAssembly.V38: self.reference_allele_v38,
+            ReferenceAssembly.V37: self.reference_site_v37, ReferenceAssembly.V38: self.reference_site_v38,
         }
-        return AnnotatedAllele.from_alleles(allele, reference_assembly_to_reference_allele)
+        return AnnotatedAllele.from_reference_sites(allele, reference_assembly_to_reference_allele)
 
 
 class FullCallData(NamedTuple):

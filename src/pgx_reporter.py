@@ -68,36 +68,25 @@ class GenotypeReporter(object):
         data_frame = pd.DataFrame(columns=cls.NEW_CALLS_TSV_COLUMNS)
         for full_call in pgx_analysis.get_all_full_calls():
             sorted_alleles = sorted(full_call.alleles)
-            chromosome_v37: Union[str, int] = (
-                full_call.start_coordinate_v37.chromosome
-                if full_call.start_coordinate_v37 is not None
-                else cls.UNKNOWN_CHROMOSOME_STRING
-            )
-            chromosome_v38: Union[str, int] = (
-                full_call.start_coordinate_v38.chromosome
-                if full_call.start_coordinate_v38 is not None
-                else cls.UNKNOWN_CHROMOSOME_STRING
-            )
-            position_v37: Union[str, int] = (
-                full_call.start_coordinate_v37.position
-                if full_call.start_coordinate_v37 is not None
-                else cls.UNKNOWN_POSITION_STRING
-            )
-            position_v38: Union[str, int] = (
-                full_call.start_coordinate_v38.position
-                if full_call.start_coordinate_v38 is not None
-                else cls.UNKNOWN_POSITION_STRING
-            )
-            reference_allele_v37 = (
-                full_call.reference_allele_v37
-                if full_call.reference_allele_v37 is not None
-                else cls.UNKNOWN_REF_ALLELE_STRING
-            )
-            reference_allele_v38 = (
-                full_call.reference_allele_v38
-                if full_call.reference_allele_v38 is not None
-                else cls.UNKNOWN_REF_ALLELE_STRING
-            )
+
+            position_v37: Union[str, int]
+            position_v38: Union[str, int]
+            if full_call.reference_site_v37 is not None:
+                chromosome_v37 = full_call.reference_site_v37.start_coordinate.chromosome
+                position_v37 = full_call.reference_site_v37.start_coordinate.position
+                reference_allele_v37 = full_call.reference_site_v37.allele
+            else:
+                chromosome_v37 = cls.UNKNOWN_CHROMOSOME_STRING
+                position_v37 = cls.UNKNOWN_POSITION_STRING
+                reference_allele_v37 = cls.UNKNOWN_REF_ALLELE_STRING
+            if full_call.reference_site_v38 is not None:
+                chromosome_v38 = full_call.reference_site_v38.start_coordinate.chromosome
+                position_v38 = full_call.reference_site_v38.start_coordinate.position
+                reference_allele_v38 = full_call.reference_site_v38.allele
+            else:
+                chromosome_v38 = cls.UNKNOWN_CHROMOSOME_STRING
+                position_v38 = cls.UNKNOWN_POSITION_STRING
+                reference_allele_v38 = cls.UNKNOWN_REF_ALLELE_STRING
 
             new_id: Dict[str, Union[str, int]] = {
                 cls.GENE_COLUMN_NAME: full_call.gene,

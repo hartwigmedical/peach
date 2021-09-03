@@ -3,6 +3,7 @@ from typing import Dict, Any, Tuple, Optional
 
 import allel
 
+from base.reference_site import ReferenceSite
 from config.tool_config import ToolConfig
 from base.constants import REF_CALL_ANNOTATION_STRING
 from base.filter import SimpleCallFilter
@@ -107,8 +108,7 @@ class VcfReader(object):
             variant_annotation = cls.__get_variant_annotation_from_variants(call_index, variants)
 
         call = SimpleCall(
-            gene_coordinate,
-            reference_allele,
+            ReferenceSite(gene_coordinate, reference_allele),
             alleles,
             gene,
             rs_ids,
@@ -126,7 +126,7 @@ class VcfReader(object):
         reference_allele = cls.__get_reference_allele_from_variants(call_index, variants)
         relevant_coordinates = cls.__get_relevant_coordinates(chromosome, position, reference_allele)
         coordinate_match_to_panel_exists = any(
-            panel.contains_rs_id_with_coordinate(coord, vcf_reference_assembly) for coord in relevant_coordinates
+            panel.contains_rs_id_with_start_coordinate(coord, vcf_reference_assembly) for coord in relevant_coordinates
         )
         return coordinate_match_to_panel_exists
 

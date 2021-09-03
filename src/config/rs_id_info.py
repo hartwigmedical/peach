@@ -2,16 +2,14 @@ from typing import NamedTuple, Set
 
 from base.gene_coordinate import GeneCoordinate
 from base.json_alias import Json
+from base.reference_site import ReferenceSite
 from base.reference_assembly import ReferenceAssembly
-from base.util import get_covered_coordinates
 
 
 class RsIdInfo(NamedTuple):
     rs_id: str
-    reference_allele_v37: str
-    reference_allele_v38: str
-    start_coordinate_v37: GeneCoordinate
-    start_coordinate_v38: GeneCoordinate
+    reference_site_v37: ReferenceSite
+    reference_site_v38: ReferenceSite
 
     @classmethod
     def from_json(cls, data: Json, chromosome_v37: str, chromosome_v38: str) -> "RsIdInfo":
@@ -22,44 +20,32 @@ class RsIdInfo(NamedTuple):
         start_coordinate_v38 = GeneCoordinate(chromosome_v38, int(data["positionV38"]))
         info = RsIdInfo(
             rs_id,
-            reference_allele_v37,
-            reference_allele_v38,
-            start_coordinate_v37,
-            start_coordinate_v38,
+            ReferenceSite(start_coordinate_v37, reference_allele_v37),
+            ReferenceSite(start_coordinate_v38, reference_allele_v38),
         )
         return info
 
     def is_compatible(self, other: "RsIdInfo") -> bool:
+        # TODO: check layout after black
         if self.rs_id == other.rs_id:
             return self == other
         else:
-            v37_coordinates_overlap = self.get_relevant_coordinates(ReferenceAssembly.V37).intersection(
-                other.get_relevant_coordinates(ReferenceAssembly.V37)
+            v37_coordinates_overlap = self.get_reference_site(ReferenceAssembly.V37).get_covered_coordinates().intersection(
+                other.get_reference_site(ReferenceAssembly.V37).get_covered_coordinates()
             )
-            v38_coordinates_overlap = self.get_relevant_coordinates(ReferenceAssembly.V38).intersection(
-                other.get_relevant_coordinates(ReferenceAssembly.V38)
+            v38_coordinates_overlap = self.get_reference_site(ReferenceAssembly.V38).get_covered_coordinates().intersection(
+                other.get_reference_site(ReferenceAssembly.V38).get_covered_coordinates()
             )
             return not v37_coordinates_overlap and not v38_coordinates_overlap
 
-    def get_start_coordinate(self, reference_assembly: ReferenceAssembly) -> GeneCoordinate:
+    def has_reference_sequence_difference(self) -> bool:
+        return self.reference_site_v37.allele != self.reference_site_v38.allele
+
+    def get_reference_site(self, reference_assembly: ReferenceAssembly) -> ReferenceSite:
         if reference_assembly == ReferenceAssembly.V37:
-            return self.start_coordinate_v37
+            return self.reference_site_v37
         elif reference_assembly == ReferenceAssembly.V38:
-            return self.start_coordinate_v38
+            return self.reference_site_v38
         else:
             error_msg = "Unrecognized reference assembly version"
             raise NotImplementedError(error_msg)
-
-    def get_reference_allele(self, reference_assembly: ReferenceAssembly) -> str:
-        if reference_assembly == ReferenceAssembly.V37:
-            return self.reference_allele_v37
-        elif reference_assembly == ReferenceAssembly.V38:
-            return self.reference_allele_v38
-        else:
-            error_msg = "Unrecognized reference assembly version"
-            raise NotImplementedError(error_msg)
-
-    def get_relevant_coordinates(self, reference_assembly: ReferenceAssembly) -> Set[GeneCoordinate]:
-        start_coordinate = self.get_start_coordinate(reference_assembly)
-        reference_allele = self.get_reference_allele(reference_assembly)
-        return get_covered_coordinates(start_coordinate, reference_allele)

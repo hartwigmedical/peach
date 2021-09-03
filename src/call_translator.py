@@ -5,13 +5,13 @@ from base.constants import REF_CALL_ANNOTATION_STRING
 from base.filter import FullCallFilter, SimpleCallFilter
 from base.gene_coordinate import GeneCoordinate
 from base.reference_assembly import ReferenceAssembly
+from base.reference_site import ReferenceSite
 from call_data import SimpleCallData, FullCall, AnnotatedAllele, SimpleCall, FullCallData
 from config.panel import Panel
 
 
 class Translation(NamedTuple):
-    start_coordinate: Optional[GeneCoordinate]
-    reference_allele: Optional[str]
+    reference_site: Optional[ReferenceSite]
     variant_annotation: str
     filter: FullCallFilter
 
@@ -42,25 +42,23 @@ class SimpleCallTranslator(object):
         reference_assembly = simple_call_data.reference_assembly
 
         rs_ids_found_in_patient = {rs_id for call in simple_call_data.calls for rs_id in call.rs_ids if rs_id != "."}
-        coordinates_covered_by_found_calls = {
-            coordinate for call in simple_call_data.calls for coordinate in call.get_relevant_coordinates()
+        ref_coordinates_covered_by_found_calls = {
+            coordinate for call in simple_call_data.calls for coordinate in call.reference_site.get_covered_coordinates()
         }
 
         uncalled_calls = set()
         for gene_info in panel.get_gene_infos():
             for rs_id_info in gene_info.rs_id_infos:
-                relevant_coordinates = rs_id_info.get_relevant_coordinates(reference_assembly)
+                relevant_coordinates = rs_id_info.get_reference_site(reference_assembly).get_covered_coordinates()
                 coordinates_partially_handled = bool(
-                    relevant_coordinates.intersection(coordinates_covered_by_found_calls)
+                    relevant_coordinates.intersection(ref_coordinates_covered_by_found_calls)
                 )
                 if rs_id_info.rs_id not in rs_ids_found_in_patient and not coordinates_partially_handled:
                     # Assuming REF/REF relative to reference assembly
-                    start_coordinate = rs_id_info.get_start_coordinate(reference_assembly)
-                    reference_allele = rs_id_info.get_reference_allele(reference_assembly)
+                    reference_site = rs_id_info.get_reference_site(reference_assembly)
                     uncalled_ref_call = SimpleCall(
-                        start_coordinate,
-                        reference_allele,
-                        (reference_allele, reference_allele),
+                        reference_site,
+                        (reference_site.allele, reference_site.allele),
                         gene_info.gene,
                         (rs_id_info.rs_id,),
                         REF_CALL_ANNOTATION_STRING,
@@ -89,8 +87,8 @@ class SimpleCallTranslator(object):
                         raise ValueError(error_msg)
                     handled_rs_ids.add(rs_id)
 
-            relevant_v37_coordinates = full_call.get_relevant_v37_coordinates()
-            if relevant_v37_coordinates is not None:
+            if full_call.reference_site_v37 is not None:
+                relevant_v37_coordinates = full_call.reference_site_v37.get_covered_coordinates()
                 if relevant_v37_coordinates.intersection(handled_v37_coordinates):
                     warning_msg = (
                         f"Call involves at least one v37 position that has already been handled:\n"
@@ -103,8 +101,8 @@ class SimpleCallTranslator(object):
                 warning_msg = f"Could not determine relevant v37 coordinates for call:\ncall={simple_call}"
                 logging.warning(warning_msg)
 
-            relevant_v38_coordinates = full_call.get_relevant_v38_coordinates()
-            if relevant_v38_coordinates is not None:
+            if full_call.reference_site_v38 is not None:
+                relevant_v38_coordinates = full_call.reference_site_v38.get_covered_coordinates()
                 if relevant_v38_coordinates.intersection(handled_v38_coordinates):
                     warning_msg = (
                         f"Call involves at least one v38 position that has already been handled:\n"
@@ -133,10 +131,8 @@ class SimpleCallTranslator(object):
         if call_reference_assembly == ReferenceAssembly.V37:
             filter_v37 = cls.__get_full_call_filter(complete_simple_call.filter)
             full_call = FullCall(
-                start_coordinate_v37=complete_simple_call.start_coordinate,
-                reference_allele_v37=complete_simple_call.reference_allele,
-                start_coordinate_v38=translation.start_coordinate,
-                reference_allele_v38=translation.reference_allele,
+                reference_site_v37=complete_simple_call.reference_site,
+                reference_site_v38=translation.reference_site,
                 alleles=complete_simple_call.alleles,
                 gene=complete_simple_call.gene,
                 rs_ids=complete_simple_call.rs_ids,
@@ -148,10 +144,8 @@ class SimpleCallTranslator(object):
         elif call_reference_assembly == ReferenceAssembly.V38:
             filter_v38 = cls.__get_full_call_filter(complete_simple_call.filter)
             full_call = FullCall(
-                start_coordinate_v37=translation.start_coordinate,
-                reference_allele_v37=translation.reference_allele,
-                start_coordinate_v38=complete_simple_call.start_coordinate,
-                reference_allele_v38=complete_simple_call.reference_allele,
+                reference_site_v37=translation.reference_site,
+                reference_site_v38=complete_simple_call.reference_site,
                 alleles=complete_simple_call.alleles,
                 gene=complete_simple_call.gene,
                 rs_ids=complete_simple_call.rs_ids,
@@ -170,11 +164,10 @@ class SimpleCallTranslator(object):
     ) -> SimpleCall:
         rs_ids: Tuple[str, ...]
         if call.rs_ids == (".",) and panel.contains_rs_id_matching_call(call, reference_assembly):
-            rs_id_info = panel.get_matching_rs_id_info(call.start_coordinate, call.reference_allele, reference_assembly)
+            rs_id_info = panel.get_matching_rs_id_info(call.reference_site, reference_assembly)
             rs_ids = (rs_id_info.rs_id,)
             new_simple_call = SimpleCall(
-                call.start_coordinate,
-                call.reference_allele,
+                call.reference_site,
                 call.alleles,
                 call.gene,
                 rs_ids,
@@ -189,43 +182,23 @@ class SimpleCallTranslator(object):
     def __get_translation_to_other_assembly(
         cls, call: SimpleCall, panel: Panel, call_reference_assembly: ReferenceAssembly
     ) -> Translation:
-        translated_start_coordinate = cls.__get_translated_start_coordinate(call, panel, call_reference_assembly)
-        translated_reference_allele = cls.__get_translated_reference_allele(call, panel, call_reference_assembly)
+        translated_reference_site = cls.__get_translated_reference_site(call, panel, call_reference_assembly)
         translated_filter, translated_variant_annotation = cls.__get_translated_filter_and_variant_annotation(
-            call, panel, call_reference_assembly, translated_reference_allele
+            call, panel, call_reference_assembly, translated_reference_site
         )
         translation = Translation(
-            translated_start_coordinate, translated_reference_allele, translated_variant_annotation, translated_filter
+            translated_reference_site, translated_variant_annotation, translated_filter
         )
         return translation
 
     @classmethod
-    def __get_translated_start_coordinate(
-        cls,
-        call: SimpleCall,
-        panel: Panel,
-        call_reference_assembly: ReferenceAssembly,
-    ) -> Optional[GeneCoordinate]:
+    def __get_translated_reference_site(
+            cls, call: SimpleCall, panel: Panel, call_reference_assembly: ReferenceAssembly
+    ) -> Optional[ReferenceSite]:
         if panel.contains_rs_id_matching_call(call, call_reference_assembly):
-            rs_id_info = panel.get_matching_rs_id_info(
-                call.start_coordinate, call.reference_allele, call_reference_assembly
-            )
+            rs_id_info = panel.get_matching_rs_id_info(call.reference_site, call_reference_assembly)
             cls.__assert_rs_id_call_matches_info(call.rs_ids, (rs_id_info.rs_id,))
-            return rs_id_info.get_start_coordinate(call_reference_assembly.opposite())
-        else:
-            # unknown variant
-            return None
-
-    @classmethod
-    def __get_translated_reference_allele(
-        cls, call: SimpleCall, panel: Panel, call_reference_assembly: ReferenceAssembly
-    ) -> Optional[str]:
-        if panel.contains_rs_id_matching_call(call, call_reference_assembly):
-            rs_id_info = panel.get_matching_rs_id_info(
-                call.start_coordinate, call.reference_allele, call_reference_assembly
-            )
-            cls.__assert_rs_id_call_matches_info(call.rs_ids, (rs_id_info.rs_id,))
-            return rs_id_info.get_reference_allele(call_reference_assembly.opposite())
+            return rs_id_info.get_reference_site(call_reference_assembly.opposite())
         else:
             # unknown variant
             return None
@@ -236,11 +209,11 @@ class SimpleCallTranslator(object):
         call: SimpleCall,
         panel: Panel,
         call_reference_assembly: ReferenceAssembly,
-        translated_reference_allele: Optional[str],
+        translated_reference_site: Optional[ReferenceSite],
     ) -> Tuple[FullCallFilter, str]:
-        annotated_alleles = cls.__get_annotated_alleles(call, call_reference_assembly, translated_reference_allele)
+        annotated_alleles = cls.__get_annotated_alleles(call, call_reference_assembly, translated_reference_site)
         if panel.has_ref_seq_difference_annotation(
-            call.gene, call.start_coordinate, call.reference_allele, call_reference_assembly
+            call.gene, call.reference_site, call_reference_assembly
         ):
             annotate_as_ref = all(
                 cls.__is_ref_allele_to_opposite_assembly_due_to_ref_sequence_difference(
@@ -257,7 +230,7 @@ class SimpleCallTranslator(object):
                 translated_filter = FullCallFilter.PASS
             elif all_variants_are_ref_to_a_reference_assembly:
                 translated_variant_annotation = panel.get_ref_seq_difference_annotation(
-                    call.gene, call.start_coordinate, call.reference_allele, call_reference_assembly
+                    call.gene, call.reference_site, call_reference_assembly
                 )
                 if call.is_pass():
                     translated_filter = FullCallFilter.PASS
@@ -310,15 +283,15 @@ class SimpleCallTranslator(object):
         cls,
         call: SimpleCall,
         call_reference_assembly: ReferenceAssembly,
-        translated_reference_allele: Optional[str],
+            translated_reference_site: Optional[ReferenceSite],
     ) -> Tuple[AnnotatedAllele, AnnotatedAllele]:
-        reference_assembly_to_reference_allele = {
-            call_reference_assembly: call.reference_allele,
-            call_reference_assembly.opposite(): translated_reference_allele,
+        reference_assembly_to_reference_site = {
+            call_reference_assembly: call.reference_site,
+            call_reference_assembly.opposite(): translated_reference_site,
         }
         annotated_alleles = (
-            AnnotatedAllele.from_alleles(call.alleles[0], reference_assembly_to_reference_allele),
-            AnnotatedAllele.from_alleles(call.alleles[1], reference_assembly_to_reference_allele),
+            AnnotatedAllele.from_reference_sites(call.alleles[0], reference_assembly_to_reference_site),
+            AnnotatedAllele.from_reference_sites(call.alleles[1], reference_assembly_to_reference_site),
         )
         return annotated_alleles
 

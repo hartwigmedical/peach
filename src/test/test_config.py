@@ -2,6 +2,7 @@ import unittest
 from typing import Dict, FrozenSet
 
 from base.gene_coordinate import GeneCoordinate
+from base.reference_site import ReferenceSite
 from config.annotation import Annotation
 from config.drug_info import DrugInfo
 from config.gene_info import GeneInfo
@@ -34,13 +35,13 @@ class TestLoadConfig(unittest.TestCase):
         )
         dpyd_rs_id_infos_expected = frozenset(
             {
-                RsIdInfo("rs3918290", "C", "C", GeneCoordinate("1", 97915614), GeneCoordinate("chr1", 97450058)),
+                RsIdInfo("rs3918290", ReferenceSite(GeneCoordinate("1", 97915614),"C"), ReferenceSite(GeneCoordinate("chr1", 97450058), "C")),
                 RsIdInfo(
-                    "rs72549309", "GATGA", "GATGA", GeneCoordinate("1", 98205966), GeneCoordinate("chr1", 97740410)
+                    "rs72549309", ReferenceSite(GeneCoordinate("1", 98205966), "GATGA"), ReferenceSite(GeneCoordinate("chr1", 97740410), "GATGA")
                 ),
-                RsIdInfo("rs1801159", "T", "T", GeneCoordinate("1", 97981395), GeneCoordinate("chr1", 97515839)),
-                RsIdInfo("rs72549303", "TG", "TC", GeneCoordinate("1", 97915621), GeneCoordinate("chr1", 97450065)),
-                RsIdInfo("rs1801265", "G", "A", GeneCoordinate("1", 98348885), GeneCoordinate("chr1", 97883329)),
+                RsIdInfo("rs1801159", ReferenceSite(GeneCoordinate("1", 97981395), "T"), ReferenceSite(GeneCoordinate("chr1", 97515839), "T")),
+                RsIdInfo("rs72549303", ReferenceSite(GeneCoordinate("1", 97915621), "TG"), ReferenceSite(GeneCoordinate("chr1", 97450065), "TC")),
+                RsIdInfo("rs1801265", ReferenceSite(GeneCoordinate("1", 98348885), "G"), ReferenceSite(GeneCoordinate("chr1", 97883329), "A")),
             }
         )
         dpyd_drugs_expected = frozenset(
@@ -69,7 +70,7 @@ class TestLoadConfig(unittest.TestCase):
         )
         fake_rs_id_infos_expected = frozenset(
             {
-                RsIdInfo("rs1212125", "T", "T", GeneCoordinate("5", 97915617), GeneCoordinate("chr5", 97450060)),
+                RsIdInfo("rs1212125", ReferenceSite(GeneCoordinate("5", 97915617), "T"), ReferenceSite(GeneCoordinate("chr5", 97450060), "T")),
             }
         )
         fake_drugs_expected = frozenset(
@@ -94,7 +95,7 @@ class TestLoadConfig(unittest.TestCase):
         )
         fake2_rs_id_infos_expected = frozenset(
             {
-                RsIdInfo("rs1212127", "C", "T", GeneCoordinate("16", 97915617), GeneCoordinate("chr16", 97450060)),
+                RsIdInfo("rs1212127", ReferenceSite(GeneCoordinate("16", 97915617), "C"), ReferenceSite(GeneCoordinate("chr16", 97450060), "T")),
             }
         )
         fake2_drugs_expected = frozenset(
@@ -146,17 +147,13 @@ class TestLoadConfig(unittest.TestCase):
 
         variant1_rs_id_info = RsIdInfo(
             variant1.rs_id,
-            "C",
-            "C",
-            GeneCoordinate(chromosome_v37, 4994545),
-            GeneCoordinate(chromosome_v38, 2993823),
+            ReferenceSite(GeneCoordinate(chromosome_v37, 4994545), "C"),
+            ReferenceSite(GeneCoordinate(chromosome_v38, 2993823), "C"),
         )
         variant2_rs_id_info = RsIdInfo(
             variant2.rs_id,
-            "G",
-            "G",
-            GeneCoordinate(chromosome_v37, 3993842),
-            GeneCoordinate(chromosome_v38, 2949923),
+            ReferenceSite(GeneCoordinate(chromosome_v37, 3993842), "G"),
+            ReferenceSite(GeneCoordinate(chromosome_v38, 2949923), "G"),
         )
         rs_id_infos = frozenset(
             [
@@ -197,24 +194,18 @@ class TestLoadConfig(unittest.TestCase):
 
         variant1_rs_id_info = RsIdInfo(
             variant1.rs_id,
-            "C",
-            "C",
-            GeneCoordinate(chromosome_v37, 4994545),
-            GeneCoordinate(chromosome_v38, 2993823),
+            ReferenceSite(GeneCoordinate(chromosome_v37, 4994545), "C"),
+            ReferenceSite(GeneCoordinate(chromosome_v38, 2993823), "C"),
         )
         variant2_rs_id_info = RsIdInfo(
             variant2.rs_id,
-            "G",
-            "G",
-            GeneCoordinate(chromosome_v37, 3993842),
-            GeneCoordinate(chromosome_v38, 2949923),
+            ReferenceSite(GeneCoordinate(chromosome_v37, 3993842), "G"),
+            ReferenceSite(GeneCoordinate(chromosome_v38, 2949923), "G"),
         )
         variant3_rs_id_info = RsIdInfo(
             variant3.rs_id,
-            "A",
-            "A",
-            GeneCoordinate(chromosome_v37, 293923),
-            GeneCoordinate(chromosome_v38, 138812),
+            ReferenceSite(GeneCoordinate(chromosome_v37, 293923), "A"),
+            ReferenceSite(GeneCoordinate(chromosome_v38, 138812), "A"),
         )
         rs_id_infos = frozenset(
             [
@@ -276,10 +267,10 @@ class TestLoadConfig(unittest.TestCase):
         rs_id_to_ref_seq_diff_annotation: Dict[str, Annotation] = dict()
 
         rs_id_info1 = RsIdInfo(
-            "rs294924", "A", "A", GeneCoordinate(chromosome_v37, 499593), GeneCoordinate(chromosome_v38, 399483)
+            "rs294924", ReferenceSite(GeneCoordinate(chromosome_v37, 499593), "A"), ReferenceSite(GeneCoordinate(chromosome_v38, 399483), "A")
         )
         rs_id_info2 = RsIdInfo(
-            "rs294927", "AA", "AA", GeneCoordinate(chromosome_v37, 499592), GeneCoordinate(chromosome_v38, 399482)
+            "rs294927", ReferenceSite(GeneCoordinate(chromosome_v37, 499592), "AA"), ReferenceSite(GeneCoordinate(chromosome_v38, 399482), "AA")
         )
         single_rs_id_info = frozenset([rs_id_info1])
         overlapping_rs_id_infos = frozenset([rs_id_info1, rs_id_info2])
@@ -309,20 +300,18 @@ class TestLoadConfig(unittest.TestCase):
         other_chromosome_v38 = "1"
 
         rs_id_info1 = RsIdInfo(
-            "rs294924", "A", "A", GeneCoordinate(chromosome_v37, 499593), GeneCoordinate(chromosome_v38, 399483)
+            "rs294924", ReferenceSite(GeneCoordinate(chromosome_v37, 499593), "A"), ReferenceSite(GeneCoordinate(chromosome_v38, 399483), "A")
         )
         rs_id_info2 = RsIdInfo(
-            "rs294924", "A", "A", GeneCoordinate(other_chromosome_v37, 499593), GeneCoordinate(chromosome_v38, 399483)
+            "rs294924", ReferenceSite(GeneCoordinate(other_chromosome_v37, 499593), "A"), ReferenceSite(GeneCoordinate(chromosome_v38, 399483), "A")
         )
         rs_id_info3 = RsIdInfo(
-            "rs294924", "A", "A", GeneCoordinate(chromosome_v37, 499593), GeneCoordinate(other_chromosome_v38, 399483)
+            "rs294924", ReferenceSite(GeneCoordinate(chromosome_v37, 499593), "A"), ReferenceSite(GeneCoordinate(other_chromosome_v38, 399483), "A")
         )
         rs_id_info4 = RsIdInfo(
             "rs294924",
-            "A",
-            "A",
-            GeneCoordinate(other_chromosome_v37, 499593),
-            GeneCoordinate(other_chromosome_v38, 399483),
+            ReferenceSite(GeneCoordinate(other_chromosome_v37, 499593), "A"),
+            ReferenceSite(GeneCoordinate(other_chromosome_v38, 399483), "A"),
         )
 
         GeneInfo(
@@ -421,10 +410,10 @@ class TestLoadConfig(unittest.TestCase):
         haplotypes = frozenset([Haplotype("*3", "No Function", frozenset([Variant("rs294924", "G")]))])
 
         rs_id_infos1 = frozenset(
-            [RsIdInfo(rs_id, "A", "C", GeneCoordinate(chromosome_v37, 499593), GeneCoordinate(chromosome_v38, 399483))]
+            [RsIdInfo(rs_id, ReferenceSite(GeneCoordinate(chromosome_v37, 499593), "A"), ReferenceSite(GeneCoordinate(chromosome_v38, 399483), "C"))]
         )
         rs_id_infos2 = frozenset(
-            [RsIdInfo(rs_id, "A", "G", GeneCoordinate(chromosome_v37, 499593), GeneCoordinate(chromosome_v38, 399483))]
+            [RsIdInfo(rs_id, ReferenceSite(GeneCoordinate(chromosome_v37, 499593), "A"), ReferenceSite(GeneCoordinate(chromosome_v38, 399483), "G"))]
         )
 
         GeneInfo(gene, reference_haplotype_name, haplotypes, rs_id_infos1, drugs, rs_id_to_ref_seq_diff_annotation)
@@ -442,10 +431,8 @@ class TestLoadConfig(unittest.TestCase):
         rs_id_to_ref_seq_diff_annotation: Dict[str, Annotation] = dict()
         rs_id_info = RsIdInfo(
             "rs294924",
-            "A",
-            "C",
-            GeneCoordinate(chromosome_v37, 499593),
-            GeneCoordinate(chromosome_v38, 399483),
+            ReferenceSite(GeneCoordinate(chromosome_v37, 499593), "A"),
+            ReferenceSite(GeneCoordinate(chromosome_v38, 399483), "C"),
         )
 
         empty_rs_id_infos: FrozenSet[RsIdInfo] = frozenset()
@@ -571,24 +558,18 @@ class TestLoadConfig(unittest.TestCase):
 
         rs_id_info1 = RsIdInfo(
             "rs294924",
-            "AT",
-            "AT",
-            GeneCoordinate(chromosome_v37, 499593),
-            GeneCoordinate(chromosome_v38, 399483),
+            ReferenceSite(GeneCoordinate(chromosome_v37, 499593), "AT"),
+            ReferenceSite(GeneCoordinate(chromosome_v38, 399483), "AT"),
         )
         rs_id_info2 = RsIdInfo(
             "rs3949923",
-            "C",
-            "C",
-            GeneCoordinate(chromosome_v37, 293993),
-            GeneCoordinate(chromosome_v38, 1388323),
+            ReferenceSite(GeneCoordinate(chromosome_v37, 293993), "C"),
+            ReferenceSite(GeneCoordinate(chromosome_v38, 1388323), "C"),
         )
         rs_id_info3 = RsIdInfo(
             "rs12993",
-            "GG",
-            "GG",
-            GeneCoordinate(chromosome_v37, 499592),
-            GeneCoordinate(chromosome_v38, 399482),
+            ReferenceSite(GeneCoordinate(chromosome_v37, 499592), "GG"),
+            ReferenceSite(GeneCoordinate(chromosome_v38, 399482), "GG"),
         )
 
         rs_id_infos1 = frozenset([rs_id_info1])

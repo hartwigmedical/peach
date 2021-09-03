@@ -4,6 +4,7 @@ from typing import Dict, Set
 from base.filter import FullCallFilter
 from base.gene_coordinate import GeneCoordinate
 from base.reference_assembly import ReferenceAssembly
+from base.reference_site import ReferenceSite
 from call_data import FullCall, HaplotypeCall, FullCallData
 from config.annotation import Annotation
 from config.drug_info import DrugInfo
@@ -31,10 +32,10 @@ class TestPgxReporter(unittest.TestCase):
             Haplotype("*3", "Normal Function", frozenset({dpyd_three_variant})),
         })
         dpyd_rs_id_infos = frozenset({
-            RsIdInfo("rs3918290", "C", "C", GeneCoordinate("1", 97915614), GeneCoordinate("chr1", 97450058)),
-            RsIdInfo("rs72549309", "GATGA", "GATGA", GeneCoordinate("1", 98205966), GeneCoordinate("chr1", 97740410)),
-            RsIdInfo("rs1801159", "T", "T", GeneCoordinate("1", 97981395), GeneCoordinate("chr1", 97515839)),
-            RsIdInfo("rs72549303", "TG", "TC", GeneCoordinate("1", 97915621), GeneCoordinate("chr1", 97450065)),
+            RsIdInfo("rs3918290", ReferenceSite(GeneCoordinate("1", 97915614), "C"), ReferenceSite(GeneCoordinate("chr1", 97450058), "C")),
+            RsIdInfo("rs72549309", ReferenceSite(GeneCoordinate("1", 98205966), "GATGA"), ReferenceSite(GeneCoordinate("chr1", 97740410), "GATGA")),
+            RsIdInfo("rs1801159", ReferenceSite(GeneCoordinate("1", 97981395), "T"), ReferenceSite(GeneCoordinate("chr1", 97515839), "T")),
+            RsIdInfo("rs72549303", ReferenceSite(GeneCoordinate("1", 97915621), "TG"), ReferenceSite(GeneCoordinate("chr1", 97450065), "TC")),
         })
         dpyd_drugs = frozenset({
             DrugInfo("5-Fluorouracil", "https://www.pharmgkb.org/chemical/PA128406956/guidelineAnnotation/PA166104939"),
@@ -48,7 +49,7 @@ class TestPgxReporter(unittest.TestCase):
             Haplotype("*4A", "Reduced Function", frozenset({fake_variant})),
         })
         fake_rs_id_infos = frozenset({
-            RsIdInfo("rs1212125", "T", "T", GeneCoordinate("5", 97915617), GeneCoordinate("chr5", 97450060)),
+            RsIdInfo("rs1212125", ReferenceSite(GeneCoordinate("5", 97915617), "T"), ReferenceSite(GeneCoordinate("chr5", 97450060), "T")),
         })
         fake_drugs = frozenset({
             DrugInfo("Aspirin", "https://www.pharmgkb.org/some_other_url"),
@@ -59,7 +60,7 @@ class TestPgxReporter(unittest.TestCase):
             Haplotype("*4A", "Reduced Function", frozenset({fake2_variant})),
         })
         fake2_rs_id_infos = frozenset({
-            RsIdInfo("rs1212127", "C", "T", GeneCoordinate("16", 97915617), GeneCoordinate("chr16", 97450060)),
+            RsIdInfo("rs1212127", ReferenceSite(GeneCoordinate("16", 97915617), "C"), ReferenceSite(GeneCoordinate("chr16", 97450060), "T")),
         })
         fake2_drugs = frozenset({
             DrugInfo("Aspirin", "https://www.pharmgkb.org/some_other_url"),
@@ -93,27 +94,27 @@ class TestPgxReporter(unittest.TestCase):
     def test_genotype_reporter_non_empty_input_v37(self) -> None:
         all_full_calls = frozenset({
             FullCall(
-                GeneCoordinate("1", 1), "C", None, None, ("C", "CAG"),
+                ReferenceSite(GeneCoordinate("1", 1), "C"), None, ("C", "CAG"),
                 "DPYD", ("rs664",), "1A>C;1A>G", FullCallFilter.PASS, "1A>C;1A>G?", FullCallFilter.UNKNOWN,
             ),
             FullCall(
-                GeneCoordinate("1", 5), "A", GeneCoordinate("chr1", 25), "A", ("G", "C"),
+                ReferenceSite(GeneCoordinate("1", 5), "A"), ReferenceSite(GeneCoordinate("chr1", 25), "A"), ("G", "C"),
                 "DPYD", (".",), "25A>C;25A>G", FullCallFilter.PASS, "25A>C;25A>G", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 15), "C", None, None, ("C", "CAG"),
+                ReferenceSite(GeneCoordinate("1", 15), "C"), None, ("C", "CAG"),
                 "DPYD", ("rs536",), "35A>C;35A>G", FullCallFilter.PASS, "35A>C;35A>G?", FullCallFilter.UNKNOWN,
             ),
             FullCall(
-                GeneCoordinate("X", 15), "TT", GeneCoordinate("chrX", 40), "AA", ("TT", "TT"),
+                ReferenceSite(GeneCoordinate("X", 15), "TT"), ReferenceSite(GeneCoordinate("chrX", 40), "AA"), ("TT", "TT"),
                 "GENE", ("rs23",), "REF_CALL", FullCallFilter.NO_CALL, "627AA>TT", FullCallFilter.INFERRED_PASS,
             ),
             FullCall(
-                GeneCoordinate("2", 154663), "T", GeneCoordinate("chr2", 40565464), "T", ("T", "T"),
+                ReferenceSite(GeneCoordinate("2", 154663), "T"), ReferenceSite(GeneCoordinate("chr2", 40565464), "T"), ("T", "T"),
                 "BRAF", ("rs154", "rs8839"), "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                GeneCoordinate("15", 24113), "A", GeneCoordinate("chr15", 684633), "T", ("T", "T"),
+                ReferenceSite(GeneCoordinate("15", 24113), "A"), ReferenceSite(GeneCoordinate("chr15", 684633), "T"), ("T", "T"),
                 ".", ("rs462", "rs9820", "rs536"), "29482A>T", FullCallFilter.PASS, "REF_CALL", FullCallFilter.PASS,
             ),
         })
@@ -137,27 +138,27 @@ class TestPgxReporter(unittest.TestCase):
     def test_genotype_reporter_non_empty_input_v38(self) -> None:
         all_full_calls = frozenset({
             FullCall(
-                None, None, GeneCoordinate("chr1", 15), "C", ("C", "CAG"),
+                None, ReferenceSite(GeneCoordinate("chr1", 15), "C"), ("C", "CAG"),
                 "DPYD", ("rs353",), "3A>C;3A>G?", FullCallFilter.UNKNOWN, "3A>C;3A>G", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("1", 5), "A", GeneCoordinate("chr1", 25), "A", ("G", "C"),
+                ReferenceSite(GeneCoordinate("1", 5), "A"), ReferenceSite(GeneCoordinate("chr1", 25), "A"), ("G", "C"),
                 "DPYD", (".",), "25A>C;25A>G", FullCallFilter.PASS, "25A>C;25A>G", FullCallFilter.PASS,
             ),
             FullCall(
-                None, None, GeneCoordinate("chr1", 35), "C", ("C", "CAG"),
+                None, ReferenceSite(GeneCoordinate("chr1", 35), "C"), ("C", "CAG"),
                 "DPYD", ("rs536",), "35A>C;35A>G?", FullCallFilter.UNKNOWN, "35A>C;35A>G", FullCallFilter.PASS,
             ),
             FullCall(
-                GeneCoordinate("X", 15), "AA", GeneCoordinate("chrX", 40), "TT", ("TT", "TT"),
+                ReferenceSite(GeneCoordinate("X", 15), "AA"), ReferenceSite(GeneCoordinate("chrX", 40), "TT"), ("TT", "TT"),
                 "GENE", ("rs23",), "627AA>TT", FullCallFilter.INFERRED_PASS, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                GeneCoordinate("2", 154663), "T", GeneCoordinate("chr2", 40565464), "T", ("T", "T"),
+                ReferenceSite(GeneCoordinate("2", 154663), "T"), ReferenceSite(GeneCoordinate("chr2", 40565464), "T"), ("T", "T"),
                 "BRAF", ("rs154", "rs8839"), "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
             ),
             FullCall(
-                GeneCoordinate("15", 24113), "T", GeneCoordinate("chr15", 684633), "A", ("T", "T"),
+                ReferenceSite(GeneCoordinate("15", 24113), "T"), ReferenceSite(GeneCoordinate("chr15", 684633), "A"), ("T", "T"),
                 ".", ("rs462", "rs9820", "rs536"), "REF_CALL", FullCallFilter.PASS, "29482A>T", FullCallFilter.PASS,
             ),
         })

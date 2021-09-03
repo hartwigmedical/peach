@@ -173,7 +173,7 @@ class GeneInfo(object):
         rs_id_infos: FrozenSet[RsIdInfo], rs_id_to_ref_seq_difference_annotation: Dict[str, Annotation]
     ) -> None:
         rs_ids_from_infos = {
-            info.rs_id for info in rs_id_infos if info.reference_allele_v37 != info.reference_allele_v38
+            info.rs_id for info in rs_id_infos if info.has_reference_sequence_difference()
         }
         rs_ids_from_annotation = set(rs_id_to_ref_seq_difference_annotation.keys())
         if rs_ids_from_infos != rs_ids_from_annotation:
@@ -196,8 +196,8 @@ class GeneInfo(object):
 
     @staticmethod
     def __assert_rs_id_infos_match_chromosome(rs_id_infos: FrozenSet[RsIdInfo], gene: str) -> None:
-        v37_chromosomes = {info.start_coordinate_v37.chromosome for info in rs_id_infos}
-        v38_chromosomes = {info.start_coordinate_v38.chromosome for info in rs_id_infos}
+        v37_chromosomes = {info.reference_site_v37.start_coordinate.chromosome for info in rs_id_infos}
+        v38_chromosomes = {info.reference_site_v38.start_coordinate.chromosome for info in rs_id_infos}
         if len(v37_chromosomes) > 1 or len(v38_chromosomes) > 1:
             error_msg = (
                 f"Rs id infos for gene {gene} disagree on chromosome:\n"
@@ -217,7 +217,7 @@ class GeneInfo(object):
                 f"Unexpected number of rs id infos match rs id with variant from haplotype:\n"
                 f"variant={variant}, matches={matching_rs_id_infos}"
             )
-            if variant.variant_allele == matching_rs_id_infos[0].reference_allele_v38:
+            if variant.variant_allele == matching_rs_id_infos[0].reference_site_v38.allele:
                 error_msg = (
                     f"Allele of variant matches reference allele from rs id info:\n"
                     f"variant={variant}, rs_id_info={matching_rs_id_infos[0]}"
