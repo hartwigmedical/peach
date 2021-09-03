@@ -39,7 +39,7 @@ class Panel(object):
     def from_json(cls, data: Json) -> "Panel":
         name = str(data["panelName"])
         version = str(data["panelVersion"])
-        gene_infos = frozenset({GeneInfo.from_json(gene_info_json) for gene_info_json in data['genes']})
+        gene_infos = frozenset({GeneInfo.from_json(gene_info_json) for gene_info_json in data["genes"]})
         return Panel(name, version, gene_infos)
 
     @property
@@ -50,18 +50,21 @@ class Panel(object):
     def version(self) -> str:
         return self.__version
 
-    def has_ref_seq_difference_annotation(self, gene: str, coordinate: GeneCoordinate,
-                                          reference_allele: str, reference_assembly: ReferenceAssembly) -> bool:
+    def has_ref_seq_difference_annotation(
+        self, gene: str, coordinate: GeneCoordinate, reference_allele: str, reference_assembly: ReferenceAssembly
+    ) -> bool:
         rs_id_is_known = self.contains_rs_id_with_coordinate_and_reference_allele(
-            coordinate, reference_allele, reference_assembly)
+            coordinate, reference_allele, reference_assembly
+        )
         if not rs_id_is_known:
             return False
         else:
             rs_id = self.get_matching_rs_id_info(coordinate, reference_allele, reference_assembly).rs_id
             return self.__get_gene_info(gene).has_ref_sequence_difference_annotation(rs_id)
 
-    def get_ref_seq_difference_annotation(self, gene: str, coordinate: GeneCoordinate,
-                                          reference_allele: str, reference_assembly: ReferenceAssembly) -> str:
+    def get_ref_seq_difference_annotation(
+        self, gene: str, coordinate: GeneCoordinate, reference_allele: str, reference_assembly: ReferenceAssembly
+    ) -> str:
         rs_id = self.get_matching_rs_id_info(coordinate, reference_allele, reference_assembly).rs_id
         return self.__get_gene_info(gene).get_ref_sequence_difference_annotation(rs_id, reference_assembly.opposite())
 
@@ -75,16 +78,20 @@ class Panel(object):
         return False
 
     def contains_rs_id_with_coordinate_and_reference_allele(
-            self, coordinate: GeneCoordinate, reference_allele: str, reference_assembly: ReferenceAssembly) -> bool:
+        self, coordinate: GeneCoordinate, reference_allele: str, reference_assembly: ReferenceAssembly
+    ) -> bool:
         for info in self.__get_rs_id_infos():
-            if (info.get_start_coordinate(reference_assembly) == coordinate
-                    and info.get_reference_allele(reference_assembly) == reference_allele):
+            if (
+                info.get_start_coordinate(reference_assembly) == coordinate
+                and info.get_reference_allele(reference_assembly) == reference_allele
+            ):
                 return True
         return False
 
     def contains_rs_id_matching_call(self, call: SimpleCall, reference_assembly: ReferenceAssembly) -> bool:
         if self.contains_rs_id_with_coordinate_and_reference_allele(
-                call.start_coordinate, call.reference_allele, reference_assembly):
+            call.start_coordinate, call.reference_allele, reference_assembly
+        ):
             return True
         elif any(self.contains_rs_id(rs_id) for rs_id in call.rs_ids):
             error_msg = (
@@ -96,12 +103,15 @@ class Panel(object):
         else:
             return False
 
-    def get_matching_rs_id_info(self, coordinate: GeneCoordinate, reference_allele: str,
-                                reference_assembly: ReferenceAssembly) -> RsIdInfo:
+    def get_matching_rs_id_info(
+        self, coordinate: GeneCoordinate, reference_allele: str, reference_assembly: ReferenceAssembly
+    ) -> RsIdInfo:
         matching_rs_id_infos = []
         for info in self.__get_rs_id_infos():
-            if (info.get_start_coordinate(reference_assembly) == coordinate
-                    and info.get_reference_allele(reference_assembly) == reference_allele):
+            if (
+                info.get_start_coordinate(reference_assembly) == coordinate
+                and info.get_reference_allele(reference_assembly) == reference_allele
+            ):
                 matching_rs_id_infos.append(info)
 
         if matching_rs_id_infos and len(matching_rs_id_infos) == 1:

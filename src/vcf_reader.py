@@ -23,8 +23,15 @@ class VcfReader(object):
     GENOTYPE_FIELD_NAME = "calldata/GT"
     SAMPLE_FIELD_NAME = "samples"
     FIELD_NAMES = [
-        CHROMOSOME_FIELD_NAME, POSITION_FIELD_NAME, RS_IDS_FIELD_NAME, REF_ALLELE_FIELD_NAME, ALT_ALLELE_FIELD_NAME,
-        FILTER_FIELD_NAME, ANNOTATION_FIELD_NAME, GENOTYPE_FIELD_NAME, SAMPLE_FIELD_NAME,
+        CHROMOSOME_FIELD_NAME,
+        POSITION_FIELD_NAME,
+        RS_IDS_FIELD_NAME,
+        REF_ALLELE_FIELD_NAME,
+        ALT_ALLELE_FIELD_NAME,
+        FILTER_FIELD_NAME,
+        ANNOTATION_FIELD_NAME,
+        GENOTYPE_FIELD_NAME,
+        SAMPLE_FIELD_NAME,
     ]
     VARIANT_ANNOTATION_FIELD_NAME = f"{ANNOTATION_FIELD_NAME}_HGVS_c"
     GENE_FIELD_NAME = f"{ANNOTATION_FIELD_NAME}_Gene_Name"
@@ -36,7 +43,8 @@ class VcfReader(object):
         variants = cls.__get_variants_from_vcf(tool_config.vcf_path)
         if variants is not None:
             return cls.__get_call_data_from_variants(
-                variants, panel, tool_config.sample_r_id, tool_config.vcf_reference_assembly)
+                variants, panel, tool_config.sample_r_id, tool_config.vcf_reference_assembly
+            )
         else:
             logging.warning("No variants found in vcf")
             return SimpleCallData(frozenset(), tool_config.vcf_reference_assembly)
@@ -51,8 +59,9 @@ class VcfReader(object):
         return variants
 
     @classmethod
-    def __get_call_data_from_variants(cls, variants: Dict[str, Any], panel: Panel, sample_r_id: str,
-                                      vcf_reference_assembly: ReferenceAssembly) -> SimpleCallData:
+    def __get_call_data_from_variants(
+        cls, variants: Dict[str, Any], panel: Panel, sample_r_id: str, vcf_reference_assembly: ReferenceAssembly
+    ) -> SimpleCallData:
         match_on_rsid = 0
         match_on_location = 0
         filtered_calls = set()
@@ -60,7 +69,8 @@ class VcfReader(object):
         for call_index in range(cls.__get_variant_count(variants)):
             rs_id_match_to_panel_exists = cls.__rs_id_exists_in_panel(call_index, panel, variants)
             coordinate_match_to_panel_exists = cls.__coordinates_of_call_overlap_with_panel_coordinates(
-                call_index, panel, variants, vcf_reference_assembly)
+                call_index, panel, variants, vcf_reference_assembly
+            )
             if rs_id_match_to_panel_exists or coordinate_match_to_panel_exists:
                 if rs_id_match_to_panel_exists:
                     match_on_rsid += 1
@@ -109,19 +119,14 @@ class VcfReader(object):
 
     @classmethod
     def __coordinates_of_call_overlap_with_panel_coordinates(
-            cls,
-            call_index: int,
-            panel: Panel,
-            variants: Dict[str, Any],
-            vcf_reference_assembly: ReferenceAssembly
+        cls, call_index: int, panel: Panel, variants: Dict[str, Any], vcf_reference_assembly: ReferenceAssembly
     ) -> bool:
         chromosome = cls.__get_chromosome_from_variants(call_index, variants)
         position = cls.__get_position_from_variants(call_index, variants)
         reference_allele = cls.__get_reference_allele_from_variants(call_index, variants)
         relevant_coordinates = cls.__get_relevant_coordinates(chromosome, position, reference_allele)
         coordinate_match_to_panel_exists = any(
-            panel.contains_rs_id_with_coordinate(coord, vcf_reference_assembly)
-            for coord in relevant_coordinates
+            panel.contains_rs_id_with_coordinate(coord, vcf_reference_assembly) for coord in relevant_coordinates
         )
         return coordinate_match_to_panel_exists
 
@@ -133,7 +138,8 @@ class VcfReader(object):
 
     @classmethod
     def __get_called_alleles_from_variants(
-            cls, call_index: int, sample_r_id: str, variants: Dict[str, Any]) -> Tuple[str, str]:
+        cls, call_index: int, sample_r_id: str, variants: Dict[str, Any]
+    ) -> Tuple[str, str]:
         reference_allele = cls.__get_reference_allele_from_variants(call_index, variants)
         sample_index = variants[cls.SAMPLE_FIELD_NAME].tolist().index(sample_r_id)
         genotype = variants[cls.GENOTYPE_FIELD_NAME][call_index][sample_index].tolist()

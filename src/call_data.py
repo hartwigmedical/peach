@@ -33,7 +33,7 @@ class SimpleCallData(NamedTuple):
     calls: FrozenSet[SimpleCall]
     reference_assembly: ReferenceAssembly
 
-    def __repr__(self) -> str:
+    def __repr__(self) -> str:  # pragma: no cover
         calls_string = "frozenset(" + ", ".join(sorted([repr(call) for call in self.calls])) + ")"
         return f"SimpleCallData({calls_string}, {self.reference_assembly!r})"
 
@@ -45,21 +45,19 @@ class AnnotatedAllele(object):
 
     @classmethod
     def from_alleles(
-            cls,
-            allele: str,
-            reference_assembly_to_reference_allele: Dict[ReferenceAssembly, Optional[str]]
+        cls, allele: str, reference_assembly_to_reference_allele: Dict[ReferenceAssembly, Optional[str]]
     ) -> "AnnotatedAllele":
         reference_assembly_to_is_variant: Dict[ReferenceAssembly, bool] = {}
         for reference_assembly, reference_allele in reference_assembly_to_reference_allele.items():
             if reference_allele is not None:
-                reference_assembly_to_is_variant[reference_assembly] = (allele != reference_allele)
+                reference_assembly_to_is_variant[reference_assembly] = allele != reference_allele
         return AnnotatedAllele(allele, reference_assembly_to_is_variant)
 
     def __eq__(self, other: object) -> bool:  # pragma: no cover
         return (
-                isinstance(other, AnnotatedAllele)
-                and self.__allele == other.__allele
-                and self.__reference_assembly_to_is_variant == other.__reference_assembly_to_is_variant
+            isinstance(other, AnnotatedAllele)
+            and self.__allele == other.__allele
+            and self.__reference_assembly_to_is_variant == other.__reference_assembly_to_is_variant
         )
 
     def __repr__(self) -> str:  # pragma: no cover
@@ -126,7 +124,7 @@ class FullCall(NamedTuple):
 class FullCallData(NamedTuple):
     calls: FrozenSet[FullCall]
 
-    def __repr__(self) -> str:
+    def __repr__(self) -> str:  # pragma: no cover
         calls_string = ", ".join(sorted([repr(call) for call in self.calls]))
         return f"FullCallData(frozenset({calls_string}))"
 
@@ -142,21 +140,16 @@ class HaplotypeCall(object):
 
     def __eq__(self, other: object) -> bool:
         return (
-                isinstance(other, HaplotypeCall)
-                and self.__haplotype_name == other.__haplotype_name
-                and self.__count == other.__count
+            isinstance(other, HaplotypeCall)
+            and self.__haplotype_name == other.__haplotype_name
+            and self.__count == other.__count
         )
 
     def __hash__(self) -> int:
         return hash((self.__haplotype_name, self.__count))
 
     def __repr__(self) -> str:  # pragma: no cover
-        return (
-            f"HaplotypeCall("
-            f"{self.__haplotype_name!r}, "
-            f"{self.__count!r}, "
-            f")"
-        )
+        return f"HaplotypeCall({self.__haplotype_name!r}, {self.__count!r})"
 
     @property
     def haplotype_name(self) -> str:

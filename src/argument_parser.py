@@ -10,6 +10,7 @@ class EnumAction(argparse.Action):
     """
     Argparse action for handling Enums
     """
+
     #  https://stackoverflow.com/questions/43968006/support-for-enum-arguments-in-argparse/55500795
     def __init__(self, **kwargs: Any) -> None:
         # Pop off the type value
@@ -29,11 +30,11 @@ class EnumAction(argparse.Action):
         self._enum = enum
 
     def __call__(
-            self,
-            parser: argparse.ArgumentParser,
-            namespace: argparse.Namespace,
-            values: Any,
-            option_string: Optional[str] = None
+        self,
+        parser: argparse.ArgumentParser,
+        namespace: argparse.Namespace,
+        values: Any,
+        option_string: Optional[str] = None,
     ) -> None:
         # Convert value back into an Enum
         enum = self._enum[values]
@@ -48,26 +49,28 @@ class ArgumentParser(object):
             description=(
                 "Run pharmacogenomics panel on v37 germline VCF file. The pharmacogenomic annotations are done on "
                 "v38, so output for both reference genomes is given where possible."
-            )
+            ),
         )
         parser._action_groups.pop()
         required = parser.add_argument_group("required arguments")
         required.add_argument(
-            "--vcf", "-i", type=str, required=True, help="VCF file to use for pharmacogenomics analysis.")
+            "--vcf", "-i", type=str, required=True, help="VCF file to use for pharmacogenomics analysis."
+        )
+        required.add_argument("--panel", "-p", type=str, required=True, help="Json file with the panel variants.")
         required.add_argument(
-            "--panel", "-p", type=str, required=True, help="Json file with the panel variants.")
-        required.add_argument(
-            "--outputdir", "-o", type=str, required=True, help="Directory to store output of pharmacogenomic analysis.")
-        required.add_argument(
-            "--sample_t_id", "-t", type=str, required=True, help="The sample ID of the tumor.")
-        required.add_argument(
-            "--sample_r_id", "-r", type=str, required=True, help="The sample ID of the normal.")
-        required.add_argument(
-            "--tool_version", "-v", type=str, required=True, help="The version of the tool.")
+            "--outputdir", "-o", type=str, required=True, help="Directory to store output of pharmacogenomic analysis."
+        )
+        required.add_argument("--sample_t_id", "-t", type=str, required=True, help="The sample ID of the tumor.")
+        required.add_argument("--sample_r_id", "-r", type=str, required=True, help="The sample ID of the normal.")
+        required.add_argument("--tool_version", "-v", type=str, required=True, help="The version of the tool.")
         experimental_optional = parser.add_argument_group("experimental optional arguments")
         experimental_optional.add_argument(
-            "--vcf_reference_assembly_version", "-a", type=ReferenceAssembly, default=ReferenceAssembly.V37,
-            required=False, action=EnumAction,
+            "--vcf_reference_assembly_version",
+            "-a",
+            type=ReferenceAssembly,
+            default=ReferenceAssembly.V37,
+            required=False,
+            action=EnumAction,
             help=(
                 "The version of the reference assembly wrt which the vcf has been constructed. "
                 "Support for V38 is experimental. Default is V37."

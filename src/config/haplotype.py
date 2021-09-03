@@ -60,7 +60,7 @@ def assert_no_overlap_haplotype_names(haplotypes: Collection[Haplotype], source_
     if names_of_haplotypes_overlap(haplotypes):
         name_to_multiple_haplotypes = get_name_to_multiple_haplotypes(haplotypes)
         error_msg = (
-            f"The {source_name} contains haplotypes with the same name but different summaries. " 
+            f"The {source_name} contains haplotypes with the same name but different summaries. "
             f"Duplicates: {name_to_multiple_haplotypes}"
         )
         raise ValueError(error_msg)
@@ -88,6 +88,7 @@ def variant_combinations_of_haplotypes_overlap(haplotypes: Collection[Haplotype]
     return len({haplotype.variants for haplotype in haplotypes}) != len(haplotypes)
 
 
-def get_variant_combination_to_multiple_haplotypes(haplotypes: Collection[Haplotype]
-                                                   ) -> Dict[FrozenSet[Variant], List[Haplotype]]:
+def get_variant_combination_to_multiple_haplotypes(
+    haplotypes: Collection[Haplotype],
+) -> Dict[FrozenSet[Variant], List[Haplotype]]:
     return get_key_to_multiple_values([(haplotype.variants, haplotype) for haplotype in haplotypes])

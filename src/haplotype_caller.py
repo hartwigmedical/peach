@@ -28,21 +28,23 @@ class HaplotypeCaller(object):
             variant_to_count = cls.__get_variant_to_count_for_gene(full_call_data, gene_info.gene)
 
             explaining_haplotype_combinations = cls.__get_explaining_haplotype_combinations(
-                variant_to_count, gene_info.haplotypes)
-    
+                variant_to_count, gene_info.haplotypes
+            )
+
             if not explaining_haplotype_combinations:
                 error_msg = f"No explaining haplotype combinations"
                 raise ValueError(error_msg)
-    
+
             minimal_explaining_haplotype_combination = cls.__get_minimal_haplotype_combination(
-                explaining_haplotype_combinations)
+                explaining_haplotype_combinations
+            )
 
             haplotype_calls = cls.__get_haplotype_calls_from_haplotype_names(
                 minimal_explaining_haplotype_combination, gene_info
             )
 
             return haplotype_calls
-    
+
         except Exception as e:
             logging.error(f"Cannot resolve haplotype for gene {gene_info.gene}. Error: {e}")
             return set()
@@ -63,7 +65,8 @@ class HaplotypeCaller(object):
 
     @classmethod
     def __get_explaining_haplotype_combinations(
-            cls, variant_to_count: DefaultDict[Variant, int], haplotypes: FrozenSet[Haplotype]) -> Set[Tuple[str, ...]]:
+        cls, variant_to_count: DefaultDict[Variant, int], haplotypes: FrozenSet[Haplotype]
+    ) -> Set[Tuple[str, ...]]:
         """
         Gets combinations of haplotypes that explain all variants in the stated amounts. Uses recursion.
         Always makes sure that the haplotypes in a haplotype combination are ordered alphabetically to
@@ -73,38 +76,42 @@ class HaplotypeCaller(object):
             return set()
         if all(count == 0 for count in variant_to_count.values()):
             return {tuple()}
-    
+
         result_set = set()
         for haplotype in haplotypes:
             reduced_variant_to_count = deepcopy(variant_to_count)
             for variant in haplotype.variants:
                 reduced_variant_to_count[variant] -= 1
-                
+
             combinations_for_reduced_variant_set = cls.__get_explaining_haplotype_combinations(
                 reduced_variant_to_count, haplotypes
             )
             for combination in combinations_for_reduced_variant_set:
                 result_set.add(tuple(sorted(list(combination) + [haplotype.name])))
-    
+
         return result_set
 
     @classmethod
     def __get_minimal_haplotype_combination(
-            cls, explaining_haplotype_combinations: Set[Tuple[str, ...]]) -> Tuple[str, ...]:
+        cls, explaining_haplotype_combinations: Set[Tuple[str, ...]]
+    ) -> Tuple[str, ...]:
         min_haplotype_count = min(len(combination) for combination in explaining_haplotype_combinations)
         minimal_explaining_haplotype_combinations = {
             combination for combination in explaining_haplotype_combinations if len(combination) == min_haplotype_count
         }
         if len(minimal_explaining_haplotype_combinations) > 1:
-            error_msg = (f"No unique minimal explaining haplotype combination: "
-                         f"options={minimal_explaining_haplotype_combinations}")
+            error_msg = (
+                f"No unique minimal explaining haplotype combination: "
+                f"options={minimal_explaining_haplotype_combinations}"
+            )
             raise ValueError(error_msg)
         minimal_explaining_haplotype_combination = minimal_explaining_haplotype_combinations.pop()
         return minimal_explaining_haplotype_combination
 
     @classmethod
     def __get_haplotype_calls_from_haplotype_names(
-            cls, haplotype_name_combination: Tuple[str, ...], gene_info: GeneInfo) -> Set[HaplotypeCall]:
+        cls, haplotype_name_combination: Tuple[str, ...], gene_info: GeneInfo
+    ) -> Set[HaplotypeCall]:
         haplotype_to_count: DefaultDict[str, int] = collections.defaultdict(int)
         for haplotype in haplotype_name_combination:
             haplotype_to_count[haplotype] += 1

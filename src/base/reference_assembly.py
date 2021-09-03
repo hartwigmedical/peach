@@ -12,4 +12,3 @@ class ReferenceAssembly(Enum):
             return ReferenceAssembly.V37
         else:
             raise NotImplementedError(f"Unrecognized reference assembly: {self}")
-

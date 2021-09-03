@@ -29,12 +29,21 @@ class GenotypeReporter(object):
     TOOL_VERSION_COLUMN_NAME = "repo_version"
     NEW_CALLS_TSV_COLUMNS = (
         GENE_COLUMN_NAME,
-        CHROMOSOME_V37_COLUMN_NAME, POSITION_V37_COLUMN_NAME,
-        CHROMOSOME_V38_COLUMN_NAME, POSITION_V38_COLUMN_NAME,
-        REF_ALLELE_V37_COLUMN_NAME, REF_ALLELE_V38_COLUMN_NAME,
-        FIRST_ALLELE_COLUMN_NAME, SECOND_ALLELE_COLUMN_NAME, RS_IDS_COLUMN_NAME,
-        ANNOTATION_V37_COLUMN_NAME, FILTER_V37_COLUMN_NAME, ANNOTATION_V38_COLUMN_NAME, FILTER_V38_COLUMN_NAME,
-        PANEL_VERSION_COLUMN_NAME, TOOL_VERSION_COLUMN_NAME,
+        CHROMOSOME_V37_COLUMN_NAME,
+        POSITION_V37_COLUMN_NAME,
+        CHROMOSOME_V38_COLUMN_NAME,
+        POSITION_V38_COLUMN_NAME,
+        REF_ALLELE_V37_COLUMN_NAME,
+        REF_ALLELE_V38_COLUMN_NAME,
+        FIRST_ALLELE_COLUMN_NAME,
+        SECOND_ALLELE_COLUMN_NAME,
+        RS_IDS_COLUMN_NAME,
+        ANNOTATION_V37_COLUMN_NAME,
+        FILTER_V37_COLUMN_NAME,
+        ANNOTATION_V38_COLUMN_NAME,
+        FILTER_V38_COLUMN_NAME,
+        PANEL_VERSION_COLUMN_NAME,
+        TOOL_VERSION_COLUMN_NAME,
     )
     CHROMOSOME_INDEX_NAME = "chromosome_index"
 
@@ -47,14 +56,14 @@ class GenotypeReporter(object):
 
     @classmethod
     def get_calls_tsv_text(
-            cls, pgx_analysis: PgxAnalysis, panel_id: str, version: str, input_reference_assembly: ReferenceAssembly
+        cls, pgx_analysis: PgxAnalysis, panel_id: str, version: str, input_reference_assembly: ReferenceAssembly
     ) -> str:
         panel_calls_df = cls.__get_panel_calls_df(pgx_analysis, panel_id, version, input_reference_assembly)
         return str(panel_calls_df.to_csv(sep=cls.TSV_SEPARATOR, index=False))
 
     @classmethod
     def __get_panel_calls_df(
-            cls, pgx_analysis: PgxAnalysis, panel_id: str, version: str, input_reference_assembly: ReferenceAssembly
+        cls, pgx_analysis: PgxAnalysis, panel_id: str, version: str, input_reference_assembly: ReferenceAssembly
     ) -> pd.DataFrame:
         data_frame = pd.DataFrame(columns=cls.NEW_CALLS_TSV_COLUMNS)
         for full_call in pgx_analysis.get_all_full_calls():
@@ -119,7 +128,8 @@ class GenotypeReporter(object):
 
     @classmethod
     def __sort_call_data_frame(
-            cls, data_frame: pd.DataFrame, input_reference_assembly: ReferenceAssembly) -> pd.DataFrame:
+        cls, data_frame: pd.DataFrame, input_reference_assembly: ReferenceAssembly
+    ) -> pd.DataFrame:
         if input_reference_assembly == ReferenceAssembly.V37:
             column_for_chromosome_sorting = cls.CHROMOSOME_V37_COLUMN_NAME
             column_for_position_sorting = cls.POSITION_V37_COLUMN_NAME
@@ -131,11 +141,17 @@ class GenotypeReporter(object):
             raise ValueError(error_msg)
 
         data_frame.loc[:, cls.CHROMOSOME_INDEX_NAME] = data_frame.loc[:, column_for_chromosome_sorting].apply(
-            lambda x: tuple(int(y) if y.isnumeric() else y for y in re.split(r"(\d+)", x)))
+            lambda x: tuple(int(y) if y.isnumeric() else y for y in re.split(r"(\d+)", x))
+        )
 
         data_frame = data_frame.sort_values(
-            by=[cls.CHROMOSOME_INDEX_NAME, column_for_position_sorting, cls.GENE_COLUMN_NAME,
-                cls.REF_ALLELE_V37_COLUMN_NAME, cls.REF_ALLELE_V38_COLUMN_NAME]
+            by=[
+                cls.CHROMOSOME_INDEX_NAME,
+                column_for_position_sorting,
+                cls.GENE_COLUMN_NAME,
+                cls.REF_ALLELE_V37_COLUMN_NAME,
+                cls.REF_ALLELE_V38_COLUMN_NAME,
+            ]
         ).reset_index(drop=True)
         data_frame = data_frame.loc[:, cls.NEW_CALLS_TSV_COLUMNS]
         return data_frame
@@ -176,12 +192,11 @@ class HaplotypeReporter(object):
         gene_to_drug_info = {}
         for gene_info in panel.get_gene_infos():
             sorted_drugs = sorted(
-                [drug for drug in gene_info.drugs],
-                key=lambda info: (info.name, info.url_prescription_info)
+                [drug for drug in gene_info.drugs], key=lambda info: (info.name, info.url_prescription_info)
             )
             gene_to_drug_info[gene_info.gene] = (
                 cls.DRUG_SEPARATOR.join([drug.name for drug in sorted_drugs]),
-                cls.DRUG_SEPARATOR.join([drug.url_prescription_info for drug in sorted_drugs])
+                cls.DRUG_SEPARATOR.join([drug.url_prescription_info for drug in sorted_drugs]),
             )
 
         header = cls.TSV_SEPARATOR.join(cls.GENOTYPE_TSV_COLUMNS)
@@ -189,7 +204,7 @@ class HaplotypeReporter(object):
         for gene in sorted(gene_to_haplotype_calls.keys()):
             if gene_to_haplotype_calls[gene]:
                 for haplotype_call in sorted(gene_to_haplotype_calls[gene], key=lambda call: call.haplotype_name):
-                    lines.append(cls.TSV_SEPARATOR.join([
+                    line_contents = [
                         gene,
                         haplotype_call.haplotype_name,
                         cls.__get_zygosity(haplotype_call),
@@ -198,9 +213,10 @@ class HaplotypeReporter(object):
                         gene_to_drug_info[gene][1],
                         panel.get_id(),
                         version,
-                    ]))
+                    ]
+                    lines.append(cls.TSV_SEPARATOR.join(line_contents))
             else:
-                lines.append(cls.TSV_SEPARATOR.join([
+                line_contents = [
                     gene,
                     cls.UNRESOLVED_HAPLOTYPE_STRING,
                     cls.NOT_APPLICABLE_ZYGOSITY_STRING,
@@ -209,7 +225,8 @@ class HaplotypeReporter(object):
                     gene_to_drug_info[gene][1],
                     panel.get_id(),
                     version,
-                ]))
+                ]
+                lines.append(cls.TSV_SEPARATOR.join(line_contents))
         text = "\n".join(lines) + "\n"
         return text
 
