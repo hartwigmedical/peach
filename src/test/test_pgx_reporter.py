@@ -92,18 +92,30 @@ class TestPgxReporter(unittest.TestCase):
 
     def test_genotype_reporter_non_empty_input_v37(self) -> None:
         all_full_calls = frozenset({
-            FullCall(GeneCoordinate("1", 1), "C", None, None, ("C", "CAG"),
-                     "DPYD", ("rs664",), "1A>C;1A>G", FullCallFilter.PASS, "1A>C;1A>G?", FullCallFilter.UNKNOWN),
-            FullCall(GeneCoordinate("1", 5), "A", GeneCoordinate("chr1", 25), "A", ("G", "C"),
-                     "DPYD", (".",), "25A>C;25A>G", FullCallFilter.PASS, "25A>C;25A>G", FullCallFilter.PASS),
-            FullCall(GeneCoordinate("1", 15), "C", None, None, ("C", "CAG"),
-                     "DPYD", ("rs536",), "35A>C;35A>G", FullCallFilter.PASS, "35A>C;35A>G?", FullCallFilter.UNKNOWN),
-            FullCall(GeneCoordinate("X", 15), "TT", GeneCoordinate("chrX", 40), "AA", ("TT", "TT"),
-                     "GENE", ("rs23",), "REF_CALL", FullCallFilter.NO_CALL, "627AA>TT", FullCallFilter.INFERRED_PASS),
-            FullCall(GeneCoordinate("2", 154663), "T", GeneCoordinate("chr2", 40565464), "T", ("T", "T"),
-                     "BRAF", ("rs154", "rs8839"), "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL),
-            FullCall(GeneCoordinate("15", 24113), "A", GeneCoordinate("chr15", 684633), "T", ("T", "T"),
-                     ".", ("rs462", "rs9820", "rs536"), "29482A>T", FullCallFilter.PASS, "REF_CALL", FullCallFilter.PASS),
+            FullCall(
+                GeneCoordinate("1", 1), "C", None, None, ("C", "CAG"),
+                "DPYD", ("rs664",), "1A>C;1A>G", FullCallFilter.PASS, "1A>C;1A>G?", FullCallFilter.UNKNOWN,
+            ),
+            FullCall(
+                GeneCoordinate("1", 5), "A", GeneCoordinate("chr1", 25), "A", ("G", "C"),
+                "DPYD", (".",), "25A>C;25A>G", FullCallFilter.PASS, "25A>C;25A>G", FullCallFilter.PASS,
+            ),
+            FullCall(
+                GeneCoordinate("1", 15), "C", None, None, ("C", "CAG"),
+                "DPYD", ("rs536",), "35A>C;35A>G", FullCallFilter.PASS, "35A>C;35A>G?", FullCallFilter.UNKNOWN,
+            ),
+            FullCall(
+                GeneCoordinate("X", 15), "TT", GeneCoordinate("chrX", 40), "AA", ("TT", "TT"),
+                "GENE", ("rs23",), "REF_CALL", FullCallFilter.NO_CALL, "627AA>TT", FullCallFilter.INFERRED_PASS,
+            ),
+            FullCall(
+                GeneCoordinate("2", 154663), "T", GeneCoordinate("chr2", 40565464), "T", ("T", "T"),
+                "BRAF", ("rs154", "rs8839"), "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
+            ),
+            FullCall(
+                GeneCoordinate("15", 24113), "A", GeneCoordinate("chr15", 684633), "T", ("T", "T"),
+                ".", ("rs462", "rs9820", "rs536"), "29482A>T", FullCallFilter.PASS, "REF_CALL", FullCallFilter.PASS,
+            ),
         })
         pgx_analysis = PgxAnalysis(FullCallData(all_full_calls), {})
         panel_id = "Panel_v0.2"
@@ -124,18 +136,30 @@ class TestPgxReporter(unittest.TestCase):
 
     def test_genotype_reporter_non_empty_input_v38(self) -> None:
         all_full_calls = frozenset({
-            FullCall(None, None, GeneCoordinate("chr1", 15), "C", ("C", "CAG"),
-                     "DPYD", ("rs353",), "3A>C;3A>G?", FullCallFilter.UNKNOWN, "3A>C;3A>G", FullCallFilter.PASS),
-            FullCall(GeneCoordinate("1", 5), "A", GeneCoordinate("chr1", 25), "A", ("G", "C"),
-                     "DPYD", (".",), "25A>C;25A>G", FullCallFilter.PASS, "25A>C;25A>G", FullCallFilter.PASS),
-            FullCall(None, None, GeneCoordinate("chr1", 35), "C", ("C", "CAG"),
-                     "DPYD", ("rs536",), "35A>C;35A>G?", FullCallFilter.UNKNOWN, "35A>C;35A>G", FullCallFilter.PASS),
-            FullCall(GeneCoordinate("X", 15), "AA", GeneCoordinate("chrX", 40), "TT", ("TT", "TT"),
-                     "GENE", ("rs23",), "627AA>TT", FullCallFilter.INFERRED_PASS, "REF_CALL", FullCallFilter.NO_CALL),
-            FullCall(GeneCoordinate("2", 154663), "T", GeneCoordinate("chr2", 40565464), "T", ("T", "T"),
-                     "BRAF", ("rs154", "rs8839"), "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL),
-            FullCall(GeneCoordinate("15", 24113), "T", GeneCoordinate("chr15", 684633), "A", ("T", "T"),
-                     ".", ("rs462", "rs9820", "rs536"), "REF_CALL", FullCallFilter.PASS, "29482A>T", FullCallFilter.PASS),
+            FullCall(
+                None, None, GeneCoordinate("chr1", 15), "C", ("C", "CAG"),
+                "DPYD", ("rs353",), "3A>C;3A>G?", FullCallFilter.UNKNOWN, "3A>C;3A>G", FullCallFilter.PASS,
+            ),
+            FullCall(
+                GeneCoordinate("1", 5), "A", GeneCoordinate("chr1", 25), "A", ("G", "C"),
+                "DPYD", (".",), "25A>C;25A>G", FullCallFilter.PASS, "25A>C;25A>G", FullCallFilter.PASS,
+            ),
+            FullCall(
+                None, None, GeneCoordinate("chr1", 35), "C", ("C", "CAG"),
+                "DPYD", ("rs536",), "35A>C;35A>G?", FullCallFilter.UNKNOWN, "35A>C;35A>G", FullCallFilter.PASS,
+            ),
+            FullCall(
+                GeneCoordinate("X", 15), "AA", GeneCoordinate("chrX", 40), "TT", ("TT", "TT"),
+                "GENE", ("rs23",), "627AA>TT", FullCallFilter.INFERRED_PASS, "REF_CALL", FullCallFilter.NO_CALL,
+            ),
+            FullCall(
+                GeneCoordinate("2", 154663), "T", GeneCoordinate("chr2", 40565464), "T", ("T", "T"),
+                "BRAF", ("rs154", "rs8839"), "REF_CALL", FullCallFilter.NO_CALL, "REF_CALL", FullCallFilter.NO_CALL,
+            ),
+            FullCall(
+                GeneCoordinate("15", 24113), "T", GeneCoordinate("chr15", 684633), "A", ("T", "T"),
+                ".", ("rs462", "rs9820", "rs536"), "REF_CALL", FullCallFilter.PASS, "29482A>T", FullCallFilter.PASS,
+            ),
         })
         pgx_analysis = PgxAnalysis(FullCallData(all_full_calls), {})
         panel_id = "Panel_v0.2"
@@ -160,7 +184,9 @@ class TestPgxReporter(unittest.TestCase):
         version = "V1"
         result = HaplotypeReporter.get_genotype_tsv_text(pgx_analysis, panel, version)
 
-        result_expected = "gene\thaplotype\tzygosity\tfunction\tlinked_drugs\turl_prescription_info\tpanel_version\trepo_version\n"
+        result_expected = (
+            "gene\thaplotype\tzygosity\tfunction\tlinked_drugs\turl_prescription_info\tpanel_version\trepo_version\n"
+        )
         self.assertEqual(result_expected, result)
 
     def test_haplotype_reporter_non_empty(self) -> None:

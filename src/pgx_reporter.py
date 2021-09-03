@@ -143,7 +143,15 @@ class GenotypeReporter(object):
 
 class HaplotypeReporter(object):
     GENOTYPE_TSV_COLUMNS = (
-        "gene", "haplotype", "zygosity", "function", "linked_drugs", "url_prescription_info", "panel_version", "repo_version")
+        "gene",
+        "haplotype",
+        "zygosity",
+        "function",
+        "linked_drugs",
+        "url_prescription_info",
+        "panel_version",
+        "repo_version",
+    )
 
     HAPLOTYPE_HOMOZYGOUS_ZYGOSITY = "HOM"
     HAPLOTYPE_HETEROZYGOUS_ZYGOSITY = "HET"

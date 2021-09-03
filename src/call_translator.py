@@ -24,7 +24,8 @@ class SimpleCallTranslator(object):
         return FullCallData(all_full_calls)
 
     @classmethod
-    def __add_calls_for_uncalled_variants_in_panel(cls, simple_call_data: SimpleCallData, panel: Panel) -> SimpleCallData:
+    def __add_calls_for_uncalled_variants_in_panel(
+            cls, simple_call_data: SimpleCallData, panel: Panel) -> SimpleCallData:
         missing_calls = cls.__get_calls_for_panel_variants_without_calls(simple_call_data, panel)
         complete_simple_call_data = SimpleCallData(
             simple_call_data.calls.union(missing_calls),
@@ -196,7 +197,11 @@ class SimpleCallTranslator(object):
 
     @classmethod
     def __get_translated_start_coordinate(
-            cls, call: SimpleCall, panel: Panel, call_reference_assembly: ReferenceAssembly) -> Optional[GeneCoordinate]:
+            cls,
+            call: SimpleCall,
+            panel: Panel,
+            call_reference_assembly: ReferenceAssembly,
+    ) -> Optional[GeneCoordinate]:
         if panel.contains_rs_id_matching_call(call, call_reference_assembly):
             rs_id_info = panel.get_matching_rs_id_info(
                 call.start_coordinate, call.reference_allele, call_reference_assembly)

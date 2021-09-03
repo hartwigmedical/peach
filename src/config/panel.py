@@ -74,8 +74,8 @@ class Panel(object):
                 return True
         return False
 
-    def contains_rs_id_with_coordinate_and_reference_allele(self, coordinate: GeneCoordinate,
-            reference_allele: str, reference_assembly: ReferenceAssembly) -> bool:
+    def contains_rs_id_with_coordinate_and_reference_allele(
+            self, coordinate: GeneCoordinate, reference_allele: str, reference_assembly: ReferenceAssembly) -> bool:
         for info in self.__get_rs_id_infos():
             if (info.get_start_coordinate(reference_assembly) == coordinate
                     and info.get_reference_allele(reference_assembly) == reference_allele):
@@ -89,7 +89,8 @@ class Panel(object):
         elif any(self.contains_rs_id(rs_id) for rs_id in call.rs_ids):
             error_msg = (
                 f"Match call with rs id info from panel on an rs id but not position and reference allele:\n"
-                f"rs ids: {call.rs_ids}, input file position: {call.start_coordinate}, reference assembly: {reference_assembly}"
+                f"rs ids: {call.rs_ids}, input file position: {call.start_coordinate}, "
+                f"reference assembly: {reference_assembly}"
             )
             raise ValueError(error_msg)
         else:
