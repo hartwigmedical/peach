@@ -31,7 +31,6 @@ class GenotypeReporter(object):
         GENE_COLUMN_NAME,
         CHROMOSOME_V37_COLUMN_NAME,
         POSITION_V37_COLUMN_NAME,
-        CHROMOSOME_V38_COLUMN_NAME,
         POSITION_V38_COLUMN_NAME,
         REF_ALLELE_V37_COLUMN_NAME,
         REF_ALLELE_V38_COLUMN_NAME,
@@ -44,6 +43,7 @@ class GenotypeReporter(object):
         FILTER_V38_COLUMN_NAME,
         PANEL_VERSION_COLUMN_NAME,
         TOOL_VERSION_COLUMN_NAME,
+        CHROMOSOME_V38_COLUMN_NAME,
     )
     CHROMOSOME_INDEX_NAME = "chromosome_index"
 
@@ -149,13 +149,14 @@ class GenotypeReporter(object):
 class HaplotypeReporter(object):
     GENOTYPE_TSV_COLUMNS = (
         "gene",
-        "haplotype",
-        "zygosity",
+        "haplotype_zygosity",
         "function",
         "linked_drugs",
         "url_prescription_info",
         "panel_version",
         "repo_version",
+        "haplotype",
+        "zygosity",
     )
 
     HAPLOTYPE_HOMOZYGOUS_ZYGOSITY = "HOM"
@@ -195,25 +196,27 @@ class HaplotypeReporter(object):
                 for haplotype_call in sorted(gene_to_haplotype_calls[gene], key=lambda call: call.haplotype_name):
                     line_contents = [
                         gene,
-                        haplotype_call.haplotype_name,
-                        cls.__get_zygosity(haplotype_call),
+                        f"{haplotype_call.haplotype_name}_{cls.__get_zygosity(haplotype_call)}",
                         panel.get_haplotype_function(gene, haplotype_call.haplotype_name),
                         gene_to_drug_info[gene][0],
                         gene_to_drug_info[gene][1],
                         panel.get_id(),
                         version,
+                        haplotype_call.haplotype_name,
+                        cls.__get_zygosity(haplotype_call),
                     ]
                     lines.append(cls.TSV_SEPARATOR.join(line_contents))
             else:
                 line_contents = [
                     gene,
                     cls.UNRESOLVED_HAPLOTYPE_STRING,
-                    cls.NOT_APPLICABLE_ZYGOSITY_STRING,
                     UNKNOWN_FUNCTION_STRING,
                     gene_to_drug_info[gene][0],
                     gene_to_drug_info[gene][1],
                     panel.get_id(),
                     version,
+                    cls.UNRESOLVED_HAPLOTYPE_STRING,
+                    cls.NOT_APPLICABLE_ZYGOSITY_STRING,
                 ]
                 lines.append(cls.TSV_SEPARATOR.join(line_contents))
         text = "\n".join(lines) + "\n"
