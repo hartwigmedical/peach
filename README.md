@@ -119,13 +119,14 @@ Name: `[sample_t_id].peach.genotype.tsv`
 Column | Example Value | Description
 ---|---|---
 gene | DPYD | Gene for which this haplotype is called.
-haplotype | *1 | Called haplotype. If no haplotype could be called, has value "Unresolved Haplotype".
-zygosity | HOM | Whether haplotype call is homozygous (HOM) or heterozygous (HET). If no haplotype could be called, has value "N/A".
+haplotype_zygosity | *1_HOM | Called haplotype including zygosity. If no haplotype could be called, has value "Unresolved Haplotype".
 function | No function | Functionality of this haplotype. Wild type has function "Normal Function". If no haplotype could be called, has value "Unknown Function".
 linked_drugs | 5-Fluoracil;Capecitabine | Drugs for which this haplotype is relevant, separated by ";".
 url_prescription_info | https://www.some_url.com/5-Fluoracil;https://www.some_other_url.com/Capecitabine | For each listed drug, a url with information on how to translate abnormal haplotype function into an appropriate treatment adjustment. Separated by ";".
 panel_version | DPYDpanel_v1.3 | Name and version of panel JSON. Both are taken from fields in the JSON.
 repo_version | 1.0 | Version of PEACH.
+haplotype | *1 | Called haplotype. If no haplotype could be called, has value "Unresolved Haplotype".
+zygosity | HOM | Whether haplotype call is homozygous (HOM) or heterozygous (HET). If no haplotype could be called, has value "N/A".
 
 ### Calls TSV file
 Name: `[sample_t_id].peach.calls.tsv`
@@ -135,7 +136,6 @@ Column | Example Value | Description
 gene | DPYD | Gene to which the variant is related.
 chromosome_v37 | 1 | Chromosome of variant wrt v37 reference genome.
 position_v37 | 98348885 | Position on chromosome wrt v37 reference genome. If unknown, has value "UNKNOWN".
-chromosome_v38 | 1 | Chromosome of variant wrt v38 reference genome.
 position_v38 | 97883329 | Position on chromosome wrt v38 reference genome. If unknown, has value "UNKNOWN".
 ref_v37 | G | Reference allele wrt v37. If unknown, has value "UNKNOWN".
 ref_v38 | A | Reference allele wrt v38. If unknown, has value "UNKNOWN".
@@ -148,6 +148,7 @@ variant_annotation_v38 | REF_CALL | Variant annotation wrt v38. See [Get_VCF Var
 filter_v38 | NO_CALL | Has value PASS, NO_CALL, UNKNOWN or INFERRED_PASS. See [Get_VCF Variant Calls](#get-vcf-variant-calls) and [Annotate Calls with Panel Information](#annotate-calls-with-panel-information) for details.
 panel_version | DPYDpanel_v1.3 | Name and version of panel JSON. Both are taken from fields in the JSON.
 repo_version | 1.0 | Version of PEACH.
+chromosome_v38 | chr1 | Chromosome of variant wrt v38 reference genome.
 
 ## Algorithm
 Haplotypes are commonly defined wrt a v38 reference genome. 
@@ -377,7 +378,7 @@ If you have installed PEACH's requirements into a venv, then remember to source 
 ## Version History and Download Links
 * 1.4
     + Change formats of output files to essentially being PEACH v1.0 output files with some additional columns, 
-      to stop breaking promises and expectations from downstream tools based on semantic versioning.
+      to avoid breaking the expectations from downstream tools based on semantic versioning.
 * [1.3](https://github.com/hartwigmedical/peach/releases/tag/v1.3)
     + Update sciki-allel version to fix pip-install failure.
 * [1.2](https://github.com/hartwigmedical/peach/releases/tag/v1.2)
