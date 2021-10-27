@@ -86,7 +86,7 @@ class TestPgxReporter(unittest.TestCase):
         result = GenotypeReporter.get_calls_tsv_text(pgx_analysis, panel_id, version, ReferenceAssembly.V37)
 
         result_expected = (
-            "gene\tchromosome_v37\tposition_v37\tposition_v38\tref_v37\tref_v38\t"
+            "gene\tchromosome\tposition_v37\tposition_v38\tref_v37\tref_v38\t"
             "allele1\tallele2\trsid\tvariant_annotation_v37\tfilter_v37\tvariant_annotation_v38\tfilter_v38\tpanel_version\trepo_version\tchromosome_v38\n"
         )
         self.assertEqual(result_expected, result)
@@ -124,7 +124,7 @@ class TestPgxReporter(unittest.TestCase):
         result = GenotypeReporter.get_calls_tsv_text(pgx_analysis, panel_id, version, ReferenceAssembly.V37)
 
         result_expected = (
-            "gene\tchromosome_v37\tposition_v37\tposition_v38\tref_v37\tref_v38\tallele1\tallele2\t"
+            "gene\tchromosome\tposition_v37\tposition_v38\tref_v37\tref_v38\tallele1\tallele2\t"
                 "rsid\tvariant_annotation_v37\tfilter_v37\tvariant_annotation_v38\tfilter_v38\tpanel_version\trepo_version\tchromosome_v38\n"
             "DPYD\t1\t1\tUNKNOWN\tC\tUNKNOWN\tC\tCAG\trs664\t1A>C;1A>G\tPASS\t1A>C;1A>G?\tUNKNOWN\tPanel_v0.2\tV1\tUNKNOWN\n"
             "DPYD\t1\t5\t25\tA\tA\tC\tG\t.\t25A>C;25A>G\tPASS\t25A>C;25A>G\tPASS\tPanel_v0.2\tV1\tchr1\n"
@@ -168,7 +168,7 @@ class TestPgxReporter(unittest.TestCase):
         result = GenotypeReporter.get_calls_tsv_text(pgx_analysis, panel_id, version, ReferenceAssembly.V38)
 
         result_expected = (
-            "gene\tchromosome_v37\tposition_v37\tposition_v38\tref_v37\tref_v38\tallele1\tallele2\t"
+            "gene\tchromosome\tposition_v37\tposition_v38\tref_v37\tref_v38\tallele1\tallele2\t"
                 "rsid\tvariant_annotation_v37\tfilter_v37\tvariant_annotation_v38\tfilter_v38\tpanel_version\trepo_version\tchromosome_v38\n"
             "DPYD\tUNKNOWN\tUNKNOWN\t15\tUNKNOWN\tC\tC\tCAG\trs353\t3A>C;3A>G?\tUNKNOWN\t3A>C;3A>G\tPASS\tPanel_v0.2\tV1\tchr1\n"
             "DPYD\t1\t5\t25\tA\tA\tC\tG\t.\t25A>C;25A>G\tPASS\t25A>C;25A>G\tPASS\tPanel_v0.2\tV1\tchr1\n"
@@ -186,7 +186,7 @@ class TestPgxReporter(unittest.TestCase):
         result = HaplotypeReporter.get_genotype_tsv_text(pgx_analysis, panel, version)
 
         result_expected = (
-            "gene\thaplotype_zygosity\tfunction\tlinked_drugs\turl_prescription_info\tpanel_version\trepo_version\thaplotype\tzygosity\n"
+            "gene\thaplotype\tfunction\tlinked_drugs\turl_prescription_info\tpanel_version\trepo_version\thaplotype_only\tzygosity_only\n"
         )
         self.assertEqual(result_expected, result)
 
@@ -202,7 +202,7 @@ class TestPgxReporter(unittest.TestCase):
         result = HaplotypeReporter.get_genotype_tsv_text(pgx_analysis, panel, version)
 
         result_expected = (
-            "gene\thaplotype_zygosity\tfunction\tlinked_drugs\turl_prescription_info\tpanel_version\trepo_version\thaplotype\tzygosity\n"
+            "gene\thaplotype\tfunction\tlinked_drugs\turl_prescription_info\tpanel_version\trepo_version\thaplotype_only\tzygosity_only\n"
             "DPYD\t*2A_HET\tNo Function\t5-Fluorouracil;Capecitabine\thttps://www.pharmgkb.org/chemical/PA128406956/guidelineAnnotation/PA166104939;https://www.pharmgkb.org/chemical/PA448771/guidelineAnnotation/PA166104963\tPanel_v0.2\tV1\t*2A\tHET\n"
             "DPYD\t*2B_HOM\tNo Function\t5-Fluorouracil;Capecitabine\thttps://www.pharmgkb.org/chemical/PA128406956/guidelineAnnotation/PA166104939;https://www.pharmgkb.org/chemical/PA448771/guidelineAnnotation/PA166104963\tPanel_v0.2\tV1\t*2B\tHOM\n"
             "DPYD\t*3_HET\tNormal Function\t5-Fluorouracil;Capecitabine\thttps://www.pharmgkb.org/chemical/PA128406956/guidelineAnnotation/PA166104939;https://www.pharmgkb.org/chemical/PA448771/guidelineAnnotation/PA166104963\tPanel_v0.2\tV1\t*3\tHET\n"

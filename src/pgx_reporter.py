@@ -12,7 +12,7 @@ from pgx_analysis import PgxAnalysis
 
 class GenotypeReporter(object):
     GENE_COLUMN_NAME = "gene"
-    CHROMOSOME_V37_COLUMN_NAME = "chromosome_v37"
+    CHROMOSOME_V37_COLUMN_NAME = "chromosome"
     CHROMOSOME_V38_COLUMN_NAME = "chromosome_v38"
     POSITION_V37_COLUMN_NAME = "position_v37"
     POSITION_V38_COLUMN_NAME = "position_v38"
@@ -149,14 +149,14 @@ class GenotypeReporter(object):
 class HaplotypeReporter(object):
     GENOTYPE_TSV_COLUMNS = (
         "gene",
-        "haplotype_zygosity",
+        "haplotype",
         "function",
         "linked_drugs",
         "url_prescription_info",
         "panel_version",
         "repo_version",
-        "haplotype",
-        "zygosity",
+        "haplotype_only",
+        "zygosity_only",
     )
 
     HAPLOTYPE_HOMOZYGOUS_ZYGOSITY = "HOM"
