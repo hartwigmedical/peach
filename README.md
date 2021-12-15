@@ -64,21 +64,21 @@ If you have installed PEACH's requirements into a venv, then remember to source 
 ```
 
 ### Mandatory Arguments
-Long&nbsp;Argument | Short Argument | Description
----|---|---
---vcf | -i | Path to germline VCF file of sample. For instance the germline VCF output from PURPLE. Calls should be wrt v37. Support for v38 calls is experimental.
---panel | -p | Path to a JSON file that contains the variants and haplotypes to test on.
---outputdir | -o | Directory to write the output to.
---sample_t_id | -t | The tumor sample ID of the run. Only used for the names of the output files.
---sample_r_id | -r | The ref sample ID of the run.
---tool_version | -v | The version of PEACH. It is included in the output files.
+| Long&nbsp;Argument | Short Argument | Description                                                                                                                                            |
+|--------------------|----------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
+| --vcf              | -i             | Path to germline VCF file of sample. For instance the germline VCF output from PURPLE. Calls should be wrt v37. Support for v38 calls is experimental. |
+| --panel            | -p             | Path to a JSON file that contains the variants and haplotypes to test on.                                                                              |
+| --outputdir        | -o             | Directory to write the output to.                                                                                                                      |
+| --sample_t_id      | -t             | The tumor sample ID of the run. Only used for the names of the output files.                                                                           |
+| --sample_r_id      | -r             | The ref sample ID of the run.                                                                                                                          |
+| --tool_version     | -v             | The version of PEACH. It is included in the output files.                                                                                              |
 
 ### Optional Arguments
 Currently, the only optional argument enables an experimental feature.
 
-Long&nbsp;Argument | Short Argument | Options | Default | Description
----|---|---|---|---
---vcf_reference_assembly_version | -a | V37, V38 | V37 | The version of the reference assembly wrt which the vcf has been constructed. Support for V38 is experimental. Default is V37.
+| Long&nbsp;Argument               | Short Argument | Options  | Default | Description                                                                                                                    |
+|----------------------------------|----------------|----------|---------|--------------------------------------------------------------------------------------------------------------------------------|
+| --vcf_reference_assembly_version | -a             | V37, V38 | V37     | The version of the reference assembly wrt which the vcf has been constructed. Support for V38 is experimental. Default is V37. |
 
 ## Input
 ### VCF
@@ -116,39 +116,39 @@ PEACH outputs two TSV files. One contains genotypes/haplotypes for each gene, th
 ### Genotype TSV file
 Name: `[sample_t_id].peach.genotype.tsv`
 
-Column | Example Value | Description
----|---|---
-gene | DPYD | Gene for which this haplotype is called.
-haplotype_zygosity | *1_HOM | Called haplotype including zygosity. If no haplotype could be called, has value "Unresolved Haplotype".
-function | No function | Functionality of this haplotype. Wild type has function "Normal Function". If no haplotype could be called, has value "Unknown Function".
-linked_drugs | 5-Fluoracil;Capecitabine | Drugs for which this haplotype is relevant, separated by ";".
-url_prescription_info | https://www.some_url.com/5-Fluoracil;https://www.some_other_url.com/Capecitabine | For each listed drug, a url with information on how to translate abnormal haplotype function into an appropriate treatment adjustment. Separated by ";".
-panel_version | DPYDpanel_v1.3 | Name and version of panel JSON. Both are taken from fields in the JSON.
-repo_version | 1.0 | Version of PEACH.
-haplotype | *1 | Called haplotype. If no haplotype could be called, has value "Unresolved Haplotype".
-zygosity | HOM | Whether haplotype call is homozygous (HOM) or heterozygous (HET). If no haplotype could be called, has value "N/A".
+| Column                | Example Value                                                                    | Description                                                                                                                                              |
+|-----------------------|----------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
+| gene                  | DPYD                                                                             | Gene for which this haplotype is called.                                                                                                                 |
+| haplotype_zygosity    | *1_HOM                                                                           | Called haplotype including zygosity. If no haplotype could be called, has value "Unresolved Haplotype".                                                  |
+| function              | No function                                                                      | Functionality of this haplotype. Wild type has function "Normal Function". If no haplotype could be called, has value "Unknown Function".                |
+| linked_drugs          | 5-Fluoracil;Capecitabine                                                         | Drugs for which this haplotype is relevant, separated by ";".                                                                                            |
+| url_prescription_info | https://www.some_url.com/5-Fluoracil;https://www.some_other_url.com/Capecitabine | For each listed drug, a url with information on how to translate abnormal haplotype function into an appropriate treatment adjustment. Separated by ";". |
+| panel_version         | DPYDpanel_v1.3                                                                   | Name and version of panel JSON. Both are taken from fields in the JSON.                                                                                  |
+| repo_version          | 1.0                                                                              | Version of PEACH.                                                                                                                                        |
+| haplotype             | *1                                                                               | Called haplotype. If no haplotype could be called, has value "Unresolved Haplotype".                                                                     |
+| zygosity              | HOM                                                                              | Whether haplotype call is homozygous (HOM) or heterozygous (HET). If no haplotype could be called, has value "N/A".                                      |
 
 ### Calls TSV file
 Name: `[sample_t_id].peach.calls.tsv`
 
-Column | Example Value | Description
----|---|---
-gene | DPYD | Gene to which the variant is related.
-chromosome_v37 | 1 | Chromosome of variant wrt v37 reference genome.
-position_v37 | 98348885 | Position on chromosome wrt v37 reference genome. If unknown, has value "UNKNOWN".
-position_v38 | 97883329 | Position on chromosome wrt v38 reference genome. If unknown, has value "UNKNOWN".
-ref_v37 | G | Reference allele wrt v37. If unknown, has value "UNKNOWN".
-ref_v38 | A | Reference allele wrt v38. If unknown, has value "UNKNOWN".
-allele1 | A | First of the called alleles. Order of alleles is lexicographical order.
-allele2 | A | Second of the called alleles. Order of alleles is lexicographical order.
-rsid | rs1801265 | Rs id(s) of variant. If more than one, then they are separated by ";". Taken from VCF if available. If not, taken from matching variant in panel JSON, if match exists. If not, has value ".".
-variant_annotation_v37 | 85C>T | Variant annotation wrt v37. See [Get_VCF Variant Calls](#get-vcf-variant-calls) and [Annotate Calls with Panel Information](#annotate-calls-with-panel-information) for details.
-filter_v37 | PASS | Has value PASS, NO_CALL, UNKNOWN or INFERRED_PASS. See [Get_VCF Variant Calls](#get-vcf-variant-calls) and [Annotate Calls with Panel Information](#annotate-calls-with-panel-information) for details.
-variant_annotation_v38 | REF_CALL | Variant annotation wrt v38. See [Get_VCF Variant Calls](#get-vcf-variant-calls) and [Annotate Calls with Panel Information](#annotate-calls-with-panel-information) for details.
-filter_v38 | NO_CALL | Has value PASS, NO_CALL, UNKNOWN or INFERRED_PASS. See [Get_VCF Variant Calls](#get-vcf-variant-calls) and [Annotate Calls with Panel Information](#annotate-calls-with-panel-information) for details.
-panel_version | DPYDpanel_v1.3 | Name and version of panel JSON. Both are taken from fields in the JSON.
-repo_version | 1.0 | Version of PEACH.
-chromosome_v38 | chr1 | Chromosome of variant wrt v38 reference genome.
+| Column                 | Example Value  | Description                                                                                                                                                                                             |
+|------------------------|----------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| gene                   | DPYD           | Gene to which the variant is related.                                                                                                                                                                   |
+| chromosome_v37         | 1              | Chromosome of variant wrt v37 reference genome.                                                                                                                                                         |
+| position_v37           | 98348885       | Position on chromosome wrt v37 reference genome. If unknown, has value "UNKNOWN".                                                                                                                       |
+| position_v38           | 97883329       | Position on chromosome wrt v38 reference genome. If unknown, has value "UNKNOWN".                                                                                                                       |
+| ref_v37                | G              | Reference allele wrt v37. If unknown, has value "UNKNOWN".                                                                                                                                              |
+| ref_v38                | A              | Reference allele wrt v38. If unknown, has value "UNKNOWN".                                                                                                                                              |
+| allele1                | A              | First of the called alleles. Order of alleles is lexicographical order.                                                                                                                                 |
+| allele2                | A              | Second of the called alleles. Order of alleles is lexicographical order.                                                                                                                                |
+| rsid                   | rs1801265      | Rs id(s) of variant. If more than one, then they are separated by ";". Taken from VCF if available. If not, taken from matching variant in panel JSON, if match exists. If not, has value ".".          |
+| variant_annotation_v37 | 85C>T          | Variant annotation wrt v37. See [Get_VCF Variant Calls](#get-vcf-variant-calls) and [Annotate Calls with Panel Information](#annotate-calls-with-panel-information) for details.                        |
+| filter_v37             | PASS           | Has value PASS, NO_CALL, UNKNOWN or INFERRED_PASS. See [Get_VCF Variant Calls](#get-vcf-variant-calls) and [Annotate Calls with Panel Information](#annotate-calls-with-panel-information) for details. |
+| variant_annotation_v38 | REF_CALL       | Variant annotation wrt v38. See [Get_VCF Variant Calls](#get-vcf-variant-calls) and [Annotate Calls with Panel Information](#annotate-calls-with-panel-information) for details.                        |
+| filter_v38             | NO_CALL        | Has value PASS, NO_CALL, UNKNOWN or INFERRED_PASS. See [Get_VCF Variant Calls](#get-vcf-variant-calls) and [Annotate Calls with Panel Information](#annotate-calls-with-panel-information) for details. |
+| panel_version          | DPYDpanel_v1.3 | Name and version of panel JSON. Both are taken from fields in the JSON.                                                                                                                                 |
+| repo_version           | 1.0            | Version of PEACH.                                                                                                                                                                                       |
+| chromosome_v38         | chr1           | Chromosome of variant wrt v38 reference genome.                                                                                                                                                         |
 
 ## Algorithm
 Haplotypes are commonly defined wrt a v38 reference genome. 
@@ -195,11 +195,11 @@ which we will call the *combined VCF calls*.
 
 The annotation and filter of the combined VCF calls are determined in the following way:
 
-Condition | Variant Annotation VCF RG Version | Filter VCF RG Version
----|---|---
-Homozygous alt or heterozygous observed call. | From HGVS.c field in ANN in VCF | PASS  
-Homozygous reference observed call. | REF_CALL | PASS
-Inferred call. | REF_CALL | NO_CALL
+| Condition                                     | Variant Annotation VCF RG Version | Filter VCF RG Version |
+|-----------------------------------------------|-----------------------------------|-----------------------|
+| Homozygous alt or heterozygous observed call. | From HGVS.c field in ANN in VCF   | PASS                  |
+| Homozygous reference observed call.           | REF_CALL                          | PASS                  |
+| Inferred call.                                | REF_CALL                          | NO_CALL               |
 
 ### Annotate Calls with Panel Information
 For each of the combined VCF calls, an attempt is made to find a variant in the panel JSON that has the same VCF position and reference allele.
@@ -214,15 +214,15 @@ If unsuccessful:
 Also, the correct annotation and filter wrt the non-VCF RG version are determined according to the following table, 
 where an asterisk (*) indicates that any value is allowed:
 
-Matches variant in panel JSON | Type of call | Call is homozygous reference wrt non-VCF RG version | Reference alleles v37 and v38 are identical | All alleles are reference with v37 or v38 | Variant Annotation Non-VCF RG Version | Filter Non-VCF RG Version
----|---|---|---|---|---|---
-False|*|*|*|*|Variant Annotation VCF RG Version + "?"|UNKNOWN
-True|Inferred|True|*|*|REF_CALL|NO_CALL
-True|Inferred|False|*|*|From "refSeqDifferenceAnnotations" field in panel JSON|INFERRED_PASS
-True|Observed|True|*|*|REF_CALL|PASS
-True|Observed|False|True|*|Variant Annotation VCF RG Version|PASS
-True|Observed|False|False|True|From "refSeqDifferenceAnnotations" field in panel JSON|PASS
-True|Observed|False|False|False|Variant Annotation VCF RG Version + "?"|UNKNOWN
+| Matches variant in panel JSON | Type of call | Call is homozygous reference wrt non-VCF RG version | Reference alleles v37 and v38 are identical | All alleles are reference with v37 or v38 | Variant Annotation Non-VCF RG Version                  | Filter Non-VCF RG Version |
+|-------------------------------|--------------|-----------------------------------------------------|---------------------------------------------|-------------------------------------------|--------------------------------------------------------|---------------------------|
+| False                         | *            | *                                                   | *                                           | *                                         | Variant Annotation VCF RG Version + "?"                | UNKNOWN                   |
+| True                          | Inferred     | True                                                | *                                           | *                                         | REF_CALL                                               | NO_CALL                   |
+| True                          | Inferred     | False                                               | *                                           | *                                         | From "refSeqDifferenceAnnotations" field in panel JSON | INFERRED_PASS             |
+| True                          | Observed     | True                                                | *                                           | *                                         | REF_CALL                                               | PASS                      |
+| True                          | Observed     | False                                               | True                                        | *                                         | Variant Annotation VCF RG Version                      | PASS                      |
+| True                          | Observed     | False                                               | False                                       | True                                      | From "refSeqDifferenceAnnotations" field in panel JSON | PASS                      |
+| True                          | Observed     | False                                               | False                                       | False                                     | Variant Annotation VCF RG Version + "?"                | UNKNOWN                   |
 
 Note that an asterisk does not indicate that every value is actually possible. 
 For instance, calls that do not match any variants from the panel JSON can only be observed calls, not inferred calls.
@@ -279,28 +279,28 @@ For details on non-standard situations, see the more detailed subsections of the
 Suppose that the panel JSON contains the following variants and haplotypes for the fictional gene FAKE,
 and that FAKE is the only gene in the panel JSON.
 
-Rs Id|Reference Allele V37|Reference Allele V38|V38 Annotation for Reference Sequence Difference
----|---|---|---
-rs1|A|A|N/A
-rs2|TA|GC|c.6543GC>TA
-rs3|GG|GG|N/A
+| Rs Id | Reference Allele V37 | Reference Allele V38 | V38 Annotation for Reference Sequence Difference |
+|-------|----------------------|----------------------|--------------------------------------------------|
+| rs1   | A                    | A                    | N/A                                              |
+| rs2   | TA                   | GC                   | c.6543GC>TA                                      |
+| rs3   | GG                   | GG                   | N/A                                              |
 
-Haplotype|Variants (Rs Id: Variant Allele wrt v38)
----|---
-*1 (wild type)|None
-*2|rs1: T
-*3|rs2: TA
-*4|rs3: G
-*5|rs1: T, rs3: G
+| Haplotype      | Variants (Rs Id: Variant Allele wrt v38) |
+|----------------|------------------------------------------|
+| *1 (wild type) | None                                     |
+| *2             | rs1: T                                   |
+| *3             | rs2: TA                                  |
+| *4             | rs3: G                                   |
+| *5             | rs1: T, rs3: G                           |
 
 #### No Calls
 If there are no calls wrt v37 in the VCF, then the full calls are:
 
-Rs Id|Allele1|Allele2|Variant Annotation V37|Filter V37|Variant Annotation V38|Filter V38
----|---|---|---|---|---|---
-rs1|A|A|REF_CALL|NO_CALL|REF_CALL|NO_CALL
-rs2|TA|TA|REF_CALL|NO_CALL|c.6543GC>TA|INFERRED_PASS
-rs3|GG|GG|REF_CALL|NO_CALL|REF_CALL|NO_CALL
+| Rs Id | Allele1 | Allele2 | Variant Annotation V37 | Filter V37 | Variant Annotation V38 | Filter V38    |
+|-------|---------|---------|------------------------|------------|------------------------|---------------|
+| rs1   | A       | A       | REF_CALL               | NO_CALL    | REF_CALL               | NO_CALL       |
+| rs2   | TA      | TA      | REF_CALL               | NO_CALL    | c.6543GC>TA            | INFERRED_PASS |
+| rs3   | GG      | GG      | REF_CALL               | NO_CALL    | REF_CALL               | NO_CALL       |
 
 The only valid haplotype combination that explains these variants is *3_HOM, 
 so this is the haplotype combination that is called for FAKE.
@@ -308,57 +308,57 @@ so this is the haplotype combination that is called for FAKE.
 #### Homozygous Wild Type
 Suppose that the v37 calls are the following:
 
-Rs Id|Allele1|Allele2|Variant Annotation V37|Filter V37
----|---|---|---|---
-rs1|A|A|c.8483A>T|PASS
-rs2|GC|GC|c.6543TA>GC|PASS
-rs3|GG|GG|c.4838GG>G|PASS
+| Rs Id | Allele1 | Allele2 | Variant Annotation V37 | Filter V37 |
+|-------|---------|---------|------------------------|------------|
+| rs1   | A       | A       | c.8483A>T              | PASS       |
+| rs2   | GC      | GC      | c.6543TA>GC            | PASS       |
+| rs3   | GG      | GG      | c.4838GG>G             | PASS       |
 
 In this case, the full calls are:
 
-Rs Id|Allele1|Allele2|Variant Annotation V37|Filter V37|Variant Annotation V38|Filter V38
----|---|---|---|---|---|---
-rs1|A|A|REF_CALL|PASS|REF_CALL|PASS
-rs2|GC|GC|c.6543TA>GC|PASS|REF_CALL|PASS
-rs3|GG|GG|REF_CALL|PASS|REF_CALL|PASS
+| Rs Id | Allele1 | Allele2 | Variant Annotation V37 | Filter V37 | Variant Annotation V38 | Filter V38 |
+|-------|---------|---------|------------------------|------------|------------------------|------------|
+| rs1   | A       | A       | REF_CALL               | PASS       | REF_CALL               | PASS       |
+| rs2   | GC      | GC      | c.6543TA>GC            | PASS       | REF_CALL               | PASS       |
+| rs3   | GG      | GG      | REF_CALL               | PASS       | REF_CALL               | PASS       |
 
 The only valid haplotype combination is *1_HOM, so this haplotype combination is called for FAKE.
 
 #### Heterozygous Wild Type
 Suppose that the v37 calls are the following:
 
-Rs Id|Allele1|Allele2|Variant Annotation V37|Filter V37
----|---|---|---|---
-rs1|A|A|c.8483A>T|PASS
-rs2|TA|GC|c.6543TA>GC|PASS
-rs3|GG|GG|c.4838GG>G|PASS
+| Rs Id | Allele1 | Allele2 | Variant Annotation V37 | Filter V37 |
+|-------|---------|---------|------------------------|------------|
+| rs1   | A       | A       | c.8483A>T              | PASS       |
+| rs2   | TA      | GC      | c.6543TA>GC            | PASS       |
+| rs3   | GG      | GG      | c.4838GG>G             | PASS       |
 
 The full calls are:
 
-Rs Id|Allele1|Allele2|Variant Annotation V37|Filter V37|Variant Annotation V38|Filter V38
----|---|---|---|---|---|---
-rs1|A|A|REF_CALL|PASS|REF_CALL|PASS
-rs2|GC|TA|c.6543TA>GC|PASS|c.6543GC>TA|PASS
-rs3|GG|GG|REF_CALL|PASS|REF_CALL|PASS
+| Rs Id | Allele1 | Allele2 | Variant Annotation V37 | Filter V37 | Variant Annotation V38 | Filter V38 |
+|-------|---------|---------|------------------------|------------|------------------------|------------|
+| rs1   | A       | A       | REF_CALL               | PASS       | REF_CALL               | PASS       |
+| rs2   | GC      | TA      | c.6543TA>GC            | PASS       | c.6543GC>TA            | PASS       |
+| rs3   | GG      | GG      | REF_CALL               | PASS       | REF_CALL               | PASS       |
 
 The only valid haplotype combination for FAKE is *3_HET/*1_HET, so this haplotype combination is called.
 
 #### Multiple Valid Haplotypes
 Suppose that the v37 calls are the following:
 
-Rs Id|Allele1|Allele2|Variant Annotation V37|Filter V37
----|---|---|---|---
-rs1|A|T|c.8483A>T|PASS
-rs2|GC|GC|c.6543TA>GC|PASS
-rs3|G|G|c.4838GG>G|PASS
+| Rs Id | Allele1 | Allele2 | Variant Annotation V37 | Filter V37 |
+|-------|---------|---------|------------------------|------------|
+| rs1   | A       | T       | c.8483A>T              | PASS       |
+| rs2   | GC      | GC      | c.6543TA>GC            | PASS       |
+| rs3   | G       | G       | c.4838GG>G             | PASS       |
 
 The resulting full calls are:
 
-Rs Id|Allele1|Allele2|Variant Annotation V37|Filter V37|Variant Annotation V38|Filter V38
----|---|---|---|---|---|---
-rs1|A|T|c.8483A>T|PASS|c.8483A>T|PASS
-rs2|GC|GC|c.6543TA>GC|PASS|REF_CALL|PASS
-rs3|G|G|c.4838GG>G|PASS|c.4838GG>G|PASS
+| Rs Id | Allele1 | Allele2 | Variant Annotation V37 | Filter V37 | Variant Annotation V38 | Filter V38 |
+|-------|---------|---------|------------------------|------------|------------------------|------------|
+| rs1   | A       | T       | c.8483A>T              | PASS       | c.8483A>T              | PASS       |
+| rs2   | GC      | GC      | c.6543TA>GC            | PASS       | REF_CALL               | PASS       |
+| rs3   | G       | G       | c.4838GG>G             | PASS       | c.4838GG>G             | PASS       |
 
 The valid haplotype combinations are *2_HET/*4_HOM and *4_HET/*5_HET. 
 These combinations have lengths 3 and 2, respectively, so the second combination is preferred.
@@ -377,29 +377,29 @@ If you have installed PEACH's requirements into a venv, then remember to source 
 
 ## Version History and Download Links
 * [1.4](https://github.com/hartwigmedical/peach/releases/tag/v1.4)
-    + Change formats of output files to essentially being PEACH v1.0 output files with some additional columns, 
-      to avoid breaking the expectations from downstream tools based on semantic versioning.
+  * Change formats of output files to essentially being PEACH v1.0 output files with some additional columns, 
+    to avoid breaking the expectations from downstream tools based on semantic versioning.
 * [1.3](https://github.com/hartwigmedical/peach/releases/tag/v1.3)
-    + Update sciki-allel version to fix pip-install failure.
+  * Update sciki-allel version to fix pip-install failure.
 * [1.2](https://github.com/hartwigmedical/peach/releases/tag/v1.2)
-    + Allow for different chromosome names wrt v37 and v38 
-        + Includes changes to the panel JSON and the genotype output file.
-    + Improve clarity and consistency of logging.
+  * Allow for different chromosome names wrt v37 and v38 
+  * Includes changes to the panel JSON and the genotype output file.
+  * Improve clarity and consistency of logging.
 * [1.1](https://github.com/hartwigmedical/peach/releases/tag/v1.1)
-    + Add shell script `peach` for running PEACH.
-    + Remove VCF filtering step. 
-        + Remove VCFTools dependency.
-        + Remove filtered-VCF output file.
-    + Add experimental support for input VCF's for reference genomes with version v38. 
-    + Change format of arguments to PEACH. 
-        + Arguments are no longer positional. 
-        + Remove arguments vcftools, recreate_bed and transcript_tsv, since they are no longer needed.
-        + Add optional parameter for experimental v38 VCF support.
-    + Change format of panel JSON.
-        + Change key "url_prescription_info" to "urlPrescriptionInfo" for consistency with other keys.
-        + Add "annotationV37" key for reference sequence differences, for support of v38 reference genomes.
-    + Adjust format of genotype TSV output file.
-        + Split "haplotype" column into "haplotype" and "zygosity".
-    + Add script for running tests.
+  * Add shell script `peach` for running PEACH.
+  * Remove VCF filtering step. 
+    * Remove VCFTools dependency.
+    * Remove filtered-VCF output file.
+  * Add experimental support for input VCF's for reference genomes with version v38. 
+  * Change format of arguments to PEACH. 
+    * Arguments are no longer positional. 
+    * Remove arguments vcftools, recreate_bed and transcript_tsv, since they are no longer needed.
+    * Add optional parameter for experimental v38 VCF support.
+  * Change format of panel JSON.
+    * Change key "url_prescription_info" to "urlPrescriptionInfo" for consistency with other keys.
+    * Add "annotationV37" key for reference sequence differences, for support of v38 reference genomes.
+  * Adjust format of genotype TSV output file.
+    * Split "haplotype" column into "haplotype" and "zygosity".
+  * Add script for running tests.
 * [1.0](https://github.com/hartwigmedical/peach/releases/tag/v1.0)
-    + First release
+  * First release
