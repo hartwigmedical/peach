@@ -4,6 +4,7 @@ from typing import Dict, Any, Tuple, Optional
 import allel
 
 from base.reference_site import ReferenceSite
+from base.util import strip_prefix
 from config.tool_config import ToolConfig
 from base.constants import REF_CALL_ANNOTATION_STRING
 from base.filter import SimpleCallFilter
@@ -25,7 +26,8 @@ class VcfReader(object):
     SAMPLE_FIELD_NAME = "samples"
 
     RS_ID_SEPARATOR = ";"
-    VARIANT_ANNOTATION_PREFIX = "c."
+    CODING_VARIANT_ANNOTATION_PREFIX = "c."
+    NON_CODING_VARIANT_ANNOTATION_PREFIX = "n."
 
     @classmethod
     def get_call_data(cls, tool_config: ToolConfig, panel: Panel) -> SimpleCallData:
@@ -56,7 +58,6 @@ class VcfReader(object):
         filtered_calls = set()
 
         total_variant_count = cls.__get_variant_count(variants)
-        logging.info(f"VCF calls: {total_variant_count}")
         for call_index in range(total_variant_count):
             if not cls.__filter_is_pass(call_index, variants):
                 # Ignore all calls with filter != PASS
@@ -161,14 +162,12 @@ class VcfReader(object):
         complete_annotation = str(variants[cls.ANNOTATION_FIELD_NAME][call_index])
         gene_name = complete_annotation.split("|")[3]
         full_variant_annotation = complete_annotation.split("|")[9]
-        if full_variant_annotation.startswith(cls.VARIANT_ANNOTATION_PREFIX):
-            variant_annotation = cls.__strip_prefix(full_variant_annotation, cls.VARIANT_ANNOTATION_PREFIX)
+        if full_variant_annotation.startswith(cls.CODING_VARIANT_ANNOTATION_PREFIX):
+            variant_annotation = strip_prefix(full_variant_annotation, cls.CODING_VARIANT_ANNOTATION_PREFIX)
+        elif full_variant_annotation.startswith(cls.NON_CODING_VARIANT_ANNOTATION_PREFIX):
+            variant_annotation = strip_prefix(full_variant_annotation, cls.NON_CODING_VARIANT_ANNOTATION_PREFIX)
         else:
-            error_msg = (
-                f"Variant annotation is missing the expected '{cls.VARIANT_ANNOTATION_PREFIX}' prefix: "
-                f"annotation={full_variant_annotation}"
-            )
-            raise SyntaxError(error_msg)
+            raise ValueError(f"Unexpected annotation prefix: {full_variant_annotation}")
 
         return gene_name, variant_annotation
 
@@ -195,13 +194,3 @@ class VcfReader(object):
     @classmethod
     def __get_variant_count(cls, variants: Dict[str, Any]) -> int:
         return len(variants[cls.RS_IDS_FIELD_NAME])
-
-    @classmethod
-    def __strip_prefix(cls, string: str, prefix: str) -> str:
-        if string.startswith(prefix):
-            return string[len(prefix):]
-        else:
-            error_msg = (
-                f"String does not start with expected prefix: string={string}, prefix={prefix}"
-            )
-            raise SyntaxError(error_msg)
