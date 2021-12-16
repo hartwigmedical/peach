@@ -40,7 +40,7 @@ class VcfReader(object):
 
     @classmethod
     def __get_variants_from_vcf(cls, vcf: str) -> Optional[Dict[str, Any]]:
-        # variants is None precisely when filtered vcf file has no variants
+        # variants is None precisely when the vcf file has no variants
         try:
             variants = allel.read_vcf(vcf, fields="*")
         except IOError:
