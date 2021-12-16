@@ -159,11 +159,8 @@ class VcfReader(object):
             cls, call_index: int, variants: Dict[str, Any]
     ) -> Tuple[str, str]:
         complete_annotation = str(variants[cls.ANNOTATION_FIELD_NAME][call_index])
-        logging.info(f"complete_annotation={complete_annotation}")
         gene_name = complete_annotation.split("|")[3]
-        logging.info(f"gene_name={gene_name}")
         full_variant_annotation = complete_annotation.split("|")[9]
-        logging.info(f"full_variant_annotation={full_variant_annotation}")
         if full_variant_annotation.startswith(cls.VARIANT_ANNOTATION_PREFIX):
             variant_annotation = cls.__strip_prefix(full_variant_annotation, cls.VARIANT_ANNOTATION_PREFIX)
         else:
