@@ -23,21 +23,9 @@ class VcfReader(object):
     ANNOTATION_FIELD_NAME = "variants/ANN"
     GENOTYPE_FIELD_NAME = "calldata/GT"
     SAMPLE_FIELD_NAME = "samples"
-    FIELD_NAMES = [
-        CHROMOSOME_FIELD_NAME,
-        POSITION_FIELD_NAME,
-        RS_IDS_FIELD_NAME,
-        REF_ALLELE_FIELD_NAME,
-        ALT_ALLELE_FIELD_NAME,
-        FILTER_FIELD_NAME,
-        ANNOTATION_FIELD_NAME,
-        GENOTYPE_FIELD_NAME,
-        SAMPLE_FIELD_NAME,
-    ]
-    VARIANT_ANNOTATION_FIELD_NAME = f"{ANNOTATION_FIELD_NAME}_HGVS_c"
-    GENE_FIELD_NAME = f"{ANNOTATION_FIELD_NAME}_Gene_Name"
 
     RS_ID_SEPARATOR = ";"
+    VARIANT_ANNOTATION_PREFIX = "c."
 
     @classmethod
     def get_call_data(cls, tool_config: ToolConfig, panel: Panel) -> SimpleCallData:
@@ -54,7 +42,7 @@ class VcfReader(object):
     def __get_variants_from_vcf(cls, vcf: str) -> Optional[Dict[str, Any]]:
         # variants is None precisely when filtered vcf file has no variants
         try:
-            variants = allel.read_vcf(vcf, fields=cls.FIELD_NAMES, transformers=allel.ANNTransformer())
+            variants = allel.read_vcf(vcf, fields="*")
         except IOError:
             raise FileNotFoundError("File " + vcf + " not found or cannot be opened.")
         return variants
@@ -89,7 +77,7 @@ class VcfReader(object):
 
     @classmethod
     def __filter_is_pass(cls, call_index: int, variants: Dict[str, Any]) -> bool:
-        return variants[f"{cls.FILTER_FIELD_NAME}_PASS"][call_index]
+        return bool(variants[f"{cls.FILTER_FIELD_NAME}_PASS"][call_index])
 
     @classmethod
     def __get_call_from_variants(cls, call_index: int, sample_r_id: str, variants: Dict[str, Any]) -> SimpleCall:
@@ -99,18 +87,20 @@ class VcfReader(object):
 
         reference_allele = cls.__get_reference_allele_from_variants(call_index, variants)
         alleles = cls.__get_called_alleles_from_variants(call_index, sample_r_id, variants)
-        gene = cls.__get_gene_from_variants(call_index, variants)
         rs_ids = cls.__get_rs_ids_from_variants(call_index, variants)
 
         if alleles == (reference_allele, reference_allele):
+            gene_name, _ = cls.__get_gene_name_and_variant_annotation_from_variants(call_index, variants)
             variant_annotation = REF_CALL_ANNOTATION_STRING
         else:
-            variant_annotation = cls.__get_variant_annotation_from_variants(call_index, variants)
+            gene_name, variant_annotation = cls.__get_gene_name_and_variant_annotation_from_variants(
+                call_index, variants
+            )
 
         call = SimpleCall(
             ReferenceSite(gene_coordinate, reference_allele),
             alleles,
-            gene,
+            gene_name,
             rs_ids,
             variant_annotation,
             SimpleCallFilter.PASS,
@@ -141,8 +131,9 @@ class VcfReader(object):
         cls, call_index: int, sample_r_id: str, variants: Dict[str, Any]
     ) -> Tuple[str, str]:
         reference_allele = cls.__get_reference_allele_from_variants(call_index, variants)
-        sample_index = variants[cls.SAMPLE_FIELD_NAME].tolist().index(sample_r_id)
-        genotype = variants[cls.GENOTYPE_FIELD_NAME][call_index][sample_index].tolist()
+        sample_list = [str(sample_name) for sample_name in variants[cls.SAMPLE_FIELD_NAME].tolist()]
+        sample_index = sample_list.index(sample_r_id)
+        genotype = [int(call) for call in variants[cls.GENOTYPE_FIELD_NAME][call_index][sample_index].tolist()]
         alts = [str(allele) for allele in variants[cls.ALT_ALLELE_FIELD_NAME][call_index]]
         if genotype == [0, 1]:
             alleles = (reference_allele, alts[0])
@@ -158,16 +149,29 @@ class VcfReader(object):
         return alleles
 
     @classmethod
-    def __get_gene_from_variants(cls, call_index: int, variants: Dict[str, Any]) -> str:
-        return str(variants[cls.GENE_FIELD_NAME][call_index])
+    def __get_gene_name_and_variant_annotation_from_variants(
+            cls, call_index: int, variants: Dict[str, Any]
+    ) -> Tuple[str, str]:
+        complete_annotation = str(variants[cls.ANNOTATION_FIELD_NAME][call_index])
+        logging.info(f"complete_annotation={complete_annotation}")
+        gene_name = complete_annotation.split("|")[3]
+        logging.info(f"gene_name={gene_name}")
+        full_variant_annotation = complete_annotation.split("|")[9]
+        logging.info(f"full_variant_annotation={full_variant_annotation}")
+        if full_variant_annotation.startswith(cls.VARIANT_ANNOTATION_PREFIX):
+            variant_annotation = cls.__strip_prefix(full_variant_annotation, cls.VARIANT_ANNOTATION_PREFIX)
+        else:
+            error_msg = (
+                f"Variant annotation is missing the expected '{cls.VARIANT_ANNOTATION_PREFIX}' prefix: "
+                f"annotation={full_variant_annotation}"
+            )
+            raise SyntaxError(error_msg)
 
-    @classmethod
-    def __get_variant_annotation_from_variants(cls, call_index: int, variants: Dict[str, Any]) -> str:
-        return str(variants[cls.VARIANT_ANNOTATION_FIELD_NAME][call_index])
+        return gene_name, variant_annotation
 
     @classmethod
     def __get_rs_ids_from_variants(cls, call_index: int, variants: Dict[str, Any]) -> Tuple[str, ...]:
-        rs_ids_string = variants[cls.RS_IDS_FIELD_NAME][call_index]
+        rs_ids_string = str(variants[cls.RS_IDS_FIELD_NAME][call_index])
         if cls.RS_ID_SEPARATOR in rs_ids_string:
             return tuple(str(rs) for rs in rs_ids_string.split(cls.RS_ID_SEPARATOR) if rs.startswith("rs"))
         else:
@@ -192,3 +196,13 @@ class VcfReader(object):
     @classmethod
     def __get_relevant_coordinates(cls, chromosome: str, position: int, ref_allele: str) -> Tuple[GeneCoordinate, ...]:
         return tuple(GeneCoordinate(chromosome, position + i) for i in range(len(ref_allele)))
+
+    @classmethod
+    def __strip_prefix(cls, string: str, prefix: str) -> str:
+        if string.startswith(prefix):
+            return string[len(prefix):]
+        else:
+            error_msg = (
+                f"String does not start with expected prefix: string={string}, prefix={prefix}"
+            )
+            raise SyntaxError(error_msg)
