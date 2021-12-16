@@ -26,7 +26,6 @@ class RsIdInfo(NamedTuple):
         return info
 
     def is_compatible(self, other: "RsIdInfo") -> bool:
-        # TODO: check layout after black
         if self.rs_id == other.rs_id:
             return self == other
         else:
