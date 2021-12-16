@@ -117,9 +117,11 @@ class VcfReader(object):
         chromosome = cls.__get_chromosome_from_variants(call_index, variants)
         position = cls.__get_position_from_variants(call_index, variants)
         reference_allele = cls.__get_reference_allele_from_variants(call_index, variants)
-        relevant_coordinates = cls.__get_relevant_coordinates(chromosome, position, reference_allele)
+
+        reference_site = ReferenceSite(GeneCoordinate(chromosome, position), reference_allele)
         coordinate_match_to_panel_exists = any(
-            panel.contains_rs_id_with_start_coordinate(coord, vcf_reference_assembly) for coord in relevant_coordinates
+            panel.contains_rs_id_with_start_coordinate(coord, vcf_reference_assembly)
+            for coord in reference_site.get_covered_coordinates()
         )
         return coordinate_match_to_panel_exists
 
@@ -195,10 +197,6 @@ class VcfReader(object):
     @classmethod
     def __get_variant_count(cls, variants: Dict[str, Any]) -> int:
         return len(variants[cls.RS_IDS_FIELD_NAME])
-
-    @classmethod
-    def __get_relevant_coordinates(cls, chromosome: str, position: int, ref_allele: str) -> Tuple[GeneCoordinate, ...]:
-        return tuple(GeneCoordinate(chromosome, position + i) for i in range(len(ref_allele)))
 
     @classmethod
     def __strip_prefix(cls, string: str, prefix: str) -> str:
