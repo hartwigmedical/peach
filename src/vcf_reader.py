@@ -55,7 +55,9 @@ class VcfReader(object):
         match_on_location = 0
         filtered_calls = set()
 
-        for call_index in range(cls.__get_variant_count(variants)):
+        total_variant_count = cls.__get_variant_count(variants)
+        logging.info(f"VCF calls: {total_variant_count}")
+        for call_index in range(total_variant_count):
             rs_id_match_to_panel_exists = cls.__rs_id_exists_in_panel(call_index, panel, variants)
             coordinate_match_to_panel_exists = cls.__coordinates_of_call_overlap_with_panel_coordinates(
                 call_index, panel, variants, vcf_reference_assembly
@@ -70,8 +72,9 @@ class VcfReader(object):
                     continue
                 filtered_calls.add(cls.__get_call_from_variants(call_index, sample_r_id, variants))
 
-        logging.info("VCF matches on RS id: " + str(match_on_rsid))
-        logging.info("VCF matches on location: " + str(match_on_location))
+        logging.info(f"VCF calls matching panel: {len(filtered_calls)}")
+        logging.info(f"VCF calls matching panel on RS id: {match_on_rsid}")
+        logging.info(f"VCF calls matching panel on location: {match_on_location}")
 
         return SimpleCallData(frozenset(filtered_calls), vcf_reference_assembly)
 
