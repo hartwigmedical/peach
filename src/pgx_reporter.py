@@ -27,7 +27,7 @@ class GenotypeReporter(object):
     FILTER_V38_COLUMN_NAME = "filter_v38"
     PANEL_VERSION_COLUMN_NAME = "panel_version"
     TOOL_VERSION_COLUMN_NAME = "repo_version"
-    NEW_CALLS_TSV_COLUMNS = (
+    CALLS_TSV_COLUMNS = (
         GENE_COLUMN_NAME,
         CHROMOSOME_V37_COLUMN_NAME,
         POSITION_V37_COLUMN_NAME,
@@ -65,7 +65,7 @@ class GenotypeReporter(object):
     def __get_panel_calls_df(
         cls, pgx_analysis: PgxAnalysis, panel_id: str, version: str, input_reference_assembly: ReferenceAssembly
     ) -> pd.DataFrame:
-        data_frame = pd.DataFrame(columns=cls.NEW_CALLS_TSV_COLUMNS)
+        data_frame = pd.DataFrame(columns=cls.CALLS_TSV_COLUMNS)
         for full_call in pgx_analysis.get_all_full_calls():
             sorted_alleles = sorted(full_call.alleles)
 
@@ -88,7 +88,7 @@ class GenotypeReporter(object):
                 position_v38 = cls.UNKNOWN_POSITION_STRING
                 reference_allele_v38 = cls.UNKNOWN_REF_ALLELE_STRING
 
-            new_id: Dict[str, Union[str, int]] = {
+            line_data: Dict[str, Union[str, int]] = {
                 cls.GENE_COLUMN_NAME: full_call.gene,
                 cls.CHROMOSOME_V37_COLUMN_NAME: chromosome_v37,
                 cls.POSITION_V37_COLUMN_NAME: position_v37,
@@ -106,7 +106,7 @@ class GenotypeReporter(object):
                 cls.PANEL_VERSION_COLUMN_NAME: panel_id,
                 cls.TOOL_VERSION_COLUMN_NAME: version,
             }
-            data_frame = data_frame.append(new_id, ignore_index=True)
+            data_frame = data_frame.append(line_data, ignore_index=True)
 
         if pd.isna(data_frame).any(axis=None):
             raise ValueError(f"This should never happen: Unhandled NaN values:\n{data_frame}")
@@ -142,7 +142,7 @@ class GenotypeReporter(object):
                 cls.REF_ALLELE_V38_COLUMN_NAME,
             ]
         ).reset_index(drop=True)
-        data_frame = data_frame.loc[:, cls.NEW_CALLS_TSV_COLUMNS]
+        data_frame = data_frame.loc[:, cls.CALLS_TSV_COLUMNS]
         return data_frame
 
 
