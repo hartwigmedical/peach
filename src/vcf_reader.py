@@ -58,6 +58,10 @@ class VcfReader(object):
         total_variant_count = cls.__get_variant_count(variants)
         logging.info(f"VCF calls: {total_variant_count}")
         for call_index in range(total_variant_count):
+            if not cls.__filter_is_pass(call_index, variants):
+                # Ignore all calls with filter != PASS
+                continue
+
             rs_id_match_to_panel_exists = cls.__rs_id_exists_in_panel(call_index, panel, variants)
             coordinate_match_to_panel_exists = cls.__coordinates_of_call_overlap_with_panel_coordinates(
                 call_index, panel, variants, vcf_reference_assembly
@@ -67,14 +71,11 @@ class VcfReader(object):
                     match_on_rsid += 1
                 if coordinate_match_to_panel_exists:
                     match_on_location += 1
-                if not cls.__filter_is_pass(call_index, variants):
-                    # Ignore all calls with filter != PASS
-                    continue
                 filtered_calls.add(cls.__get_call_from_variants(call_index, sample_r_id, variants))
 
-        logging.info(f"VCF calls matching panel: {len(filtered_calls)}")
-        logging.info(f"VCF calls matching panel on RS id: {match_on_rsid}")
-        logging.info(f"VCF calls matching panel on location: {match_on_location}")
+        logging.info(f"VCF calls QC-PASS and matching panel: {len(filtered_calls)}")
+        logging.info(f"VCF calls QC-PASS and matching panel on RS id: {match_on_rsid}")
+        logging.info(f"VCF calls QC-PASS and matching panel on location: {match_on_location}")
 
         return SimpleCallData(frozenset(filtered_calls), vcf_reference_assembly)
 
