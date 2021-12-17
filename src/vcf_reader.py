@@ -58,6 +58,7 @@ class VcfReader(object):
         filtered_calls = set()
 
         total_variant_count = cls.__get_variant_count(variants)
+        logging.info(f"VCF calls: {total_variant_count}")
         for call_index in range(total_variant_count):
             if not cls.__filter_is_pass(call_index, variants):
                 # Ignore all calls with filter != PASS
@@ -160,14 +161,19 @@ class VcfReader(object):
             cls, call_index: int, variants: Dict[str, Any]
     ) -> Tuple[str, str]:
         complete_annotation = str(variants[cls.ANNOTATION_FIELD_NAME][call_index])
-        gene_name = complete_annotation.split("|")[3]
-        full_variant_annotation = complete_annotation.split("|")[9]
-        if full_variant_annotation.startswith(cls.CODING_VARIANT_ANNOTATION_PREFIX):
-            variant_annotation = strip_prefix(full_variant_annotation, cls.CODING_VARIANT_ANNOTATION_PREFIX)
-        elif full_variant_annotation.startswith(cls.NON_CODING_VARIANT_ANNOTATION_PREFIX):
-            variant_annotation = strip_prefix(full_variant_annotation, cls.NON_CODING_VARIANT_ANNOTATION_PREFIX)
+        if complete_annotation:
+            gene_name = complete_annotation.split("|")[3]
+            full_variant_annotation = complete_annotation.split("|")[9]
+            if full_variant_annotation.startswith(cls.CODING_VARIANT_ANNOTATION_PREFIX):
+                variant_annotation = strip_prefix(full_variant_annotation, cls.CODING_VARIANT_ANNOTATION_PREFIX)
+            elif full_variant_annotation.startswith(cls.NON_CODING_VARIANT_ANNOTATION_PREFIX):
+                variant_annotation = strip_prefix(full_variant_annotation, cls.NON_CODING_VARIANT_ANNOTATION_PREFIX)
+            else:
+                raise ValueError(f"Unexpected annotation prefix: {full_variant_annotation}")
         else:
-            raise ValueError(f"Unexpected annotation prefix: {full_variant_annotation}")
+            # TODO: solve this in a better way, or assert later that none of the returned simple calls have this
+            gene_name = ""
+            variant_annotation = ""
 
         return gene_name, variant_annotation
 
