@@ -30,19 +30,17 @@ class VcfReader(object):
     CODING_VARIANT_ANNOTATION_PREFIX = "c."
     NON_CODING_VARIANT_ANNOTATION_PREFIX = "n."
 
-    @classmethod
-    def get_call_data(cls, tool_config: ToolConfig, panel: Panel) -> SimpleCallData:
-        variants = cls.__get_variants_from_vcf(tool_config.vcf_path)
+    def get_call_data(self, tool_config: ToolConfig, panel: Panel) -> SimpleCallData:
+        variants = self.__get_variants_from_vcf(tool_config.vcf_path)
         if variants is not None:
-            return cls.__get_call_data_from_variants(
+            return self.__get_call_data_from_variants(
                 variants, panel, tool_config.sample_r_id, tool_config.vcf_reference_assembly
             )
         else:
             logging.warning("No variants found in vcf")
             return SimpleCallData(frozenset(), tool_config.vcf_reference_assembly)
 
-    @classmethod
-    def __get_variants_from_vcf(cls, vcf: str) -> Optional[Dict[str, Any]]:
+    def __get_variants_from_vcf(self, vcf: str) -> Optional[Dict[str, Any]]:
         # variants is None precisely when the vcf file has no variants
         try:
             variants = allel.read_vcf(vcf, fields="*")
@@ -50,20 +48,19 @@ class VcfReader(object):
             raise FileNotFoundError("File " + vcf + " not found or cannot be opened.")
         return variants
 
-    @classmethod
     def __get_call_data_from_variants(
-        cls, variants: Dict[str, Any], panel: Panel, sample_r_id: str, vcf_reference_assembly: ReferenceAssembly
+        self, variants: Dict[str, Any], panel: Panel, sample_r_id: str, vcf_reference_assembly: ReferenceAssembly
     ) -> SimpleCallData:
         filtered_calls = set()
 
-        total_variant_count = cls.__get_variant_count(variants)
+        total_variant_count = self.__get_variant_count(variants)
         logging.info(f"VCF calls: {total_variant_count}")
         for call_index in range(total_variant_count):
-            if not cls.__filter_is_pass(call_index, variants):
+            if not self.__filter_is_pass(call_index, variants):
                 # Ignore all calls with filter != PASS
                 continue
 
-            call = cls.__get_call_from_variants(call_index, sample_r_id, variants)
+            call = self.__get_call_from_variants(call_index, sample_r_id, variants)
             if panel.get_relevant_rs_ids(call, vcf_reference_assembly):
                 filtered_calls.add(call)
 
@@ -71,25 +68,23 @@ class VcfReader(object):
 
         return SimpleCallData(frozenset(filtered_calls), vcf_reference_assembly)
 
-    @classmethod
-    def __filter_is_pass(cls, call_index: int, variants: Dict[str, Any]) -> bool:
-        return bool(variants[f"{cls.FILTER_FIELD_NAME}_PASS"][call_index])
+    def __filter_is_pass(self, call_index: int, variants: Dict[str, Any]) -> bool:
+        return bool(variants[f"{self.FILTER_FIELD_NAME}_PASS"][call_index])
 
-    @classmethod
-    def __get_call_from_variants(cls, call_index: int, sample_r_id: str, variants: Dict[str, Any]) -> SimpleCall:
-        chromosome = cls.__get_chromosome_from_variants(call_index, variants)
-        position = cls.__get_position_from_variants(call_index, variants)
+    def __get_call_from_variants(self, call_index: int, sample_r_id: str, variants: Dict[str, Any]) -> SimpleCall:
+        chromosome = self.__get_chromosome_from_variants(call_index, variants)
+        position = self.__get_position_from_variants(call_index, variants)
         gene_coordinate = GeneCoordinate(chromosome, position)
 
-        reference_allele = cls.__get_reference_allele_from_variants(call_index, variants)
-        alleles = cls.__get_called_alleles_from_variants(call_index, sample_r_id, variants)
-        rs_ids = cls.__get_rs_ids_from_variants(call_index, variants)
+        reference_allele = self.__get_reference_allele_from_variants(call_index, variants)
+        alleles = self.__get_called_alleles_from_variants(call_index, sample_r_id, variants)
+        rs_ids = self.__get_rs_ids_from_variants(call_index, variants)
 
         if alleles == (reference_allele, reference_allele):
-            gene_name, _ = cls.__get_gene_name_and_variant_annotation_from_variants(call_index, variants)
+            gene_name, _ = self.__get_gene_name_and_variant_annotation_from_variants(call_index, variants)
             variant_annotation = REF_CALL_ANNOTATION_STRING
         else:
-            gene_name, variant_annotation = cls.__get_gene_name_and_variant_annotation_from_variants(
+            gene_name, variant_annotation = self.__get_gene_name_and_variant_annotation_from_variants(
                 call_index, variants
             )
 
@@ -103,15 +98,14 @@ class VcfReader(object):
         )
         return call
 
-    @classmethod
     def __get_called_alleles_from_variants(
-        cls, call_index: int, sample_r_id: str, variants: Dict[str, Any]
+        self, call_index: int, sample_r_id: str, variants: Dict[str, Any]
     ) -> Tuple[str, str]:
-        reference_allele = cls.__get_reference_allele_from_variants(call_index, variants)
-        sample_list = [str(sample_name) for sample_name in variants[cls.SAMPLE_FIELD_NAME].tolist()]
+        reference_allele = self.__get_reference_allele_from_variants(call_index, variants)
+        sample_list = [str(sample_name) for sample_name in variants[self.SAMPLE_FIELD_NAME].tolist()]
         sample_index = sample_list.index(sample_r_id)
-        genotype = [int(call) for call in variants[cls.GENOTYPE_FIELD_NAME][call_index][sample_index].tolist()]
-        alts = [str(allele) for allele in variants[cls.ALT_ALLELE_FIELD_NAME][call_index]]
+        genotype = [int(call) for call in variants[self.GENOTYPE_FIELD_NAME][call_index][sample_index].tolist()]
+        alts = [str(allele) for allele in variants[self.ALT_ALLELE_FIELD_NAME][call_index]]
         if genotype == [0, 1]:
             alleles = (reference_allele, alts[0])
         elif genotype == [1, 1]:
@@ -125,18 +119,17 @@ class VcfReader(object):
             raise ValueError(error_msg)
         return alleles
 
-    @classmethod
     def __get_gene_name_and_variant_annotation_from_variants(
-            cls, call_index: int, variants: Dict[str, Any]
+            self, call_index: int, variants: Dict[str, Any]
     ) -> Tuple[str, str]:
-        complete_annotation = str(variants[cls.ANNOTATION_FIELD_NAME][call_index])
+        complete_annotation = str(variants[self.ANNOTATION_FIELD_NAME][call_index])
         if complete_annotation:
             gene_name = complete_annotation.split("|")[3]
             full_variant_annotation = complete_annotation.split("|")[9]
-            if full_variant_annotation.startswith(cls.CODING_VARIANT_ANNOTATION_PREFIX):
-                variant_annotation = strip_prefix(full_variant_annotation, cls.CODING_VARIANT_ANNOTATION_PREFIX)
-            elif full_variant_annotation.startswith(cls.NON_CODING_VARIANT_ANNOTATION_PREFIX):
-                variant_annotation = strip_prefix(full_variant_annotation, cls.NON_CODING_VARIANT_ANNOTATION_PREFIX)
+            if full_variant_annotation.startswith(self.CODING_VARIANT_ANNOTATION_PREFIX):
+                variant_annotation = strip_prefix(full_variant_annotation, self.CODING_VARIANT_ANNOTATION_PREFIX)
+            elif full_variant_annotation.startswith(self.NON_CODING_VARIANT_ANNOTATION_PREFIX):
+                variant_annotation = strip_prefix(full_variant_annotation, self.NON_CODING_VARIANT_ANNOTATION_PREFIX)
             else:
                 raise ValueError(f"Unexpected annotation prefix: {full_variant_annotation}")
         else:
@@ -146,28 +139,23 @@ class VcfReader(object):
 
         return gene_name, variant_annotation
 
-    @classmethod
-    def __get_rs_ids_from_variants(cls, call_index: int, variants: Dict[str, Any]) -> Tuple[str, ...]:
-        rs_ids_string = str(variants[cls.RS_IDS_FIELD_NAME][call_index])
-        if cls.RS_ID_SEPARATOR in rs_ids_string:
-            return tuple(str(rs) for rs in rs_ids_string.split(cls.RS_ID_SEPARATOR) if rs.startswith("rs"))
-        elif rs_ids_string == cls.RS_ID_EMPTY_INDICATOR:
+    def __get_rs_ids_from_variants(self, call_index: int, variants: Dict[str, Any]) -> Tuple[str, ...]:
+        rs_ids_string = str(variants[self.RS_IDS_FIELD_NAME][call_index])
+        if self.RS_ID_SEPARATOR in rs_ids_string:
+            return tuple(str(rs) for rs in rs_ids_string.split(self.RS_ID_SEPARATOR) if rs.startswith("rs"))
+        elif rs_ids_string == self.RS_ID_EMPTY_INDICATOR:
             return tuple()
         else:
             return (str(rs_ids_string),)
 
-    @classmethod
-    def __get_reference_allele_from_variants(cls, call_index: int, variants: Dict[str, Any]) -> str:
-        return str(variants[cls.REF_ALLELE_FIELD_NAME][call_index])
+    def __get_reference_allele_from_variants(self, call_index: int, variants: Dict[str, Any]) -> str:
+        return str(variants[self.REF_ALLELE_FIELD_NAME][call_index])
 
-    @classmethod
-    def __get_position_from_variants(cls, call_index: int, variants: Dict[str, Any]) -> int:
-        return int(variants[cls.POSITION_FIELD_NAME][call_index])
+    def __get_position_from_variants(self, call_index: int, variants: Dict[str, Any]) -> int:
+        return int(variants[self.POSITION_FIELD_NAME][call_index])
 
-    @classmethod
-    def __get_chromosome_from_variants(cls, call_index: int, variants: Dict[str, Any]) -> str:
-        return str(variants[cls.CHROMOSOME_FIELD_NAME][call_index])
+    def __get_chromosome_from_variants(self, call_index: int, variants: Dict[str, Any]) -> str:
+        return str(variants[self.CHROMOSOME_FIELD_NAME][call_index])
 
-    @classmethod
-    def __get_variant_count(cls, variants: Dict[str, Any]) -> int:
-        return len(variants[cls.RS_IDS_FIELD_NAME])
+    def __get_variant_count(self, variants: Dict[str, Any]) -> int:
+        return len(variants[self.RS_IDS_FIELD_NAME])

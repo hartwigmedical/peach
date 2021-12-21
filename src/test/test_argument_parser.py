@@ -18,7 +18,7 @@ class TestArgumentParser(unittest.TestCase):
         arguments.extend(["-o", "output_directory"])
         arguments.extend(["-p", "panel_location"])
         arguments.extend(["-a", "V37"])
-        actual_config = ArgumentParser.get_tool_config(arguments)
+        actual_config = ArgumentParser().get_tool_config(arguments)
 
         expected_config = ToolConfig(
             "vcf_file",
@@ -40,7 +40,7 @@ class TestArgumentParser(unittest.TestCase):
         arguments.extend(["--outputdir", "output_directory"])
         arguments.extend(["--panel", "panel_location"])
         arguments.extend(["--vcf_reference_assembly_version", "V38"])
-        actual_config = ArgumentParser.get_tool_config(arguments)
+        actual_config = ArgumentParser().get_tool_config(arguments)
 
         expected_config = ToolConfig(
             "vcf_file",
@@ -62,7 +62,7 @@ class TestArgumentParser(unittest.TestCase):
         arguments.extend(["-o", "output_directory"])
         arguments.extend(["-p", "panel_location"])
         arguments.extend(["-a", "V38"])
-        actual_config = ArgumentParser.get_tool_config(arguments)
+        actual_config = ArgumentParser().get_tool_config(arguments)
 
         expected_config = ToolConfig(
             "vcf_file",
@@ -83,7 +83,7 @@ class TestArgumentParser(unittest.TestCase):
         arguments.extend(["-v", "script_version"])
         arguments.extend(["-o", "output_directory"])
         arguments.extend(["-p", "panel_location"])
-        actual_config = ArgumentParser.get_tool_config(arguments)
+        actual_config = ArgumentParser().get_tool_config(arguments)
 
         expected_config = ToolConfig(
             "vcf_file",
@@ -105,7 +105,7 @@ class TestArgumentParser(unittest.TestCase):
             "-o output_directory",
             "-p panel_location",
         ]
-        ArgumentParser.get_tool_config(minimum_arguments)
+        ArgumentParser().get_tool_config(minimum_arguments)
 
         for i in range(len(minimum_arguments)):
             too_few_arguments = deepcopy(minimum_arguments)
@@ -113,7 +113,7 @@ class TestArgumentParser(unittest.TestCase):
             with patch("sys.stderr", new_callable=StringIO):  # silence the help message in this test
                 with self.subTest(arguments=too_few_arguments):
                     with self.assertRaises(SystemExit):
-                        ArgumentParser.get_tool_config(too_few_arguments)
+                        ArgumentParser().get_tool_config(too_few_arguments)
 
 
 if __name__ == "__main__":  # pragma: no cover

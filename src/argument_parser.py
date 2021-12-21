@@ -42,8 +42,7 @@ class EnumAction(argparse.Action):
 
 
 class ArgumentParser(object):
-    @classmethod
-    def get_tool_config(cls, sys_args: List[str]) -> ToolConfig:
+    def get_tool_config(self, sys_args: List[str]) -> ToolConfig:
         parser = argparse.ArgumentParser(
             prog="peach",
             description=(

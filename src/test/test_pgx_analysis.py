@@ -15,7 +15,7 @@ class TestPgxAnalysis(unittest.TestCase):
         """No variants wrt v37"""
         panel = get_wide_example_panel()
         simple_call_data = SimpleCallData(frozenset(), ReferenceAssembly.V37)
-        pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
+        pgx_analysis = PgxAnalyser().create_pgx_analysis(simple_call_data, panel)
 
         gene_to_haplotype_calls_expected = {
             "DPYD": {HaplotypeCall("*3", 2)}, "FAKE": {HaplotypeCall("*1", 2)}, "FAKE2": {HaplotypeCall("*4A", 2)}
@@ -60,7 +60,7 @@ class TestPgxAnalysis(unittest.TestCase):
         """No variants wrt v38"""
         panel = get_wide_example_panel()
         simple_call_data = SimpleCallData(frozenset(), ReferenceAssembly.V38)
-        pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
+        pgx_analysis = PgxAnalyser().create_pgx_analysis(simple_call_data, panel)
 
         gene_to_haplotype_calls_expected = {
             "DPYD": {HaplotypeCall("*1", 2)}, "FAKE": {HaplotypeCall("*1", 2)}, "FAKE2": {HaplotypeCall("*1", 2)}
@@ -115,7 +115,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 ReferenceSite(GeneCoordinate("1", 97915614), "C"), ("C", "C"),
                 "DPYD", ("rs3918290",), "REF_CALL", SimpleCallFilter.PASS),
         }), ReferenceAssembly.V37)
-        pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
+        pgx_analysis = PgxAnalyser().create_pgx_analysis(simple_call_data, panel)
 
         gene_to_haplotype_calls_expected = {
             "DPYD": {HaplotypeCall("*1", 2)}, "FAKE": {HaplotypeCall("*1", 2)}, "FAKE2": {HaplotypeCall("*1", 2)}
@@ -175,7 +175,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 ReferenceSite(GeneCoordinate("1", 97981395), "T"), ("T", "C"),
                 "DPYD", ("rs1801159",), "674A>G", SimpleCallFilter.PASS),
         }), ReferenceAssembly.V37)
-        pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
+        pgx_analysis = PgxAnalyser().create_pgx_analysis(simple_call_data, panel)
 
         gene_to_haplotype_calls_expected = {
             "DPYD": {HaplotypeCall("*2B", 1), HaplotypeCall("*3", 1)},
@@ -237,7 +237,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 ReferenceSite(GeneCoordinate("chr1", 97515839), "T"), ("T", "C"),
                 "DPYD", ("rs1801159",), "674A>G", SimpleCallFilter.PASS),
         }), ReferenceAssembly.V38)
-        pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
+        pgx_analysis = PgxAnalyser().create_pgx_analysis(simple_call_data, panel)
 
         gene_to_haplotype_calls_expected = {
             "DPYD": {HaplotypeCall("*2B", 1), HaplotypeCall("*3", 1)},
@@ -290,7 +290,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 ReferenceSite(GeneCoordinate("1", 97912838), "A"), ("AGT", "AGT"),
                 "DPYD", ("rs2938101",), "293A>AGT", SimpleCallFilter.PASS),
         }), ReferenceAssembly.V37)
-        pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
+        pgx_analysis = PgxAnalyser().create_pgx_analysis(simple_call_data, panel)
 
         gene_to_haplotype_calls_expected = {
             "DPYD": {HaplotypeCall("*2A", 1), HaplotypeCall("*3", 2), HaplotypeCall("*7", 2)}
@@ -329,7 +329,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 ReferenceSite(GeneCoordinate("chr1", 97450065), "TC"), ("TC", "TC"),
                 "DPYD", ("rs72549303",), "REF_CALL", SimpleCallFilter.PASS),
         }), ReferenceAssembly.V38)
-        pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
+        pgx_analysis = PgxAnalyser().create_pgx_analysis(simple_call_data, panel)
 
         gene_to_haplotype_calls_expected = {"DPYD": {HaplotypeCall("*2B", 2)}}
         all_full_calls_expected = frozenset({
@@ -366,7 +366,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 ReferenceSite(GeneCoordinate("1", 97915621), "TG"), ("TC", "TC"),
                 "DPYD", ("rs72549303",), "6744CA>GA", SimpleCallFilter.PASS),
         }), ReferenceAssembly.V37)
-        pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
+        pgx_analysis = PgxAnalyser().create_pgx_analysis(simple_call_data, panel)
 
         gene_to_haplotype_calls_expected = {"DPYD": {HaplotypeCall("*2B", 1), HaplotypeCall("*1", 1)}}
         all_full_calls_expected = frozenset({
@@ -406,7 +406,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 ReferenceSite(GeneCoordinate("chr1", 97450065), "TC"), ("TC", "TC"),
                 "DPYD", ("rs72549303",), "REF_CALL", SimpleCallFilter.PASS),
         }), ReferenceAssembly.V38)
-        pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
+        pgx_analysis = PgxAnalyser().create_pgx_analysis(simple_call_data, panel)
 
         gene_to_haplotype_calls_expected = {"DPYD": {HaplotypeCall("*2B", 1), HaplotypeCall("*2A", 1)}}
         all_full_calls_expected = frozenset({
@@ -446,7 +446,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 ReferenceSite(GeneCoordinate("1", 97912838), "A"), ("AGT", "AGT"),
                 "DPYD", ("rs2938101",), "301A>AGT", SimpleCallFilter.PASS),
         }), ReferenceAssembly.V37)
-        pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
+        pgx_analysis = PgxAnalyser().create_pgx_analysis(simple_call_data, panel)
 
         gene_to_haplotype_calls_expected = {
             "DPYD": {HaplotypeCall("*2B", 1), HaplotypeCall("*9", 1), HaplotypeCall("*7", 2)}
@@ -490,7 +490,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 ReferenceSite(GeneCoordinate("chr1", 97450065), "TC"), ("TG", "TG"),
                 "DPYD", ("rs72549303",), "6744GA>CA", SimpleCallFilter.PASS),
         }), ReferenceAssembly.V38)
-        pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
+        pgx_analysis = PgxAnalyser().create_pgx_analysis(simple_call_data, panel)
 
         gene_to_haplotype_calls_expected = {
             "DPYD": {HaplotypeCall("*10", 1), HaplotypeCall("*2B", 1), HaplotypeCall("*9", 1)}
@@ -533,7 +533,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 ReferenceSite(GeneCoordinate("1", 97915621), "TG"), ("TG", "TC"),
                 "DPYD", ("rs72549303",), "6744CA>GA", SimpleCallFilter.PASS),
         }), ReferenceAssembly.V37)
-        pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
+        pgx_analysis = PgxAnalyser().create_pgx_analysis(simple_call_data, panel)
 
         gene_to_haplotype_calls_expected: Dict[str, Set[HaplotypeCall]] = {"DPYD": set()}
         all_full_calls_expected = frozenset({
@@ -570,7 +570,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 ReferenceSite(GeneCoordinate("1", 2488242), "AC"), ("AC", "AG"),
                 "DPYD", tuple(), "9213CT>GT", SimpleCallFilter.PASS),  # unknown
         }), ReferenceAssembly.V37)
-        pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
+        pgx_analysis = PgxAnalyser().create_pgx_analysis(simple_call_data, panel)
 
         gene_to_haplotype_calls_expected: Dict[str, Set[HaplotypeCall]] = {
             "DPYD": set(), "FAKE": {HaplotypeCall("*4A", 1), HaplotypeCall("*1", 1)}, "FAKE2": set()}
@@ -633,7 +633,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 ReferenceSite(GeneCoordinate("chr1", 2488242), "AC"), ("AC", "AG"),
                 "DPYD", tuple(), "9213CT>GT", SimpleCallFilter.PASS),  # unknown
         }), ReferenceAssembly.V38)
-        pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
+        pgx_analysis = PgxAnalyser().create_pgx_analysis(simple_call_data, panel)
 
         gene_to_haplotype_calls_expected: Dict[str, Set[HaplotypeCall]] = {
             "DPYD": set(), "FAKE": {HaplotypeCall("*4A", 1), HaplotypeCall("*1", 1)}, "FAKE2": set()}
@@ -700,9 +700,9 @@ class TestPgxAnalysis(unittest.TestCase):
         good_simple_call_data = SimpleCallData(frozenset(good_calls), reference_assembly)
         all_simple_call_data = SimpleCallData(frozenset(good_calls.union({bad_call})), reference_assembly)
 
-        PgxAnalyser.create_pgx_analysis(good_simple_call_data, panel)  # no error
+        PgxAnalyser().create_pgx_analysis(good_simple_call_data, panel)  # no error
         with self.assertRaises(ValueError):
-            PgxAnalyser.create_pgx_analysis(all_simple_call_data, panel)
+            PgxAnalyser().create_pgx_analysis(all_simple_call_data, panel)
 
     @unittest.skip("WIP")
     def test_incorrect_gene(self) -> None:
@@ -723,10 +723,10 @@ class TestPgxAnalysis(unittest.TestCase):
         good_simple_call_data = SimpleCallData(frozenset(good_calls), reference_assembly)
         all_simple_call_data = SimpleCallData(frozenset(good_calls.union({bad_call})), reference_assembly)
 
-        PgxAnalyser.create_pgx_analysis(good_simple_call_data, panel)  # no error
-        print(PgxAnalyser.create_pgx_analysis(all_simple_call_data, panel))
+        PgxAnalyser().create_pgx_analysis(good_simple_call_data, panel)  # no error
+        print(PgxAnalyser().create_pgx_analysis(all_simple_call_data, panel))
         with self.assertRaises(ValueError):
-            PgxAnalyser.create_pgx_analysis(all_simple_call_data, panel)
+            PgxAnalyser().create_pgx_analysis(all_simple_call_data, panel)
 
     def test_known_variants_with_incorrect_rs_id(self) -> None:
         """Known variant with one incorrect rs id. Uses v38 input"""
@@ -753,9 +753,9 @@ class TestPgxAnalysis(unittest.TestCase):
         good_call_data = SimpleCallData(frozenset(good_calls), reference_assembly)
         all_call_data = SimpleCallData(frozenset(good_calls.union({bad_call})), reference_assembly)
 
-        PgxAnalyser.create_pgx_analysis(good_call_data, panel)
+        PgxAnalyser().create_pgx_analysis(good_call_data, panel)
         with self.assertRaises(ValueError):
-            PgxAnalyser.create_pgx_analysis(all_call_data, panel)
+            PgxAnalyser().create_pgx_analysis(all_call_data, panel)
 
     def test_known_variant_with_incorrect_position(self) -> None:
         """Known variant with incorrect position. Uses v37 input."""
@@ -784,9 +784,9 @@ class TestPgxAnalysis(unittest.TestCase):
         good_call_data = SimpleCallData(frozenset(good_calls), reference_assembly)
         all_call_data = SimpleCallData(frozenset(good_calls.union({bad_call})), reference_assembly)
 
-        PgxAnalyser.create_pgx_analysis(good_call_data, panel)
+        PgxAnalyser().create_pgx_analysis(good_call_data, panel)
         with self.assertRaises(ValueError):
-            PgxAnalyser.create_pgx_analysis(all_call_data, panel)
+            PgxAnalyser().create_pgx_analysis(all_call_data, panel)
 
     def test_known_variant_with_incorrect_chromosome(self) -> None:
         """Known variants with one incorrect chromosome. Uses v38 input"""
@@ -815,9 +815,9 @@ class TestPgxAnalysis(unittest.TestCase):
         good_call_data = SimpleCallData(frozenset(good_calls), reference_assembly)
         all_call_data = SimpleCallData(frozenset(good_calls.union({bad_call})), reference_assembly)
 
-        PgxAnalyser.create_pgx_analysis(good_call_data, panel)
+        PgxAnalyser().create_pgx_analysis(good_call_data, panel)
         with self.assertRaises(ValueError):
-            PgxAnalyser.create_pgx_analysis(all_call_data, panel)
+            PgxAnalyser().create_pgx_analysis(all_call_data, panel)
 
     def test_known_variant_with_multiple_rs_ids_not_matching_panel(self) -> None:
         """Multiple rs ids when panel says there should be one. Uses v37 input."""
@@ -842,9 +842,9 @@ class TestPgxAnalysis(unittest.TestCase):
         good_call_data = SimpleCallData(frozenset(good_calls), reference_assembly)
         all_call_data = SimpleCallData(frozenset(good_calls.union({bad_call})), reference_assembly)
 
-        PgxAnalyser.create_pgx_analysis(good_call_data, panel)
+        PgxAnalyser().create_pgx_analysis(good_call_data, panel)
         with self.assertRaises(ValueError):
-            PgxAnalyser.create_pgx_analysis(all_call_data, panel)
+            PgxAnalyser().create_pgx_analysis(all_call_data, panel)
 
     def test_unresolved_haplotype_because_of_unexpected_base_v37(self) -> None:
         """No haplotype call because of unexpected base at known variant location, for v37 input."""
@@ -871,12 +871,12 @@ class TestPgxAnalysis(unittest.TestCase):
             frozenset({unexpected_base_call, call_that_ref_seq_diff_is_ref_v38}),
             reference_assembly
         )
-        good_pgx_analysis = PgxAnalyser.create_pgx_analysis(good_call_data, panel)
+        good_pgx_analysis = PgxAnalyser().create_pgx_analysis(good_call_data, panel)
         good_gene_to_haplotype_calls_expected = {"DPYD": {HaplotypeCall("*2A", 1), HaplotypeCall("*1", 1)}}
         self.assertEqual(
             good_gene_to_haplotype_calls_expected, good_pgx_analysis.get_gene_to_haplotype_calls())
 
-        unexpected_base_pgx_analysis = PgxAnalyser.create_pgx_analysis(unexpected_base_call_data, panel)
+        unexpected_base_pgx_analysis = PgxAnalyser().create_pgx_analysis(unexpected_base_call_data, panel)
 
         unexpected_base_gene_to_haplotype_calls_expected: Dict[str, Set[HaplotypeCall]] = {"DPYD": set()}
         unexpected_base_all_full_calls_expected = frozenset({
@@ -926,12 +926,12 @@ class TestPgxAnalysis(unittest.TestCase):
             frozenset({unexpected_base_call, other_call}),
             reference_assembly
         )
-        good_pgx_analysis = PgxAnalyser.create_pgx_analysis(good_call_data, panel)
+        good_pgx_analysis = PgxAnalyser().create_pgx_analysis(good_call_data, panel)
         good_gene_to_haplotype_calls_expected = {"DPYD": {HaplotypeCall("*2B", 1), HaplotypeCall("*5", 1)}}
         self.assertEqual(
             good_gene_to_haplotype_calls_expected, good_pgx_analysis.get_gene_to_haplotype_calls())
 
-        unexpected_base_pgx_analysis = PgxAnalyser.create_pgx_analysis(unexpected_base_call_data, panel)
+        unexpected_base_pgx_analysis = PgxAnalyser().create_pgx_analysis(unexpected_base_call_data, panel)
 
         unexpected_base_gene_to_haplotype_calls_expected: Dict[str, Set[HaplotypeCall]] = {"DPYD": set()}
         unexpected_base_all_full_calls_expected = frozenset({
@@ -973,7 +973,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 ReferenceSite(GeneCoordinate("1", 97915621), "TG"), ("TC", "TC"),
                 "DPYD", ("rs72549303",), "6744CA>GA", SimpleCallFilter.PASS),
         }), ReferenceAssembly.V37)
-        pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
+        pgx_analysis = PgxAnalyser().create_pgx_analysis(simple_call_data, panel)
 
         gene_to_haplotype_calls_expected: Dict[str, Set[HaplotypeCall]] = {"DPYD": set()}
         all_full_calls_expected = frozenset({
@@ -1013,7 +1013,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 ReferenceSite(GeneCoordinate("chr1", 97450065), "TC"), ("TC", "TC"),
                 "DPYD", ("rs72549303",), "REF_CALL", SimpleCallFilter.PASS),
         }), ReferenceAssembly.V38)
-        pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
+        pgx_analysis = PgxAnalyser().create_pgx_analysis(simple_call_data, panel)
 
         gene_to_haplotype_calls_expected: Dict[str, Set[HaplotypeCall]] = {"DPYD": set()}
         all_full_calls_expected = frozenset({
@@ -1053,7 +1053,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 ReferenceSite(GeneCoordinate("1", 97915621), "TG"), ("TC", "TC"),
                 "DPYD", ("rs72549303",), "6744CA>GA", SimpleCallFilter.PASS),
         }), ReferenceAssembly.V37)
-        pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
+        pgx_analysis = PgxAnalyser().create_pgx_analysis(simple_call_data, panel)
 
         gene_to_haplotype_calls_expected: Dict[str, Set[HaplotypeCall]] = {"DPYD": set()}
         all_full_calls_expected = frozenset({
@@ -1087,7 +1087,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 ReferenceSite(GeneCoordinate("1", 97915621), "TG"), ("TG", "TG"),
                 "DPYD", ("rs72549303",), "REF_CALL", SimpleCallFilter.PASS),
         }), ReferenceAssembly.V37)
-        pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
+        pgx_analysis = PgxAnalyser().create_pgx_analysis(simple_call_data, panel)
 
         gene_to_haplotype_calls_expected = {
             "DPYD": {HaplotypeCall("*3", 2)}, "FAKE": {HaplotypeCall("*1", 2)}, "FAKE2": {HaplotypeCall("*4A", 2)}
@@ -1138,7 +1138,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 ReferenceSite(GeneCoordinate("chr1", 97450065), "TC"), ("TC", "TC"),
                 "DPYD", ("rs72549303",), "REF_CALL", SimpleCallFilter.PASS),
         }), ReferenceAssembly.V38)
-        pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
+        pgx_analysis = PgxAnalyser().create_pgx_analysis(simple_call_data, panel)
 
         gene_to_haplotype_calls_expected = {
             "DPYD": {HaplotypeCall("*1", 2)}, "FAKE": {HaplotypeCall("*1", 2)}, "FAKE2": {HaplotypeCall("*1", 2)}
@@ -1189,7 +1189,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 ReferenceSite(GeneCoordinate("chr1", 97450065), "TC"), ("TG", "TG"),
                 "DPYD", ("rs72549303",), "6744GA>CA", SimpleCallFilter.PASS),
         }), ReferenceAssembly.V38)
-        pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
+        pgx_analysis = PgxAnalyser().create_pgx_analysis(simple_call_data, panel)
 
         gene_to_haplotype_calls_expected = {
             "DPYD": {HaplotypeCall("*3", 2)}, "FAKE": {HaplotypeCall("*1", 2)}, "FAKE2": {HaplotypeCall("*4A", 2)}
@@ -1238,7 +1238,7 @@ class TestPgxAnalysis(unittest.TestCase):
             SimpleCall(ReferenceSite(GeneCoordinate("1", 97915621), "TG"), ("TG", "TC"),
                        "DPYD", tuple(), "6744CA>GA", SimpleCallFilter.PASS),
         }), ReferenceAssembly.V37)
-        pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
+        pgx_analysis = PgxAnalyser().create_pgx_analysis(simple_call_data, panel)
 
         gene_to_haplotype_calls_expected = {
             "DPYD": {HaplotypeCall("*3", 1), HaplotypeCall("*1", 1)},
@@ -1289,7 +1289,7 @@ class TestPgxAnalysis(unittest.TestCase):
             SimpleCall(ReferenceSite(GeneCoordinate("chr1", 97450065), "TC"), ("TG", "TC"),
                        "DPYD", tuple(), "6744GA>CA", SimpleCallFilter.PASS),
         }), ReferenceAssembly.V38)
-        pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
+        pgx_analysis = PgxAnalyser().create_pgx_analysis(simple_call_data, panel)
 
         gene_to_haplotype_calls_expected = {
             "DPYD": {HaplotypeCall("*3", 1), HaplotypeCall("*1", 1)},
@@ -1345,7 +1345,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 ReferenceSite(GeneCoordinate("chr1", 97450065), "TC"), ("AC", "TC"),
                 "DPYD", ("rs72549303",), "6744CT>GT;6744CT>GC", SimpleCallFilter.PASS),  # with ref v38
         }), ReferenceAssembly.V38)
-        pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
+        pgx_analysis = PgxAnalyser().create_pgx_analysis(simple_call_data, panel)
 
         gene_to_haplotype_calls_expected: Dict[str, Set[HaplotypeCall]] = {
             "DPYD": set(), "FAKE": {HaplotypeCall("*1", 2)}, "FAKE2": set()
@@ -1396,7 +1396,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 ReferenceSite(GeneCoordinate("1", 97915621), "TG"), ("AC", "AG"),
                 "DPYD", ("rs72549303",), "6744CT>GT;6744CT>GC", SimpleCallFilter.PASS),
         }), ReferenceAssembly.V37)
-        pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
+        pgx_analysis = PgxAnalyser().create_pgx_analysis(simple_call_data, panel)
 
         gene_to_haplotype_calls_expected: Dict[str, Set[HaplotypeCall]] = {
             "DPYD": set(), "FAKE": {HaplotypeCall("*1", 2)}, "FAKE2": set()
@@ -1453,7 +1453,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 ReferenceSite(GeneCoordinate("chr1", 97450065), "TC"), ("TC", "TC"),
                 "DPYD", ("rs72549303",), "REF_CALL", SimpleCallFilter.PASS),
         }), ReferenceAssembly.V38)
-        pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
+        pgx_analysis = PgxAnalyser().create_pgx_analysis(simple_call_data, panel)
 
         gene_to_haplotype_calls_expected: Dict[str, Set[HaplotypeCall]] = {"DPYD": set()}
         all_full_calls_expected = frozenset({
@@ -1498,7 +1498,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 ReferenceSite(GeneCoordinate("1", 97915622), "G"), ("C", "C"),
                 "DPYD", tuple(), "6744C>G", SimpleCallFilter.PASS),  # unknown
         }), ReferenceAssembly.V37)
-        pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
+        pgx_analysis = PgxAnalyser().create_pgx_analysis(simple_call_data, panel)
 
         gene_to_haplotype_calls_expected: Dict[str, Set[HaplotypeCall]] = {"DPYD": set()}
         all_full_calls_expected = frozenset({

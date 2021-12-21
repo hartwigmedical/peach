@@ -13,20 +13,18 @@ from config.variant import Variant
 class HaplotypeCaller(object):
     HAPLOTYPE_CALLING_REFERENCE_ASSEMBLY = ReferenceAssembly.V38
 
-    @classmethod
-    def get_gene_to_haplotypes_call(cls, full_call_data: FullCallData, panel: Panel) -> Dict[str, Set[HaplotypeCall]]:
+    def get_gene_to_haplotypes_call(self, full_call_data: FullCallData, panel: Panel) -> Dict[str, Set[HaplotypeCall]]:
         gene_to_haplotype_calls = {}
         for gene in panel.get_genes():
             logging.info(f"Calling haplotypes for {gene}")
-            gene_to_haplotype_calls[gene] = cls.__get_haplotypes_call(gene, full_call_data, panel)
+            gene_to_haplotype_calls[gene] = self.__get_haplotypes_call(gene, full_call_data, panel)
         return gene_to_haplotype_calls
 
-    @classmethod
-    def __get_haplotypes_call(cls, gene: str, full_call_data: FullCallData, panel: Panel) -> Set[HaplotypeCall]:
+    def __get_haplotypes_call(self, gene: str, full_call_data: FullCallData, panel: Panel) -> Set[HaplotypeCall]:
         try:
-            variant_to_count = cls.__get_variant_to_count_for_gene(full_call_data, gene)
+            variant_to_count = self.__get_variant_to_count_for_gene(full_call_data, gene)
 
-            explaining_haplotype_combinations = cls.__get_explaining_haplotype_combinations(
+            explaining_haplotype_combinations = self.__get_explaining_haplotype_combinations(
                 variant_to_count, frozenset(panel.get_haplotypes(gene))
             )
 
@@ -34,11 +32,11 @@ class HaplotypeCaller(object):
                 error_msg = f"No explaining haplotype combinations"
                 raise ValueError(error_msg)
 
-            minimal_explaining_haplotype_combination = cls.__get_minimal_haplotype_combination(
+            minimal_explaining_haplotype_combination = self.__get_minimal_haplotype_combination(
                 explaining_haplotype_combinations
             )
 
-            haplotype_calls = cls.__get_haplotype_calls_from_haplotype_names(
+            haplotype_calls = self.__get_haplotype_calls_from_haplotype_names(
                 minimal_explaining_haplotype_combination, panel.get_wild_type_haplotype_name(gene)
             )
 
@@ -48,23 +46,21 @@ class HaplotypeCaller(object):
             logging.error(f"Cannot resolve haplotype for gene {gene}. Error: {e}")
             return set()
 
-    @classmethod
-    def __get_variant_to_count_for_gene(cls, full_call_data: FullCallData, gene: str) -> DefaultDict[Variant, int]:
+    def __get_variant_to_count_for_gene(self, full_call_data: FullCallData, gene: str) -> DefaultDict[Variant, int]:
         full_calls_for_gene = {call for call in full_call_data.calls if call.gene == gene}
         variant_to_count: DefaultDict[Variant, int] = collections.defaultdict(int)
         for call in full_calls_for_gene:
-            cls.__assert_handleable_call(call)
+            self.__assert_handleable_call(call)
             for annotated_allele in call.get_annotated_alleles():
-                if not annotated_allele.is_annotated_vs(cls.HAPLOTYPE_CALLING_REFERENCE_ASSEMBLY):
+                if not annotated_allele.is_annotated_vs(self.HAPLOTYPE_CALLING_REFERENCE_ASSEMBLY):
                     error_msg = f"Unknown variant: allele={annotated_allele}"
                     raise ValueError(error_msg)
-                if annotated_allele.is_variant_vs(cls.HAPLOTYPE_CALLING_REFERENCE_ASSEMBLY):
+                if annotated_allele.is_variant_vs(self.HAPLOTYPE_CALLING_REFERENCE_ASSEMBLY):
                     variant_to_count[Variant(call.rs_ids[0], annotated_allele.allele)] += 1
         return variant_to_count
 
-    @classmethod
     def __get_explaining_haplotype_combinations(
-        cls, variant_to_count: DefaultDict[Variant, int], haplotypes: FrozenSet[Haplotype]
+        self, variant_to_count: DefaultDict[Variant, int], haplotypes: FrozenSet[Haplotype]
     ) -> Set[Tuple[str, ...]]:
         """
         Gets combinations of haplotypes that explain all variants in the stated amounts. Uses recursion.
@@ -82,7 +78,7 @@ class HaplotypeCaller(object):
             for variant in haplotype.variants:
                 reduced_variant_to_count[variant] -= 1
 
-            combinations_for_reduced_variant_set = cls.__get_explaining_haplotype_combinations(
+            combinations_for_reduced_variant_set = self.__get_explaining_haplotype_combinations(
                 reduced_variant_to_count, haplotypes
             )
             for combination in combinations_for_reduced_variant_set:
@@ -90,9 +86,8 @@ class HaplotypeCaller(object):
 
         return result_set
 
-    @classmethod
     def __get_minimal_haplotype_combination(
-        cls, explaining_haplotype_combinations: Set[Tuple[str, ...]]
+        self, explaining_haplotype_combinations: Set[Tuple[str, ...]]
     ) -> Tuple[str, ...]:
         min_haplotype_count = min(len(combination) for combination in explaining_haplotype_combinations)
         minimal_explaining_haplotype_combinations = {
@@ -107,9 +102,8 @@ class HaplotypeCaller(object):
         minimal_explaining_haplotype_combination = minimal_explaining_haplotype_combinations.pop()
         return minimal_explaining_haplotype_combination
 
-    @classmethod
     def __get_haplotype_calls_from_haplotype_names(
-        cls, haplotype_name_combination: Tuple[str, ...], wild_type_haplotype_name: str
+        self, haplotype_name_combination: Tuple[str, ...], wild_type_haplotype_name: str
     ) -> Set[HaplotypeCall]:
         haplotype_to_count: DefaultDict[str, int] = collections.defaultdict(int)
         for haplotype in haplotype_name_combination:
@@ -131,8 +125,7 @@ class HaplotypeCaller(object):
 
         return haplotype_calls
 
-    @classmethod
-    def __assert_handleable_call(cls, call: FullCall) -> None:
+    def __assert_handleable_call(self, call: FullCall) -> None:
         if len(call.rs_ids) > 1:
             error_msg = f"Call has more than one rs id: rs ids={call.rs_ids}, call={call}"
             raise ValueError(error_msg)

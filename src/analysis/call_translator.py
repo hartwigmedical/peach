@@ -17,26 +17,23 @@ class Translation(NamedTuple):
 
 
 class SimpleCallTranslator(object):
-    @classmethod
-    def get_all_full_call_data(cls, simple_call_data: SimpleCallData, panel: Panel) -> FullCallData:
-        complete_simple_call_data = cls.__add_calls_for_uncalled_variants_in_panel(simple_call_data, panel)
-        all_full_calls = cls.__get_full_calls_from_simple_calls(complete_simple_call_data, panel)
+    def get_all_full_call_data(self, simple_call_data: SimpleCallData, panel: Panel) -> FullCallData:
+        complete_simple_call_data = self.__add_calls_for_uncalled_variants_in_panel(simple_call_data, panel)
+        all_full_calls = self.__get_full_calls_from_simple_calls(complete_simple_call_data, panel)
         return FullCallData(all_full_calls)
 
-    @classmethod
     def __add_calls_for_uncalled_variants_in_panel(
-        cls, simple_call_data: SimpleCallData, panel: Panel
+        self, simple_call_data: SimpleCallData, panel: Panel
     ) -> SimpleCallData:
-        missing_calls = cls.__get_calls_for_panel_variants_without_calls(simple_call_data, panel)
+        missing_calls = self.__get_calls_for_panel_variants_without_calls(simple_call_data, panel)
         complete_simple_call_data = SimpleCallData(
             simple_call_data.calls.union(missing_calls),
             simple_call_data.reference_assembly,
         )
         return complete_simple_call_data
 
-    @classmethod
     def __get_calls_for_panel_variants_without_calls(
-        cls, simple_call_data: SimpleCallData, panel: Panel
+        self, simple_call_data: SimpleCallData, panel: Panel
     ) -> FrozenSet[SimpleCall]:
         # assume ref call when no call is found. Set filter to NO_CALL
         reference_assembly = simple_call_data.reference_assembly
@@ -70,14 +67,13 @@ class SimpleCallTranslator(object):
                     uncalled_calls.add(uncalled_ref_call)
         return frozenset(uncalled_calls)
 
-    @classmethod
-    def __get_full_calls_from_simple_calls(cls, simple_call_data: SimpleCallData, panel: Panel) -> FrozenSet[FullCall]:
+    def __get_full_calls_from_simple_calls(self, simple_call_data: SimpleCallData, panel: Panel) -> FrozenSet[FullCall]:
         handled_v37_coordinates: Set[GeneCoordinate] = set()
         handled_v38_coordinates: Set[GeneCoordinate] = set()
         handled_rs_ids: Set[str] = set()
         full_calls = set()
         for simple_call in simple_call_data.calls:
-            full_call = cls.__get_full_call_from_simple_call(simple_call, panel, simple_call_data.reference_assembly)
+            full_call = self.__get_full_call_from_simple_call(simple_call, panel, simple_call_data.reference_assembly)
 
             for rs_id in full_call.rs_ids:
                 if rs_id in handled_rs_ids:
@@ -121,17 +117,16 @@ class SimpleCallTranslator(object):
 
         return frozenset(full_calls)
 
-    @classmethod
     def __get_full_call_from_simple_call(
-        cls, simple_call: SimpleCall, panel: Panel, call_reference_assembly: ReferenceAssembly
+        self, simple_call: SimpleCall, panel: Panel, call_reference_assembly: ReferenceAssembly
     ) -> FullCall:
-        cls.__assert_gene_in_panel(simple_call.gene, panel)
+        self.__assert_gene_in_panel(simple_call.gene, panel)
 
-        complete_simple_call = cls.__fill_in_rs_ids_if_needed(simple_call, panel, call_reference_assembly)
-        translation = cls.__get_translation_to_other_assembly(complete_simple_call, panel, call_reference_assembly)
+        complete_simple_call = self.__fill_in_rs_ids_if_needed(simple_call, panel, call_reference_assembly)
+        translation = self.__get_translation_to_other_assembly(complete_simple_call, panel, call_reference_assembly)
 
         if call_reference_assembly == ReferenceAssembly.V37:
-            filter_v37 = cls.__get_full_call_filter(complete_simple_call.filter)
+            filter_v37 = self.__get_full_call_filter(complete_simple_call.filter)
             full_call = FullCall(
                 reference_site_v37=complete_simple_call.reference_site,
                 reference_site_v38=translation.reference_site,
@@ -144,7 +139,7 @@ class SimpleCallTranslator(object):
                 filter_v38=translation.filter,
             )
         elif call_reference_assembly == ReferenceAssembly.V38:
-            filter_v38 = cls.__get_full_call_filter(complete_simple_call.filter)
+            filter_v38 = self.__get_full_call_filter(complete_simple_call.filter)
             full_call = FullCall(
                 reference_site_v37=translation.reference_site,
                 reference_site_v38=complete_simple_call.reference_site,
@@ -160,9 +155,8 @@ class SimpleCallTranslator(object):
             raise NotImplementedError(f"Unrecognized reference assembly: {call_reference_assembly}")
         return full_call
 
-    @classmethod
     def __fill_in_rs_ids_if_needed(
-        cls, call: SimpleCall, panel: Panel, reference_assembly: ReferenceAssembly
+        self, call: SimpleCall, panel: Panel, reference_assembly: ReferenceAssembly
     ) -> SimpleCall:
         rs_ids: Tuple[str, ...]
         if call.rs_ids == tuple() and panel.contains_rs_id_matching_call(call, reference_assembly):
@@ -180,47 +174,44 @@ class SimpleCallTranslator(object):
         else:
             return call
 
-    @classmethod
     def __get_translation_to_other_assembly(
-        cls, call: SimpleCall, panel: Panel, call_reference_assembly: ReferenceAssembly
+        self, call: SimpleCall, panel: Panel, call_reference_assembly: ReferenceAssembly
     ) -> Translation:
-        translated_reference_site = cls.__get_translated_reference_site(call, panel, call_reference_assembly)
-        translated_filter, translated_variant_annotation = cls.__get_translated_filter_and_variant_annotation(
+        translated_reference_site = self.__get_translated_reference_site(call, panel, call_reference_assembly)
+        translated_filter, translated_variant_annotation = self.__get_translated_filter_and_variant_annotation(
             call, panel, call_reference_assembly, translated_reference_site
         )
         translation = Translation(translated_reference_site, translated_variant_annotation, translated_filter)
         return translation
 
-    @classmethod
     def __get_translated_reference_site(
-        cls, call: SimpleCall, panel: Panel, call_reference_assembly: ReferenceAssembly
+        self, call: SimpleCall, panel: Panel, call_reference_assembly: ReferenceAssembly
     ) -> Optional[ReferenceSite]:
         if panel.contains_rs_id_matching_call(call, call_reference_assembly):
             rs_id_info = panel.get_matching_rs_id_info(call.reference_site, call_reference_assembly)
-            cls.__assert_rs_id_call_matches_info(call.rs_ids, (rs_id_info.rs_id,))
+            self.__assert_rs_id_call_matches_info(call.rs_ids, (rs_id_info.rs_id,))
             return rs_id_info.get_reference_site(call_reference_assembly.opposite())
         else:
             # unknown variant
             return None
 
-    @classmethod
     def __get_translated_filter_and_variant_annotation(
-        cls,
+        self,
         call: SimpleCall,
         panel: Panel,
         call_reference_assembly: ReferenceAssembly,
         translated_reference_site: Optional[ReferenceSite],
     ) -> Tuple[FullCallFilter, str]:
-        annotated_alleles = cls.__get_annotated_alleles(call, call_reference_assembly, translated_reference_site)
+        annotated_alleles = self.__get_annotated_alleles(call, call_reference_assembly, translated_reference_site)
         if panel.has_ref_seq_difference_annotation(call.gene, call.reference_site, call_reference_assembly):
             annotate_as_ref = all(
-                cls.__is_ref_allele_to_opposite_assembly_due_to_ref_sequence_difference(
+                self.__is_ref_allele_to_opposite_assembly_due_to_ref_sequence_difference(
                     annotated_allele, call_reference_assembly
                 )
                 for annotated_allele in annotated_alleles
             )
             all_variants_are_ref_to_a_reference_assembly = all(
-                cls.__allele_is_ref_to_a_reference_assembly(annotated_allele, call_reference_assembly)
+                self.__allele_is_ref_to_a_reference_assembly(annotated_allele, call_reference_assembly)
                 for annotated_allele in annotated_alleles
             )
             if annotate_as_ref:
@@ -260,25 +251,22 @@ class SimpleCallTranslator(object):
             )
         return translated_filter, translated_variant_annotation
 
-    @classmethod
     def __allele_is_ref_to_a_reference_assembly(
-        cls, annotated_allele: AnnotatedAllele, call_reference_assembly: ReferenceAssembly
+        self, annotated_allele: AnnotatedAllele, call_reference_assembly: ReferenceAssembly
     ) -> bool:
         is_ref_vs_call_reference_assembly = not annotated_allele.is_variant_vs(call_reference_assembly)
         is_ref_vs_opposite_reference_assembly = not annotated_allele.is_variant_vs(call_reference_assembly.opposite())
         return is_ref_vs_call_reference_assembly or is_ref_vs_opposite_reference_assembly
 
-    @classmethod
     def __is_ref_allele_to_opposite_assembly_due_to_ref_sequence_difference(
-        cls, annotated_allele: AnnotatedAllele, call_reference_assembly: ReferenceAssembly
+        self, annotated_allele: AnnotatedAllele, call_reference_assembly: ReferenceAssembly
     ) -> bool:
         is_variant_vs_call_reference_assembly = annotated_allele.is_variant_vs(call_reference_assembly)
         is_ref_vs_opposite_reference_assembly = not annotated_allele.is_variant_vs(call_reference_assembly.opposite())
         return is_variant_vs_call_reference_assembly and is_ref_vs_opposite_reference_assembly
 
-    @classmethod
     def __get_annotated_alleles(
-        cls,
+        self,
         call: SimpleCall,
         call_reference_assembly: ReferenceAssembly,
         translated_reference_site: Optional[ReferenceSite],
@@ -293,12 +281,10 @@ class SimpleCallTranslator(object):
         )
         return annotated_alleles
 
-    @classmethod
-    def __get_full_call_filter(cls, direct_filter: SimpleCallFilter) -> FullCallFilter:
+    def __get_full_call_filter(self, direct_filter: SimpleCallFilter) -> FullCallFilter:
         return FullCallFilter[direct_filter.name]
 
-    @classmethod
-    def __assert_rs_id_call_matches_info(cls, rs_ids_call: Tuple[str, ...], rs_ids_info: Tuple[str, ...]) -> None:
+    def __assert_rs_id_call_matches_info(self, rs_ids_call: Tuple[str, ...], rs_ids_info: Tuple[str, ...]) -> None:
         if rs_ids_call != tuple() and rs_ids_call != rs_ids_info:
             # TODO: make this more flexible, if necessary
             error_msg = (
@@ -306,8 +292,7 @@ class SimpleCallTranslator(object):
             )
             raise ValueError(error_msg)
 
-    @classmethod
-    def __assert_gene_in_panel(cls, gene: str, panel: Panel) -> None:
+    def __assert_gene_in_panel(self, gene: str, panel: Panel) -> None:
         if gene not in panel.get_genes():
             error_msg = f"Call for unknown gene:\ngene={gene}"
             raise ValueError(error_msg)

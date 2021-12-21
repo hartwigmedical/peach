@@ -35,10 +35,10 @@ def main(tool_config: ToolConfig) -> None:
 
     # Get data for patient
     logging.info("Reading call data from VCF")
-    vcf_call_data = VcfReader.get_call_data(tool_config, panel)
+    vcf_call_data = VcfReader().get_call_data(tool_config, panel)
 
     # Compute output from input data
-    pgx_analysis = PgxAnalyser.create_pgx_analysis(vcf_call_data, panel)
+    pgx_analysis = PgxAnalyser().create_pgx_analysis(vcf_call_data, panel)
 
     # Output
     logging.info("Creating output files")
@@ -60,7 +60,7 @@ def load_panel(panel_path: str) -> Panel:
     """Load manually annotated JSON panel file"""
     try:
         with open(panel_path, "r+", encoding="utf-8") as json_file:
-            return JsonParser.get_panel(json.load(json_file))
+            return JsonParser().get_panel(json.load(json_file))
     except IOError:
         raise FileNotFoundError(f"Panel file {panel_path} not found or cannot be opened.")
 
@@ -70,7 +70,7 @@ def print_calls_to_file(pgx_analysis: PgxAnalysis, tool_config: ToolConfig, pane
     if os.path.exists(calls_file):
         raise IOError(f"Calls output file {calls_file} already exists. Exiting.")
     with open(calls_file, "w") as f:
-        text = GenotypeReporter.get_calls_tsv_text(
+        text = GenotypeReporter().get_calls_tsv_text(
             pgx_analysis, panel_id, tool_config.tool_version, tool_config.vcf_reference_assembly
         )
         f.write(text)
@@ -83,11 +83,11 @@ def print_genotypes_to_file(pgx_analysis: PgxAnalysis, panel: Panel, tool_config
     if os.path.exists(genotype_file):
         raise IOError(f"Genotype output file {genotype_file} already exists. Exiting.")
     with open(genotype_file, "w") as f:
-        f.write(HaplotypeReporter.get_genotype_tsv_text(pgx_analysis, panel, tool_config.tool_version))
+        f.write(HaplotypeReporter().get_genotype_tsv_text(pgx_analysis, panel, tool_config.tool_version))
     if not os.path.exists(genotype_file):
         raise FileNotFoundError(f"Failed to write calls output file {genotype_file}")
 
 
 if __name__ == "__main__":
-    config = ArgumentParser.get_tool_config(sys.argv[1:])
+    config = ArgumentParser().get_tool_config(sys.argv[1:])
     main(config)

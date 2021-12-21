@@ -23,7 +23,7 @@ class TestPgxReporter(unittest.TestCase):
         pgx_analysis = PgxAnalysis(FullCallData(frozenset()), {})
         panel_id = "Panel_v0.2"
         version = "V1"
-        result = GenotypeReporter.get_calls_tsv_text(pgx_analysis, panel_id, version, ReferenceAssembly.V37)
+        result = GenotypeReporter().get_calls_tsv_text(pgx_analysis, panel_id, version, ReferenceAssembly.V37)
 
         result_expected = (
             "gene\tchromosome\tposition_v37\tposition_v38\tref_v37\tref_v38\t"
@@ -61,7 +61,7 @@ class TestPgxReporter(unittest.TestCase):
         pgx_analysis = PgxAnalysis(FullCallData(all_full_calls), {})
         panel_id = "Panel_v0.2"
         version = "V1"
-        result = GenotypeReporter.get_calls_tsv_text(pgx_analysis, panel_id, version, ReferenceAssembly.V37)
+        result = GenotypeReporter().get_calls_tsv_text(pgx_analysis, panel_id, version, ReferenceAssembly.V37)
 
         result_expected = (
             "gene\tchromosome\tposition_v37\tposition_v38\tref_v37\tref_v38\tallele1\tallele2\t"
@@ -105,7 +105,7 @@ class TestPgxReporter(unittest.TestCase):
         pgx_analysis = PgxAnalysis(FullCallData(all_full_calls), {})
         panel_id = "Panel_v0.2"
         version = "V1"
-        result = GenotypeReporter.get_calls_tsv_text(pgx_analysis, panel_id, version, ReferenceAssembly.V38)
+        result = GenotypeReporter().get_calls_tsv_text(pgx_analysis, panel_id, version, ReferenceAssembly.V38)
 
         result_expected = (
             "gene\tchromosome\tposition_v37\tposition_v38\tref_v37\tref_v38\tallele1\tallele2\t"
@@ -123,7 +123,7 @@ class TestPgxReporter(unittest.TestCase):
         pgx_analysis = PgxAnalysis(FullCallData(frozenset()), {})
         panel = get_empty_panel()
         version = "V1"
-        result = HaplotypeReporter.get_genotype_tsv_text(pgx_analysis, panel, version)
+        result = HaplotypeReporter().get_genotype_tsv_text(pgx_analysis, panel, version)
 
         result_expected = (
             "gene\thaplotype\tfunction\tlinked_drugs\turl_prescription_info\tpanel_version\trepo_version\thaplotype_only\tzygosity_only\n"
@@ -139,7 +139,7 @@ class TestPgxReporter(unittest.TestCase):
         pgx_analysis = PgxAnalysis(FullCallData(frozenset()), gene_to_haplotype_calls)
         panel = get_wide_example_panel()
         version = "V1"
-        result = HaplotypeReporter.get_genotype_tsv_text(pgx_analysis, panel, version)
+        result = HaplotypeReporter().get_genotype_tsv_text(pgx_analysis, panel, version)
 
         result_expected = (
             "gene\thaplotype\tfunction\tlinked_drugs\turl_prescription_info\tpanel_version\trepo_version\thaplotype_only\tzygosity_only\n"

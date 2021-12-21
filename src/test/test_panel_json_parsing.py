@@ -199,7 +199,7 @@ class TestPanelJsonParsing(unittest.TestCase):
                 }
             ]
         }
-        panel = JsonParser.get_panel(panel_json)
+        panel = JsonParser().get_panel(panel_json)
         panel_expected = self.__get_expected_panel()
 
         self.assertEqual(panel_expected, panel)
