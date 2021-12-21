@@ -1,18 +1,11 @@
 from typing import NamedTuple, List, Dict, Collection
 
-from base.json_alias import Json
 from base.util import get_key_to_multiple_values
 
 
 class DrugInfo(NamedTuple):
     name: str
     url_prescription_info: str
-
-    @classmethod
-    def from_json(cls, data: Json) -> "DrugInfo":
-        name = str(data["name"])
-        url_prescription_info = str(data["urlPrescriptionInfo"])
-        return DrugInfo(name, url_prescription_info)
 
 
 def assert_no_overlap_drug_names(drugs: Collection[DrugInfo], source_name: str) -> None:

@@ -7,6 +7,7 @@ from argument_parser import ArgumentParser
 from config.tool_config import ToolConfig
 from config.panel import Panel
 from analysis.pgx_analysis import PgxAnalyser, PgxAnalysis
+from json_parser import JsonParser
 from pgx_reporter import HaplotypeReporter, GenotypeReporter
 from vcf_reader import VcfReader
 
@@ -59,7 +60,7 @@ def load_panel(panel_path: str) -> Panel:
     """Load manually annotated JSON panel file"""
     try:
         with open(panel_path, "r+", encoding="utf-8") as json_file:
-            return Panel.from_json(json.load(json_file))
+            return JsonParser.get_panel(json.load(json_file))
     except IOError:
         raise FileNotFoundError(f"Panel file {panel_path} not found or cannot be opened.")
 

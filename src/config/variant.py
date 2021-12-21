@@ -1,18 +1,11 @@
 from typing import NamedTuple, Dict, List, Collection
 
-from base.json_alias import Json
 from base.util import get_key_to_multiple_values
 
 
 class Variant(NamedTuple):
     rs_id: str
     variant_allele: str
-
-    @classmethod
-    def from_json(cls, data: Json) -> "Variant":
-        rs_id = str(data["rsid"])
-        variant_allele = str(data["altAlleleV38"])
-        return Variant(rs_id, variant_allele)
 
 
 def assert_no_overlap_variant_rs_ids(variants: Collection[Variant], source_name: str) -> None:

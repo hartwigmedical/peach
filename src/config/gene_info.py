@@ -3,7 +3,6 @@ import logging
 from typing import List, Dict, Collection, FrozenSet, Optional
 
 from base.constants import NORMAL_FUNCTION_STRING
-from base.json_alias import Json
 from base.reference_assembly import ReferenceAssembly
 from base.util import get_key_to_multiple_values
 from config.annotation import Annotation
@@ -112,40 +111,6 @@ class GeneInfo(object):
     @property
     def drugs(self) -> FrozenSet[DrugInfo]:
         return self.__drugs
-
-    @classmethod
-    def from_json(cls, data: Json) -> "GeneInfo":
-        gene = str(data["gene"])
-        chromosome_v37 = str(data["chromosomeV37"])
-        chromosome_v38 = str(data["chromosomeV38"])
-        wild_type_haplotype = str(data["wildTypeHaplotype"])
-        transcript_id: Optional[str]
-        if "canonicalTranscript" in data.keys():
-            transcript_id = str(data["canonicalTranscript"])
-        else:
-            transcript_id = None
-        rs_id_infos = frozenset(
-            {
-                RsIdInfo.from_json(rs_id_info_json, chromosome_v37, chromosome_v38)
-                for rs_id_info_json in data["variants"]
-            }
-        )
-        haplotypes = frozenset({Haplotype.from_json(haplotype_json) for haplotype_json in data["haplotypes"]})
-        drugs = frozenset({DrugInfo.from_json(drug_json) for drug_json in data["drugs"]})
-        rs_id_to_ref_seq_difference_annotation_v38 = {
-            str(annotation_json["rsid"]): Annotation.from_json(annotation_json)
-            for annotation_json in data["refSeqDifferenceAnnotations"]
-        }
-        gene_info = GeneInfo(
-            gene,
-            wild_type_haplotype,
-            transcript_id,
-            haplotypes,
-            rs_id_infos,
-            drugs,
-            rs_id_to_ref_seq_difference_annotation_v38,
-        )
-        return gene_info
 
     def has_ref_sequence_difference_annotation(self, rs_id: str) -> bool:
         return rs_id in self.__rs_id_to_ref_seq_difference_annotation.keys()

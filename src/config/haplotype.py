@@ -1,6 +1,5 @@
 from typing import Collection, Dict, List, FrozenSet
 
-from base.json_alias import Json
 from base.util import get_key_to_multiple_values
 from config.variant import Variant, assert_no_overlap_variant_rs_ids
 
@@ -47,13 +46,6 @@ class Haplotype(object):
     @property
     def variants(self) -> FrozenSet[Variant]:
         return self.__variants
-
-    @classmethod
-    def from_json(cls, data: Json) -> "Haplotype":
-        name = str(data["haplotypeName"])
-        function = str(data["function"])
-        variants = frozenset({Variant.from_json(variant_json) for variant_json in data["haplotypeVariants"]})
-        return Haplotype(name, function, variants)
 
 
 def assert_no_overlap_haplotype_names(haplotypes: Collection[Haplotype], source_name: str) -> None:

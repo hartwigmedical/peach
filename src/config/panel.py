@@ -2,7 +2,6 @@ import itertools
 from typing import Set, FrozenSet
 
 from base.gene_coordinate import GeneCoordinate
-from base.json_alias import Json
 from base.reference_assembly import ReferenceAssembly
 from base.reference_site import ReferenceSite
 from call_data import SimpleCall
@@ -35,13 +34,6 @@ class Panel(object):
             f"gene_infos={self.__gene_infos!r}, "
             f")"
         )
-
-    @classmethod
-    def from_json(cls, data: Json) -> "Panel":
-        name = str(data["panelName"])
-        version = str(data["panelVersion"])
-        gene_infos = frozenset({GeneInfo.from_json(gene_info_json) for gene_info_json in data["genes"]})
-        return Panel(name, version, gene_infos)
 
     @property
     def name(self) -> str:
