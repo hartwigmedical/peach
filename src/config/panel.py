@@ -6,6 +6,7 @@ from base.reference_assembly import ReferenceAssembly
 from base.reference_site import ReferenceSite
 from call_data import SimpleCall
 from config.gene_info import GeneInfo, assert_no_overlap_gene_names
+from config.haplotype import Haplotype
 from config.rs_id_info import RsIdInfo
 
 
@@ -58,6 +59,12 @@ class Panel(object):
     def get_rs_ids_for_gene(self, gene: str) -> Set[str]:
         return self.__get_gene_info(gene).get_rs_ids()
 
+    def get_wild_type_haplotype_name(self, gene: str) -> str:
+        return self.__get_gene_info(gene).wild_type_haplotype_name
+
+    def get_haplotypes(self, gene: str) -> Set[Haplotype]:
+        return set(self.__get_gene_info(gene).haplotypes)
+
     def has_ref_seq_difference_annotation(
         self, gene: str, reference_site: ReferenceSite, reference_assembly: ReferenceAssembly
     ) -> bool:
@@ -73,9 +80,6 @@ class Panel(object):
     ) -> str:
         rs_id = self.get_matching_rs_id_info(reference_site, reference_assembly).rs_id
         return self.__get_gene_info(gene).get_ref_sequence_difference_annotation(rs_id, reference_assembly.opposite())
-
-    def get_gene_infos(self) -> Set[GeneInfo]:
-        return set(self.__gene_infos)
 
     def contains_rs_id_with_start_coordinate(
         self, coordinate: GeneCoordinate, reference_assembly: ReferenceAssembly
