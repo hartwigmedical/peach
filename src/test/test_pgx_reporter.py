@@ -99,7 +99,7 @@ class TestPgxReporter(unittest.TestCase):
             ),
             FullCall(
                 ReferenceSite(GeneCoordinate("1", 5), "A"), ReferenceSite(GeneCoordinate("chr1", 25), "A"), ("G", "C"),
-                "DPYD", (".",), "25A>C;25A>G", FullCallFilter.PASS, "25A>C;25A>G", FullCallFilter.PASS,
+                "DPYD", tuple(), "25A>C;25A>G", FullCallFilter.PASS, "25A>C;25A>G", FullCallFilter.PASS,
             ),
             FullCall(
                 ReferenceSite(GeneCoordinate("1", 15), "C"), None, ("C", "CAG"),
@@ -143,7 +143,7 @@ class TestPgxReporter(unittest.TestCase):
             ),
             FullCall(
                 ReferenceSite(GeneCoordinate("1", 5), "A"), ReferenceSite(GeneCoordinate("chr1", 25), "A"), ("G", "C"),
-                "DPYD", (".",), "25A>C;25A>G", FullCallFilter.PASS, "25A>C;25A>G", FullCallFilter.PASS,
+                "DPYD", tuple(), "25A>C;25A>G", FullCallFilter.PASS, "25A>C;25A>G", FullCallFilter.PASS,
             ),
             FullCall(
                 None, ReferenceSite(GeneCoordinate("chr1", 35), "C"), ("C", "CAG"),

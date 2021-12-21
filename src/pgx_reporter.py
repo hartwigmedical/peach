@@ -53,6 +53,7 @@ class GenotypeReporter(object):
 
     TSV_SEPARATOR = "\t"
     RS_ID_SEPARATOR = ";"
+    RS_ID_EMPTY_INDICATOR = "."
 
     @classmethod
     def get_calls_tsv_text(
@@ -88,6 +89,11 @@ class GenotypeReporter(object):
                 position_v38 = cls.UNKNOWN_POSITION_STRING
                 reference_allele_v38 = cls.UNKNOWN_REF_ALLELE_STRING
 
+            if full_call.rs_ids:
+                rs_id_string = cls.RS_ID_SEPARATOR.join(full_call.rs_ids)
+            else:
+                rs_id_string = cls.RS_ID_EMPTY_INDICATOR
+
             line_data: Dict[str, Union[str, int]] = {
                 cls.GENE_COLUMN_NAME: full_call.gene,
                 cls.CHROMOSOME_V37_COLUMN_NAME: chromosome_v37,
@@ -98,7 +104,7 @@ class GenotypeReporter(object):
                 cls.REF_ALLELE_V38_COLUMN_NAME: reference_allele_v38,
                 cls.FIRST_ALLELE_COLUMN_NAME: sorted_alleles[0],
                 cls.SECOND_ALLELE_COLUMN_NAME: sorted_alleles[1],
-                cls.RS_IDS_COLUMN_NAME: cls.RS_ID_SEPARATOR.join(full_call.rs_ids),
+                cls.RS_IDS_COLUMN_NAME: rs_id_string,
                 cls.ANNOTATION_V37_COLUMN_NAME: full_call.variant_annotation_v37,
                 cls.FILTER_V37_COLUMN_NAME: full_call.filter_v37.name,
                 cls.ANNOTATION_V38_COLUMN_NAME: full_call.variant_annotation_v38,

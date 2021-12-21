@@ -26,6 +26,7 @@ class VcfReader(object):
     SAMPLE_FIELD_NAME = "samples"
 
     RS_ID_SEPARATOR = ";"
+    RS_ID_EMPTY_INDICATOR = "."
     CODING_VARIANT_ANNOTATION_PREFIX = "c."
     NON_CODING_VARIANT_ANNOTATION_PREFIX = "n."
 
@@ -182,6 +183,8 @@ class VcfReader(object):
         rs_ids_string = str(variants[cls.RS_IDS_FIELD_NAME][call_index])
         if cls.RS_ID_SEPARATOR in rs_ids_string:
             return tuple(str(rs) for rs in rs_ids_string.split(cls.RS_ID_SEPARATOR) if rs.startswith("rs"))
+        elif rs_ids_string == cls.RS_ID_EMPTY_INDICATOR:
+            return tuple()
         else:
             return (str(rs_ids_string),)
 

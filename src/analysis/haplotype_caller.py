@@ -140,6 +140,6 @@ class HaplotypeCaller(object):
         if len(call.rs_ids) < 1:
             error_msg = f"Call has zero rs ids: call={call}"
             raise ValueError(error_msg)
-        if call.rs_ids[0] == ".":
+        if call.rs_ids == tuple():
             error_msg = f"Call has unknown rs id: call={call}"
             raise ValueError(error_msg)

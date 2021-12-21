@@ -41,7 +41,7 @@ class SimpleCallTranslator(object):
         # assume ref call when no call is found. Set filter to NO_CALL
         reference_assembly = simple_call_data.reference_assembly
 
-        rs_ids_found_in_patient = {rs_id for call in simple_call_data.calls for rs_id in call.rs_ids if rs_id != "."}
+        rs_ids_found_in_patient = {rs_id for call in simple_call_data.calls for rs_id in call.rs_ids}
         ref_coordinates_covered_by_found_calls = {
             coordinate
             for call in simple_call_data.calls
@@ -79,15 +79,14 @@ class SimpleCallTranslator(object):
             full_call = cls.__get_full_call_from_simple_call(simple_call, panel, simple_call_data.reference_assembly)
 
             for rs_id in full_call.rs_ids:
-                if rs_id != ".":
-                    if rs_id in handled_rs_ids:
-                        error_msg = (
-                            f"Call for rs id that has already been handled:\n"
-                            f"call={simple_call}\n"
-                            f"handled_rs_ids={handled_rs_ids}"
-                        )
-                        raise ValueError(error_msg)
-                    handled_rs_ids.add(rs_id)
+                if rs_id in handled_rs_ids:
+                    error_msg = (
+                        f"Call for rs id that has already been handled:\n"
+                        f"call={simple_call}\n"
+                        f"handled_rs_ids={handled_rs_ids}"
+                    )
+                    raise ValueError(error_msg)
+                handled_rs_ids.add(rs_id)
 
             if full_call.reference_site_v37 is not None:
                 relevant_v37_coordinates = full_call.reference_site_v37.get_covered_coordinates()
@@ -165,7 +164,7 @@ class SimpleCallTranslator(object):
         cls, call: SimpleCall, panel: Panel, reference_assembly: ReferenceAssembly
     ) -> SimpleCall:
         rs_ids: Tuple[str, ...]
-        if call.rs_ids == (".",) and panel.contains_rs_id_matching_call(call, reference_assembly):
+        if call.rs_ids == tuple() and panel.contains_rs_id_matching_call(call, reference_assembly):
             rs_id_info = panel.get_matching_rs_id_info(call.reference_site, reference_assembly)
             rs_ids = (rs_id_info.rs_id,)
             new_simple_call = SimpleCall(
@@ -299,7 +298,7 @@ class SimpleCallTranslator(object):
 
     @classmethod
     def __assert_rs_id_call_matches_info(cls, rs_ids_call: Tuple[str, ...], rs_ids_info: Tuple[str, ...]) -> None:
-        if rs_ids_call != (".",) and rs_ids_call != rs_ids_info:
+        if rs_ids_call != tuple() and rs_ids_call != rs_ids_info:
             # TODO: make this more flexible, if necessary
             error_msg = (
                 f"Given rs id does not match rs id from panel: from call={rs_ids_call}, from panel={rs_ids_info}"

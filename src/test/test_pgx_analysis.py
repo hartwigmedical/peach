@@ -239,7 +239,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 "FAKE2", ("rs1212127",), "1324C>T", SimpleCallFilter.PASS),
             SimpleCall(
                 ReferenceSite(GeneCoordinate("1", 97915621), "TG"), ("TC", "TC"),
-                "DPYD", (".",), "6744CA>GA", SimpleCallFilter.PASS),
+                "DPYD", tuple(), "6744CA>GA", SimpleCallFilter.PASS),
             SimpleCall(
                 ReferenceSite(GeneCoordinate("1", 97915614), "C"), ("C", "C"),
                 "DPYD", ("rs3918290",), "REF_CALL", SimpleCallFilter.PASS),
@@ -697,7 +697,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 "FAKE", ("rs1212125",), "1005T>C", SimpleCallFilter.PASS),
             SimpleCall(
                 ReferenceSite(GeneCoordinate("1", 2488242), "AC"), ("AC", "AG"),
-                "DPYD", (".",), "9213CT>GT", SimpleCallFilter.PASS),  # unknown
+                "DPYD", tuple(), "9213CT>GT", SimpleCallFilter.PASS),  # unknown
         }), ReferenceAssembly.V37)
         pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
 
@@ -706,7 +706,7 @@ class TestPgxAnalysis(unittest.TestCase):
         all_full_calls_expected = frozenset({
             FullCall(
                 ReferenceSite(GeneCoordinate("1", 2488242), "AC"), None,
-                ("AC", "AG"), "DPYD", (".",),
+                ("AC", "AG"), "DPYD", tuple(),
                 "9213CT>GT", FullCallFilter.PASS, "9213CT>GT?", FullCallFilter.UNKNOWN,
             ),
             FullCall(
@@ -760,7 +760,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 "FAKE", ("rs1212125",), "1005T>C", SimpleCallFilter.PASS),
             SimpleCall(
                 ReferenceSite(GeneCoordinate("chr1", 2488242), "AC"), ("AC", "AG"),
-                "DPYD", (".",), "9213CT>GT", SimpleCallFilter.PASS),  # unknown
+                "DPYD", tuple(), "9213CT>GT", SimpleCallFilter.PASS),  # unknown
         }), ReferenceAssembly.V38)
         pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
 
@@ -769,7 +769,7 @@ class TestPgxAnalysis(unittest.TestCase):
         all_full_calls_expected = frozenset({
             FullCall(
                 None, ReferenceSite(GeneCoordinate("chr1", 2488242), "AC"),
-                ("AC", "AG"), "DPYD", (".",),
+                ("AC", "AG"), "DPYD", tuple(),
                 "9213CT>GT?", FullCallFilter.UNKNOWN, "9213CT>GT", FullCallFilter.PASS,
             ),
             FullCall(
@@ -1134,7 +1134,7 @@ class TestPgxAnalysis(unittest.TestCase):
         simple_call_data = SimpleCallData(frozenset({
             SimpleCall(
                 ReferenceSite(GeneCoordinate("chr1", 97450057), "GC"), ("CT", "CT"),
-                "DPYD", (".",), "9212GC>CT", SimpleCallFilter.PASS),  # unknown
+                "DPYD", tuple(), "9212GC>CT", SimpleCallFilter.PASS),  # unknown
             SimpleCall(
                 ReferenceSite(GeneCoordinate("chr1", 97515839), "T"), ("C", "C"),
                 "DPYD", ("rs1801159",), "293T>C", SimpleCallFilter.PASS),
@@ -1148,7 +1148,7 @@ class TestPgxAnalysis(unittest.TestCase):
         all_full_calls_expected = frozenset({
             FullCall(
                 None, ReferenceSite(GeneCoordinate("chr1", 97450057), "GC"),
-                ("CT", "CT"), "DPYD", (".",),
+                ("CT", "CT"), "DPYD", tuple(),
                 "9212GC>CT?", FullCallFilter.UNKNOWN, "9212GC>CT", FullCallFilter.PASS,
             ),
             FullCall(
@@ -1174,7 +1174,7 @@ class TestPgxAnalysis(unittest.TestCase):
         simple_call_data = SimpleCallData(frozenset({
             SimpleCall(
                 ReferenceSite(GeneCoordinate("1", 97915614), "CG"), ("TC", "TC"),
-                "DPYD", (".",), "9212CG>TC", SimpleCallFilter.PASS),  # unknown
+                "DPYD", tuple(), "9212CG>TC", SimpleCallFilter.PASS),  # unknown
             SimpleCall(
                 ReferenceSite(GeneCoordinate("1", 97981395), "T"), ("C", "C"),
                 "DPYD", ("rs1801159",), "293T>C", SimpleCallFilter.PASS),
@@ -1188,7 +1188,7 @@ class TestPgxAnalysis(unittest.TestCase):
         all_full_calls_expected = frozenset({
             FullCall(
                 ReferenceSite(GeneCoordinate("1", 97915614), "CG"), None,
-                ("TC", "TC"), "DPYD", (".",),
+                ("TC", "TC"), "DPYD", tuple(),
                 "9212CG>TC", FullCallFilter.PASS, "9212CG>TC?", FullCallFilter.UNKNOWN,
             ),
             FullCall(
@@ -1363,9 +1363,9 @@ class TestPgxAnalysis(unittest.TestCase):
         panel = self.__get_wide_example_panel()
         simple_call_data = SimpleCallData(frozenset({
             SimpleCall(ReferenceSite(GeneCoordinate("16", 97915617), "C"), ("C", "T"),
-                       "FAKE2", (".",), "1324C>T", SimpleCallFilter.PASS),
+                       "FAKE2", tuple(), "1324C>T", SimpleCallFilter.PASS),
             SimpleCall(ReferenceSite(GeneCoordinate("1", 97915621), "TG"), ("TG", "TC"),
-                       "DPYD", (".",), "6744CA>GA", SimpleCallFilter.PASS),
+                       "DPYD", tuple(), "6744CA>GA", SimpleCallFilter.PASS),
         }), ReferenceAssembly.V37)
         pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
 
@@ -1414,9 +1414,9 @@ class TestPgxAnalysis(unittest.TestCase):
         panel = self.__get_wide_example_panel()
         simple_call_data = SimpleCallData(frozenset({
             SimpleCall(ReferenceSite(GeneCoordinate("chr16", 97450060), "T"), ("C", "T"),
-                       "FAKE2", (".",), "1324T>C", SimpleCallFilter.PASS),
+                       "FAKE2", tuple(), "1324T>C", SimpleCallFilter.PASS),
             SimpleCall(ReferenceSite(GeneCoordinate("chr1", 97450065), "TC"), ("TG", "TC"),
-                       "DPYD", (".",), "6744GA>CA", SimpleCallFilter.PASS),
+                       "DPYD", tuple(), "6744GA>CA", SimpleCallFilter.PASS),
         }), ReferenceAssembly.V38)
         pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
 
@@ -1574,7 +1574,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 "DPYD", ("rs3918290",), "9212C>T", SimpleCallFilter.PASS),
             SimpleCall(
                 ReferenceSite(GeneCoordinate("chr1", 97450058), "CG"), ("CG", "TC"),
-                "DPYD", (".",), "9212CG>TC", SimpleCallFilter.PASS),  # unknown
+                "DPYD", tuple(), "9212CG>TC", SimpleCallFilter.PASS),  # unknown
             SimpleCall(
                 ReferenceSite(GeneCoordinate("chr1", 97515839), "T"), ("C", "C"),
                 "DPYD", ("rs1801159",), "293T>C", SimpleCallFilter.PASS),
@@ -1593,7 +1593,7 @@ class TestPgxAnalysis(unittest.TestCase):
             ),
             FullCall(
                 None, ReferenceSite(GeneCoordinate("chr1", 97450058), "CG"),
-                ("CG", "TC"), "DPYD", (".",),
+                ("CG", "TC"), "DPYD", tuple(),
                 "9212CG>TC?", FullCallFilter.UNKNOWN, "9212CG>TC", FullCallFilter.PASS,
             ),
             FullCall(
@@ -1625,7 +1625,7 @@ class TestPgxAnalysis(unittest.TestCase):
                 "DPYD", ("rs72549303",), "6744CA>GT", SimpleCallFilter.PASS),
             SimpleCall(
                 ReferenceSite(GeneCoordinate("1", 97915622), "G"), ("C", "C"),
-                "DPYD", (".",), "6744C>G", SimpleCallFilter.PASS),  # unknown
+                "DPYD", tuple(), "6744C>G", SimpleCallFilter.PASS),  # unknown
         }), ReferenceAssembly.V37)
         pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
 
@@ -1643,7 +1643,7 @@ class TestPgxAnalysis(unittest.TestCase):
             ),
             FullCall(
                 ReferenceSite(GeneCoordinate("1", 97915622), "G"), None,
-                ("C", "C"), "DPYD", (".",),
+                ("C", "C"), "DPYD", tuple(),
                 "6744C>G", FullCallFilter.PASS, "6744C>G?", FullCallFilter.UNKNOWN,
             ),
             FullCall(
