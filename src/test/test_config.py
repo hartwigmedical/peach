@@ -75,6 +75,7 @@ class TestLoadConfig(unittest.TestCase):
         dpyd_gene_info_expected = GeneInfo(
             "DPYD",
             "*1",
+            "ENST00000370192",
             dpyd_haplotypes_expected,
             dpyd_rs_id_infos_expected,
             dpyd_drugs_expected,
@@ -104,6 +105,7 @@ class TestLoadConfig(unittest.TestCase):
         fake_gene_info_expected = GeneInfo(
             "FAKE",
             "*1",
+            None,
             fake_haplotypes_expected,
             fake_rs_id_infos_expected,
             fake_drugs_expected,
@@ -133,6 +135,7 @@ class TestLoadConfig(unittest.TestCase):
         fake2_gene_info_expected = GeneInfo(
             "FAKE2",
             "*1",
+            None,
             fake2_haplotypes_expected,
             fake2_rs_id_infos_expected,
             fake2_drugs_expected,
@@ -201,9 +204,25 @@ class TestLoadConfig(unittest.TestCase):
             ]
         )
 
-        GeneInfo(gene, reference_haplotype_name, haplotypes1, rs_id_infos, drugs, rs_id_to_ref_seq_diff_annotation)
+        GeneInfo(
+            gene,
+            reference_haplotype_name,
+            None,
+            haplotypes1,
+            rs_id_infos,
+            drugs,
+            rs_id_to_ref_seq_diff_annotation,
+        )
         with self.assertRaises(ValueError):
-            GeneInfo(gene, reference_haplotype_name, haplotypes2, rs_id_infos, drugs, rs_id_to_ref_seq_diff_annotation)
+            GeneInfo(
+                gene,
+                reference_haplotype_name,
+                None,
+                haplotypes2,
+                rs_id_infos,
+                drugs,
+                rs_id_to_ref_seq_diff_annotation,
+            )
 
     def test_gene_info_with_overlapping_haplotype_variants(self) -> None:
         """Error when different haplotypes have the exact same variant combination"""
@@ -254,9 +273,25 @@ class TestLoadConfig(unittest.TestCase):
             ]
         )
 
-        GeneInfo(gene, reference_haplotype_name, haplotypes1, rs_id_infos, drugs, rs_id_to_ref_seq_diff_annotation)
+        GeneInfo(
+            gene,
+            reference_haplotype_name,
+            None,
+            haplotypes1,
+            rs_id_infos,
+            drugs,
+            rs_id_to_ref_seq_diff_annotation,
+        )
         with self.assertRaises(ValueError):
-            GeneInfo(gene, reference_haplotype_name, haplotypes2, rs_id_infos, drugs, rs_id_to_ref_seq_diff_annotation)
+            GeneInfo(
+                gene,
+                reference_haplotype_name,
+                None,
+                haplotypes2,
+                rs_id_infos,
+                drugs,
+                rs_id_to_ref_seq_diff_annotation,
+            )
 
     def test_gene_info_with_overlapping_drug_names(self) -> None:
         """Error when drug name used multiple times for gene"""
@@ -271,11 +306,12 @@ class TestLoadConfig(unittest.TestCase):
         drugs = frozenset([drug_info1])
         overlapping_drugs = frozenset([drug_info1, drug_info2])
 
-        GeneInfo(gene, reference_haplotype_name, haplotypes, rs_id_infos, drugs, rs_id_to_ref_seq_diff_annotation)
+        GeneInfo(gene, reference_haplotype_name, None, haplotypes, rs_id_infos, drugs, rs_id_to_ref_seq_diff_annotation)
         with self.assertRaises(ValueError):
             GeneInfo(
                 gene,
                 reference_haplotype_name,
+                None,
                 haplotypes,
                 rs_id_infos,
                 overlapping_drugs,
@@ -305,11 +341,20 @@ class TestLoadConfig(unittest.TestCase):
         single_rs_id_info = frozenset([rs_id_info1])
         overlapping_rs_id_infos = frozenset([rs_id_info1, rs_id_info2])
 
-        GeneInfo(gene, reference_haplotype_name, haplotypes, single_rs_id_info, drugs, rs_id_to_ref_seq_diff_annotation)
+        GeneInfo(
+            gene,
+            reference_haplotype_name,
+            None,
+            haplotypes,
+            single_rs_id_info,
+            drugs,
+            rs_id_to_ref_seq_diff_annotation,
+        )
         with self.assertRaises(ValueError):
             GeneInfo(
                 gene,
                 reference_haplotype_name,
+                None,
                 haplotypes,
                 overlapping_rs_id_infos,
                 drugs,
@@ -353,6 +398,7 @@ class TestLoadConfig(unittest.TestCase):
         GeneInfo(
             gene,
             reference_haplotype_name,
+            None,
             haplotypes,
             frozenset([rs_id_info1]),
             drugs,
@@ -361,6 +407,7 @@ class TestLoadConfig(unittest.TestCase):
         GeneInfo(
             gene,
             reference_haplotype_name,
+            None,
             haplotypes,
             frozenset([rs_id_info2]),
             drugs,
@@ -369,6 +416,7 @@ class TestLoadConfig(unittest.TestCase):
         GeneInfo(
             gene,
             reference_haplotype_name,
+            None,
             haplotypes,
             frozenset([rs_id_info3]),
             drugs,
@@ -377,6 +425,7 @@ class TestLoadConfig(unittest.TestCase):
         GeneInfo(
             gene,
             reference_haplotype_name,
+            None,
             haplotypes,
             frozenset([rs_id_info4]),
             drugs,
@@ -386,6 +435,7 @@ class TestLoadConfig(unittest.TestCase):
             GeneInfo(
                 gene,
                 reference_haplotype_name,
+                None,
                 haplotypes,
                 frozenset([rs_id_info1, rs_id_info2]),
                 drugs,
@@ -395,6 +445,7 @@ class TestLoadConfig(unittest.TestCase):
             GeneInfo(
                 gene,
                 reference_haplotype_name,
+                None,
                 haplotypes,
                 frozenset([rs_id_info1, rs_id_info3]),
                 drugs,
@@ -404,6 +455,7 @@ class TestLoadConfig(unittest.TestCase):
             GeneInfo(
                 gene,
                 reference_haplotype_name,
+                None,
                 haplotypes,
                 frozenset([rs_id_info1, rs_id_info2, rs_id_info3, rs_id_info4]),
                 drugs,
@@ -421,11 +473,20 @@ class TestLoadConfig(unittest.TestCase):
         empty_haplotypes: FrozenSet[Haplotype] = frozenset()
         non_empty_haplotypes = frozenset([Haplotype("*2", "No Function", frozenset([Variant("rs238423", "A")]))])
 
-        GeneInfo(gene, reference_haplotype_name, empty_haplotypes, rs_id_infos, drugs, rs_id_to_ref_seq_diff_annotation)
+        GeneInfo(
+            gene,
+            reference_haplotype_name,
+            None,
+            empty_haplotypes,
+            rs_id_infos,
+            drugs,
+            rs_id_to_ref_seq_diff_annotation,
+        )
         with self.assertRaises(ValueError):
             GeneInfo(
                 gene,
                 reference_haplotype_name,
+                None,
                 non_empty_haplotypes,
                 rs_id_infos,
                 drugs,
@@ -464,9 +525,25 @@ class TestLoadConfig(unittest.TestCase):
             ]
         )
 
-        GeneInfo(gene, reference_haplotype_name, haplotypes, rs_id_infos1, drugs, rs_id_to_ref_seq_diff_annotation)
+        GeneInfo(
+            gene,
+            reference_haplotype_name,
+            None,
+            haplotypes,
+            rs_id_infos1,
+            drugs,
+            rs_id_to_ref_seq_diff_annotation,
+        )
         with self.assertRaises(ValueError):
-            GeneInfo(gene, reference_haplotype_name, haplotypes, rs_id_infos2, drugs, rs_id_to_ref_seq_diff_annotation)
+            GeneInfo(
+                gene,
+                reference_haplotype_name,
+                None,
+                haplotypes,
+                rs_id_infos2,
+                drugs,
+                rs_id_to_ref_seq_diff_annotation,
+            )
 
     def test_gene_info_with_ref_seq_difference_without_annotation(self) -> None:
         """Error when a ref seq difference does not have an annotation"""
@@ -486,11 +563,20 @@ class TestLoadConfig(unittest.TestCase):
         empty_rs_id_infos: FrozenSet[RsIdInfo] = frozenset()
         non_empty_rs_id_infos = frozenset([rs_id_info])
 
-        GeneInfo(gene, reference_haplotype_name, haplotypes, empty_rs_id_infos, drugs, rs_id_to_ref_seq_diff_annotation)
+        GeneInfo(
+            gene,
+            reference_haplotype_name,
+            "ENST000000384893",
+            haplotypes,
+            empty_rs_id_infos,
+            drugs,
+            rs_id_to_ref_seq_diff_annotation,
+        )
         with self.assertRaises(ValueError):
             GeneInfo(
                 gene,
                 reference_haplotype_name,
+                "ENST000000384893",
                 haplotypes,
                 non_empty_rs_id_infos,
                 drugs,
@@ -508,11 +594,20 @@ class TestLoadConfig(unittest.TestCase):
         empty_rs_id_to_ref_seq_diff_annotation: Dict[str, Annotation] = dict()
         non_empty_rs_id_to_ref_seq_diff_annotation = {"rs2493023": Annotation("3445T>A", "3445A>T")}
 
-        GeneInfo(gene, reference_haplotype_name, haplotypes, rs_id_infos, drugs, empty_rs_id_to_ref_seq_diff_annotation)
+        GeneInfo(
+            gene,
+            reference_haplotype_name,
+            "ENST000000384893",
+            haplotypes,
+            rs_id_infos,
+            drugs,
+            empty_rs_id_to_ref_seq_diff_annotation,
+        )
         with self.assertRaises(ValueError):
             GeneInfo(
                 gene,
                 reference_haplotype_name,
+                "ENST000000384893",
                 haplotypes,
                 rs_id_infos,
                 drugs,
@@ -561,6 +656,7 @@ class TestLoadConfig(unittest.TestCase):
         gene_info1 = GeneInfo(
             gene1,
             reference_haplotype_name,
+            None,
             haplotypes,
             rs_id_infos,
             drugs,
@@ -569,6 +665,7 @@ class TestLoadConfig(unittest.TestCase):
         gene_info2 = GeneInfo(
             gene2,
             reference_haplotype_name,
+            None,
             haplotypes,
             rs_id_infos,
             drugs,
@@ -577,6 +674,7 @@ class TestLoadConfig(unittest.TestCase):
         gene_info3 = GeneInfo(
             gene1,
             other_reference_haplotype_name,
+            None,
             haplotypes,
             rs_id_infos,
             drugs,
@@ -626,6 +724,7 @@ class TestLoadConfig(unittest.TestCase):
         gene_info1 = GeneInfo(
             gene1,
             reference_haplotype_name,
+            None,
             haplotypes,
             rs_id_infos1,
             drugs,
@@ -634,6 +733,7 @@ class TestLoadConfig(unittest.TestCase):
         gene_info2 = GeneInfo(
             gene2,
             reference_haplotype_name,
+            None,
             haplotypes,
             rs_id_infos2,
             drugs,
@@ -642,6 +742,7 @@ class TestLoadConfig(unittest.TestCase):
         gene_info3 = GeneInfo(
             gene2,
             reference_haplotype_name,
+            None,
             haplotypes,
             rs_id_infos3,
             drugs,

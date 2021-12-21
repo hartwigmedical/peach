@@ -67,15 +67,15 @@ class TestPgxAnalysis(unittest.TestCase):
         fake2_rs_id_to_ref_seq_difference_annotations = {"rs1212127": Annotation("1324C>T", "1324T>C")}
 
         dpyd_gene_info = GeneInfo(
-            "DPYD", "*1", dpyd_haplotypes, dpyd_rs_id_infos,
+            "DPYD", "*1", "ENST00000370192", dpyd_haplotypes, dpyd_rs_id_infos,
             dpyd_drugs, dpyd_rs_id_to_ref_seq_difference_annotations,
         )
         fake_gene_info = GeneInfo(
-            "FAKE", "*1", fake_haplotypes, fake_rs_id_infos,
+            "FAKE", "*1", None, fake_haplotypes, fake_rs_id_infos,
             fake_drugs, fake_rs_id_to_ref_seq_difference_annotations,
         )
         fake2_gene_info = GeneInfo(
-            "FAKE2", "*1", fake2_haplotypes, fake2_rs_id_infos,
+            "FAKE2", "*1", None, fake2_haplotypes, fake2_rs_id_infos,
             fake2_drugs, fake2_rs_id_to_ref_seq_difference_annotations,
         )
         gene_infos = frozenset({dpyd_gene_info, fake_gene_info, fake2_gene_info})
@@ -132,7 +132,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
         gene_infos = frozenset({
             GeneInfo(
-                "DPYD", "*1", included_dpyd_haplotypes, included_dpyd_rs_id_infos,
+                "DPYD", "*1", "ENST00000370192", included_dpyd_haplotypes, included_dpyd_rs_id_infos,
                 dpyd_drugs, dpyd_rs_id_to_difference_annotations,
             ),
         })
@@ -830,6 +830,30 @@ class TestPgxAnalysis(unittest.TestCase):
         all_simple_call_data = SimpleCallData(frozenset(good_calls.union({bad_call})), reference_assembly)
 
         PgxAnalyser.create_pgx_analysis(good_simple_call_data, panel)  # no error
+        with self.assertRaises(ValueError):
+            PgxAnalyser.create_pgx_analysis(all_simple_call_data, panel)
+
+    @unittest.skip("WIP")
+    def test_incorrect_gene(self) -> None:
+        """Variants that are assigned to an incorrect gene. Uses v37 input"""
+        panel = self.__get_wide_example_panel()
+        reference_assembly = ReferenceAssembly.V37
+
+        good_calls = {
+            SimpleCall(
+                ReferenceSite(GeneCoordinate("5", 97915617), "T"), ("T", "C"), "FAKE",
+                ("rs1212125",), "1005T>C", SimpleCallFilter.PASS),
+        }
+        bad_call = SimpleCall(
+            ReferenceSite(GeneCoordinate("3", 18473423), "T"), ("T", "C"), "DPYD",
+            ("rs2492932",), "12T>C", SimpleCallFilter.PASS,
+        )
+
+        good_simple_call_data = SimpleCallData(frozenset(good_calls), reference_assembly)
+        all_simple_call_data = SimpleCallData(frozenset(good_calls.union({bad_call})), reference_assembly)
+
+        PgxAnalyser.create_pgx_analysis(good_simple_call_data, panel)  # no error
+        print(PgxAnalyser.create_pgx_analysis(all_simple_call_data, panel))
         with self.assertRaises(ValueError):
             PgxAnalyser.create_pgx_analysis(all_simple_call_data, panel)
 

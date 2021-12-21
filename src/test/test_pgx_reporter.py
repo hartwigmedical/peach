@@ -68,11 +68,11 @@ class TestPgxReporter(unittest.TestCase):
         fake2_rs_id_to_difference_annotations = {"rs1212127": Annotation("1324C>T", "1324T>C")}
 
         gene_infos = frozenset({
-            GeneInfo("DPYD", "*1", dpyd_haplotypes, dpyd_rs_id_infos,
+            GeneInfo("DPYD", "*1", "ENST00000370192", dpyd_haplotypes, dpyd_rs_id_infos,
                      dpyd_drugs, dpyd_rs_id_to_difference_annotations),
-            GeneInfo("FAKE", "*1", fake_haplotypes, fake_rs_id_infos,
+            GeneInfo("FAKE", "*1", None, fake_haplotypes, fake_rs_id_infos,
                      fake_drugs, fake_rs_id_to_difference_annotations),
-            GeneInfo("FAKE2", "*1", fake2_haplotypes, fake2_rs_id_infos,
+            GeneInfo("FAKE2", "*1", None, fake2_haplotypes, fake2_rs_id_infos,
                      fake2_drugs, fake2_rs_id_to_difference_annotations),
         })
         name = "Panel"

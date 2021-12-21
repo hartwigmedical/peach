@@ -1,6 +1,6 @@
 import itertools
 import logging
-from typing import List, Dict, Collection, FrozenSet
+from typing import List, Dict, Collection, FrozenSet, Optional
 
 from base.constants import NORMAL_FUNCTION_STRING
 from base.json_alias import Json
@@ -23,6 +23,7 @@ class GeneInfo(object):
         self,
         gene: str,
         wild_type_haplotype_name: str,
+        transcript_id: Optional[str],
         haplotypes: FrozenSet[Haplotype],
         rs_id_infos: FrozenSet[RsIdInfo],
         drugs: FrozenSet[DrugInfo],
@@ -110,6 +111,11 @@ class GeneInfo(object):
         chromosome_v37 = str(data["chromosomeV37"])
         chromosome_v38 = str(data["chromosomeV38"])
         wild_type_haplotype = str(data["wildTypeHaplotype"])
+        transcript_id: Optional[str]
+        if "canonicalTranscript" in data.keys():
+            transcript_id = str(data["canonicalTranscript"])
+        else:
+            transcript_id = None
         rs_id_infos = frozenset(
             {
                 RsIdInfo.from_json(rs_id_info_json, chromosome_v37, chromosome_v38)
@@ -125,6 +131,7 @@ class GeneInfo(object):
         gene_info = GeneInfo(
             gene,
             wild_type_haplotype,
+            transcript_id,
             haplotypes,
             rs_id_infos,
             drugs,

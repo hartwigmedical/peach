@@ -7,6 +7,7 @@
       "chromosomeV37": "1",
       "chromosomeV38": "chr1",
       "wildTypeHaplotype": "*1",
+      "canonicalTranscript": "ENST00000370192",
       "haplotypes": [
         {
           "haplotypeName": "*2A",
