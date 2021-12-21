@@ -31,6 +31,7 @@ class GeneInfo(object):
         assert_no_overlap_haplotype_names(haplotypes, f"gene info for {gene}")
         assert_no_overlap_haplotype_variant_combinations(haplotypes, f"gene info for {gene}")
         assert_no_overlap_drug_names(drugs, f"GeneInfo json for {gene}")
+        self.__assert_rs_ids_all_different(rs_id_infos)
         self.__assert_rs_id_infos_compatible(rs_id_infos)
         self.__assert_rs_id_infos_match_chromosome(rs_id_infos, gene)
         self.__assert_info_exists_for_all_rs_ids_in_haplotypes(haplotypes, rs_id_infos)
@@ -211,6 +212,15 @@ class GeneInfo(object):
                     f"variant={variant}, rs_id_info={matching_rs_id_infos[0]}"
                 )
                 raise ValueError(error_msg)
+
+    @staticmethod
+    def __assert_rs_ids_all_different(rs_id_infos: FrozenSet[RsIdInfo]) -> None:
+        rs_ids = [info.rs_id for info in rs_id_infos]
+        if len(rs_ids) != len(set(rs_ids)):
+            error_msg = (
+                f"Not all rs ids are different: rs_ids={sorted(rs_ids)}"
+            )
+            raise ValueError(error_msg)
 
 
 def assert_no_overlap_gene_names(gene_infos: Collection[GeneInfo], source_name: str) -> None:

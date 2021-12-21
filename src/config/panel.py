@@ -13,6 +13,7 @@ from config.rs_id_info import RsIdInfo
 class Panel(object):
     def __init__(self, name: str, version: str, gene_infos: FrozenSet[GeneInfo]) -> None:
         assert_no_overlap_gene_names(gene_infos, "config json")
+        self.__assert_rs_ids_all_different(gene_infos)
         self.__assert_all_rs_id_infos_compatible(gene_infos)
 
         self.__name = name
@@ -164,3 +165,12 @@ class Panel(object):
                     if not left_info.is_compatible(right_info):
                         error_msg = f"Incompatible rs id infos in config. left: {left_info}, right: {right_info}"
                         raise ValueError(error_msg)
+
+    @staticmethod
+    def __assert_rs_ids_all_different(gene_infos: FrozenSet[GeneInfo]) -> None:
+        rs_ids = [rs_id_info.rs_id for gene_info in gene_infos for rs_id_info in gene_info.rs_id_infos]
+        if len(rs_ids) != len(set(rs_ids)):
+            error_msg = (
+                f"Not all rs ids are different: rs_ids={sorted(rs_ids)}"
+            )
+            raise ValueError(error_msg)
