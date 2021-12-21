@@ -54,8 +54,6 @@ class VcfReader(object):
     def __get_call_data_from_variants(
         cls, variants: Dict[str, Any], panel: Panel, sample_r_id: str, vcf_reference_assembly: ReferenceAssembly
     ) -> SimpleCallData:
-        match_on_rsid = 0
-        match_on_location = 0
         filtered_calls = set()
 
         total_variant_count = cls.__get_variant_count(variants)
@@ -65,20 +63,11 @@ class VcfReader(object):
                 # Ignore all calls with filter != PASS
                 continue
 
-            rs_id_match_to_panel_exists = cls.__rs_id_exists_in_panel(call_index, panel, variants)
-            coordinate_match_to_panel_exists = cls.__coordinates_of_call_overlap_with_panel_coordinates(
-                call_index, panel, variants, vcf_reference_assembly
-            )
-            if rs_id_match_to_panel_exists or coordinate_match_to_panel_exists:
-                if rs_id_match_to_panel_exists:
-                    match_on_rsid += 1
-                if coordinate_match_to_panel_exists:
-                    match_on_location += 1
-                filtered_calls.add(cls.__get_call_from_variants(call_index, sample_r_id, variants))
+            call = cls.__get_call_from_variants(call_index, sample_r_id, variants)
+            if panel.get_relevant_rs_ids(call, vcf_reference_assembly):
+                filtered_calls.add(call)
 
         logging.info(f"VCF calls QC-PASS and matching panel: {len(filtered_calls)}")
-        logging.info(f"VCF calls QC-PASS and matching panel on RS id: {match_on_rsid}")
-        logging.info(f"VCF calls QC-PASS and matching panel on location: {match_on_location}")
 
         return SimpleCallData(frozenset(filtered_calls), vcf_reference_assembly)
 
@@ -113,27 +102,6 @@ class VcfReader(object):
             SimpleCallFilter.PASS,
         )
         return call
-
-    @classmethod
-    def __coordinates_of_call_overlap_with_panel_coordinates(
-        cls, call_index: int, panel: Panel, variants: Dict[str, Any], vcf_reference_assembly: ReferenceAssembly
-    ) -> bool:
-        chromosome = cls.__get_chromosome_from_variants(call_index, variants)
-        position = cls.__get_position_from_variants(call_index, variants)
-        reference_allele = cls.__get_reference_allele_from_variants(call_index, variants)
-
-        reference_site = ReferenceSite(GeneCoordinate(chromosome, position), reference_allele)
-        coordinate_match_to_panel_exists = any(
-            panel.contains_rs_id_with_start_coordinate(coord, vcf_reference_assembly)
-            for coord in reference_site.get_covered_coordinates()
-        )
-        return coordinate_match_to_panel_exists
-
-    @classmethod
-    def __rs_id_exists_in_panel(cls, call_index: int, panel: Panel, variants: Dict[str, Any]) -> bool:
-        rs_ids = cls.__get_rs_ids_from_variants(call_index, variants)
-        rs_id_match_to_panel_exists = any(panel.contains_rs_id(rs_id) for rs_id in rs_ids)
-        return rs_id_match_to_panel_exists
 
     @classmethod
     def __get_called_alleles_from_variants(
