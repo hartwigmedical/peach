@@ -120,10 +120,31 @@ class SimpleCallTranslator(object):
     def __get_full_call_from_simple_call(
         self, simple_call: SimpleCall, panel: Panel, call_reference_assembly: ReferenceAssembly
     ) -> FullCall:
-        self.__assert_gene_in_panel(simple_call.gene, panel)
+        if panel.contains_rs_id_with_reference_site(simple_call.reference_site, call_reference_assembly):
+            # TODO: change this
+            matching_rs_id = panel.get_rs_id_with_reference_site(simple_call.reference_site, call_reference_assembly)
+            if matching_rs_id in simple_call.rs_ids:
+                rs_ids_tuple = simple_call.rs_ids
+            else:
+                rs_ids_tuple = tuple(list(simple_call.rs_ids) + [matching_rs_id])
 
-        complete_simple_call = self.__fill_in_rs_ids_if_needed(simple_call, panel, call_reference_assembly)
-        translation = self.__get_translation_to_other_assembly(complete_simple_call, panel, call_reference_assembly)
+            complete_simple_call = SimpleCall(
+                simple_call.reference_site,
+                simple_call.alleles,
+                simple_call.gene,
+                rs_ids_tuple,
+                simple_call.variant_annotation,
+                simple_call.filter,
+            )
+            translation = self.__get_translation_to_other_assembly(complete_simple_call, panel, call_reference_assembly)
+        else:
+            # TODO: change this
+            if any(panel.contains_rs_id(rs_id) for rs_id in simple_call.rs_ids):
+                error_msg = f"Rs id is in panel, but the call reference site does not match the panel reference site."
+                raise ValueError(error_msg)
+
+            complete_simple_call = simple_call
+            translation = self.__get_translation_to_other_assembly(complete_simple_call, panel, call_reference_assembly)
 
         if call_reference_assembly == ReferenceAssembly.V37:
             filter_v37 = self.__get_full_call_filter(complete_simple_call.filter)
@@ -153,26 +174,9 @@ class SimpleCallTranslator(object):
             )
         else:
             raise NotImplementedError(f"Unrecognized reference assembly: {call_reference_assembly}")
-        return full_call
 
-    def __fill_in_rs_ids_if_needed(
-        self, call: SimpleCall, panel: Panel, reference_assembly: ReferenceAssembly
-    ) -> SimpleCall:
-        rs_ids: Tuple[str, ...]
-        if call.rs_ids == tuple() and panel.contains_rs_id_matching_call(call, reference_assembly):
-            rs_id_info = panel.get_matching_rs_id_info(call.reference_site, reference_assembly)
-            rs_ids = (rs_id_info.rs_id,)
-            new_simple_call = SimpleCall(
-                call.reference_site,
-                call.alleles,
-                call.gene,
-                rs_ids,
-                call.variant_annotation,
-                call.filter,
-            )
-            return new_simple_call
-        else:
-            return call
+        self.__assert_gene_in_panel(full_call.gene, panel)
+        return full_call
 
     def __get_translation_to_other_assembly(
         self, call: SimpleCall, panel: Panel, call_reference_assembly: ReferenceAssembly

@@ -66,17 +66,39 @@ class Panel(object):
     def get_haplotypes(self, gene: str) -> Set[Haplotype]:
         return set(self.__get_gene_info(gene).haplotypes)
 
-    def get_relevant_rs_ids(self, call: SimpleCall, reference_assembly: ReferenceAssembly) -> Set[str]:
+    def is_relevant_to_panel(self, call: SimpleCall, reference_assembly: ReferenceAssembly) -> bool:
         covered_coordinates_call = call.reference_site.get_covered_coordinates()
-        relevant_rs_ids = set()
         for info in self.__get_rs_id_infos():
             rs_id_covered_coordinates = info.get_reference_site(reference_assembly).get_covered_coordinates()
             info_matches = (
                     rs_id_covered_coordinates.intersection(covered_coordinates_call) or info.rs_id in call.rs_ids
             )
             if info_matches:
-                relevant_rs_ids.add(info.rs_id)
-        return relevant_rs_ids
+                return True
+        return False
+
+    def contains_rs_id_with_reference_site(
+            self, reference_site: ReferenceSite, reference_assembly: ReferenceAssembly
+    ) -> bool:
+        for info in self.__get_rs_id_infos():
+            if info.get_reference_site(reference_assembly) == reference_site:
+                return True
+        return False
+
+    def get_rs_id_with_reference_site(
+            self, reference_site: ReferenceSite, reference_assembly: ReferenceAssembly
+    ) -> str:
+        matching_rs_ids = set()
+        for info in self.__get_rs_id_infos():
+            if info.get_reference_site(reference_assembly) == reference_site:
+                matching_rs_ids.add(info.rs_id)
+
+        if matching_rs_ids and len(matching_rs_ids) == 1:
+            return matching_rs_ids.pop()
+        elif not matching_rs_ids:
+            raise ValueError("No rs id infos match position and ref allele")
+        else:
+            raise ValueError("Multiple rs id infos match position and ref allele. This should be impossible.")
 
     def has_ref_seq_difference_annotation(
         self, gene: str, reference_site: ReferenceSite, reference_assembly: ReferenceAssembly
@@ -93,14 +115,6 @@ class Panel(object):
     ) -> str:
         rs_id = self.get_matching_rs_id_info(reference_site, reference_assembly).rs_id
         return self.__get_gene_info(gene).get_ref_sequence_difference_annotation(rs_id, reference_assembly.opposite())
-
-    def contains_rs_id_with_reference_site(
-        self, reference_site: ReferenceSite, reference_assembly: ReferenceAssembly
-    ) -> bool:
-        for info in self.__get_rs_id_infos():
-            if info.get_reference_site(reference_assembly) == reference_site:
-                return True
-        return False
 
     def contains_rs_id_matching_call(self, call: SimpleCall, reference_assembly: ReferenceAssembly) -> bool:
         if self.contains_rs_id_with_reference_site(call.reference_site, reference_assembly):

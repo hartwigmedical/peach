@@ -61,7 +61,7 @@ class VcfReader(object):
                 continue
 
             call = self.__get_call_from_variants(call_index, sample_r_id, variants)
-            if panel.get_relevant_rs_ids(call, vcf_reference_assembly):
+            if panel.is_relevant_to_panel(call, vcf_reference_assembly):
                 filtered_calls.add(call)
 
         logging.info(f"VCF calls QC-PASS and matching panel: {len(filtered_calls)}")
