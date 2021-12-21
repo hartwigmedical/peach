@@ -43,6 +43,12 @@ class Panel(object):
     def version(self) -> str:
         return self.__version
 
+    def get_drugs(self, gene: str) -> Set[str]:
+        return {drug_info.name for drug_info in self.__get_gene_info(gene).drugs}
+
+    def get_drug_prescription_url(self, gene: str, drug_name: str) -> str:
+        return self.__get_gene_info(gene).get_prescription_url(drug_name)
+
     def has_ref_seq_difference_annotation(
         self, gene: str, reference_site: ReferenceSite, reference_assembly: ReferenceAssembly
     ) -> bool:

@@ -129,6 +129,13 @@ class GeneInfo(object):
         else:
             return self.__get_haplotype(haplotype_name).function
 
+    def get_prescription_url(self, drug_name: str) -> str:
+        matching_drug_infos = [drug_info for drug_info in self.__drugs if drug_info.name == drug_name]
+        if len(matching_drug_infos) == 1:
+            return matching_drug_infos[0].url_prescription_info
+        else:
+            raise ValueError(f"Not exactly one matching drug info in panel for gene={self.gene}: drug_name={drug_name}")
+
     def __get_haplotype(self, haplotype_name: str) -> Haplotype:
         matching_haplotypes = [haplotype for haplotype in self.__haplotypes if haplotype.name == haplotype_name]
         assert len(matching_haplotypes) == 1, (

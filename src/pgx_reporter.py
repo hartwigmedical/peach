@@ -185,27 +185,23 @@ class HaplotypeReporter(object):
             f"From panel={sorted(list(panel.get_genes()))}"
         )
 
-        gene_to_drug_info = {}
-        for gene_info in panel.get_gene_infos():
-            sorted_drugs = sorted(
-                [drug for drug in gene_info.drugs], key=lambda info: (info.name, info.url_prescription_info)
-            )
-            gene_to_drug_info[gene_info.gene] = (
-                cls.DRUG_SEPARATOR.join([drug.name for drug in sorted_drugs]),
-                cls.DRUG_SEPARATOR.join([drug.url_prescription_info for drug in sorted_drugs]),
-            )
-
         header = cls.TSV_SEPARATOR.join(cls.GENOTYPE_TSV_COLUMNS)
         lines = [header]
         for gene in sorted(gene_to_haplotype_calls.keys()):
+            sorted_drugs = sorted(panel.get_drugs(gene))
+            combined_drugs_string = cls.DRUG_SEPARATOR.join(sorted_drugs)
+            combined_drug_urls_string = cls.DRUG_SEPARATOR.join(
+                panel.get_drug_prescription_url(gene, drug_name) for drug_name in sorted_drugs
+            )
+
             if gene_to_haplotype_calls[gene]:
                 for haplotype_call in sorted(gene_to_haplotype_calls[gene], key=lambda call: call.haplotype_name):
                     line_contents = [
                         gene,
                         f"{haplotype_call.haplotype_name}_{cls.__get_zygosity(haplotype_call)}",
                         panel.get_haplotype_function(gene, haplotype_call.haplotype_name),
-                        gene_to_drug_info[gene][0],
-                        gene_to_drug_info[gene][1],
+                        combined_drugs_string,
+                        combined_drug_urls_string,
                         panel.get_id(),
                         version,
                         haplotype_call.haplotype_name,
@@ -217,8 +213,8 @@ class HaplotypeReporter(object):
                     gene,
                     cls.UNRESOLVED_HAPLOTYPE_STRING,
                     UNKNOWN_FUNCTION_STRING,
-                    gene_to_drug_info[gene][0],
-                    gene_to_drug_info[gene][1],
+                    combined_drugs_string,
+                    combined_drug_urls_string,
                     panel.get_id(),
                     version,
                     cls.UNRESOLVED_HAPLOTYPE_STRING,
