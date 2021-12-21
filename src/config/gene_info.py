@@ -45,6 +45,7 @@ class GeneInfo(object):
 
         self.__gene = gene
         self.__wild_type_haplotype_name = wild_type_haplotype_name
+        self.__transcript_id = transcript_id
         self.__haplotypes = haplotypes
         self.__rs_id_infos = rs_id_infos
         self.__drugs = drugs
@@ -55,6 +56,7 @@ class GeneInfo(object):
             isinstance(other, GeneInfo)
             and self.__gene == other.__gene
             and self.__wild_type_haplotype_name == other.__wild_type_haplotype_name
+            and self.__transcript_id == other.__transcript_id
             and self.__haplotypes == other.__haplotypes
             and self.__rs_id_infos == other.__rs_id_infos
             and self.__drugs == other.__drugs
@@ -66,6 +68,7 @@ class GeneInfo(object):
             (
                 self.__gene,
                 self.__wild_type_haplotype_name,
+                self.__transcript_id,
                 self.__haplotypes,
                 self.__rs_id_infos,
                 self.__drugs,
@@ -78,6 +81,7 @@ class GeneInfo(object):
             f"GeneInfo("
             f"gene={self.__gene!r}, "
             f"wild_type_haplotype_name={self.__wild_type_haplotype_name!r}, "
+            f"transcript_id={self.__transcript_id!r}, "
             f"haplotypes={self.__haplotypes!r}, "
             f"rs_id_infos={self.__rs_id_infos!r}, "
             f"drugs={self.__drugs!r}, "
@@ -92,6 +96,10 @@ class GeneInfo(object):
     @property
     def wild_type_haplotype_name(self) -> str:
         return self.__wild_type_haplotype_name
+
+    @property
+    def transcript_id(self) -> Optional[str]:
+        return self.__transcript_id
 
     @property
     def haplotypes(self) -> FrozenSet[Haplotype]:
