@@ -15,70 +15,10 @@ from config.rs_id_info import RsIdInfo
 from config.variant import Variant
 from analysis.pgx_analysis import PgxAnalysis
 from pgx_reporter import GenotypeReporter, HaplotypeReporter
+from test.util_for_test import get_wide_example_panel, get_empty_panel
 
 
 class TestPgxReporter(unittest.TestCase):
-    @classmethod
-    def __get_example_panel(cls) -> Panel:
-        dpyd_two_a_variant = Variant("rs3918290", "T")
-        dpyd_two_b_variant = Variant("rs1801159", "C")
-        dpyd_three_variant = Variant("rs72549303", "TG")
-        fake_variant = Variant("rs1212125", "C")
-        fake2_variant = Variant("rs1212127", "C")
-
-        dpyd_haplotypes = frozenset({
-            Haplotype("*2A", "No Function", frozenset({dpyd_two_a_variant})),
-            Haplotype("*2B", "No Function", frozenset({dpyd_two_a_variant, dpyd_two_b_variant})),
-            Haplotype("*3", "Normal Function", frozenset({dpyd_three_variant})),
-        })
-        dpyd_rs_id_infos = frozenset({
-            RsIdInfo("rs3918290", ReferenceSite(GeneCoordinate("1", 97915614), "C"), ReferenceSite(GeneCoordinate("chr1", 97450058), "C")),
-            RsIdInfo("rs72549309", ReferenceSite(GeneCoordinate("1", 98205966), "GATGA"), ReferenceSite(GeneCoordinate("chr1", 97740410), "GATGA")),
-            RsIdInfo("rs1801159", ReferenceSite(GeneCoordinate("1", 97981395), "T"), ReferenceSite(GeneCoordinate("chr1", 97515839), "T")),
-            RsIdInfo("rs72549303", ReferenceSite(GeneCoordinate("1", 97915621), "TG"), ReferenceSite(GeneCoordinate("chr1", 97450065), "TC")),
-        })
-        dpyd_drugs = frozenset({
-            DrugInfo("5-Fluorouracil", "https://www.pharmgkb.org/chemical/PA128406956/guidelineAnnotation/PA166104939"),
-            DrugInfo("Capecitabine", "https://www.pharmgkb.org/chemical/PA448771/guidelineAnnotation/PA166104963"),
-        })
-        dpyd_rs_id_to_difference_annotations = {
-            "rs72549303": Annotation("6744CA>GA", "6744GA>CA"),
-        }
-
-        fake_haplotypes = frozenset({
-            Haplotype("*4A", "Reduced Function", frozenset({fake_variant})),
-        })
-        fake_rs_id_infos = frozenset({
-            RsIdInfo("rs1212125", ReferenceSite(GeneCoordinate("5", 97915617), "T"), ReferenceSite(GeneCoordinate("chr5", 97450060), "T")),
-        })
-        fake_drugs = frozenset({
-            DrugInfo("Aspirin", "https://www.pharmgkb.org/some_other_url"),
-        })
-        fake_rs_id_to_difference_annotations: Dict[str, Annotation] = {}
-
-        fake2_haplotypes = frozenset({
-            Haplotype("*4A", "Reduced Function", frozenset({fake2_variant})),
-        })
-        fake2_rs_id_infos = frozenset({
-            RsIdInfo("rs1212127", ReferenceSite(GeneCoordinate("16", 97915617), "C"), ReferenceSite(GeneCoordinate("chr16", 97450060), "T")),
-        })
-        fake2_drugs = frozenset({
-            DrugInfo("Aspirin", "https://www.pharmgkb.org/some_other_url"),
-        })
-        fake2_rs_id_to_difference_annotations = {"rs1212127": Annotation("1324C>T", "1324T>C")}
-
-        gene_infos = frozenset({
-            GeneInfo("DPYD", "*1", "ENST00000370192", dpyd_haplotypes, dpyd_rs_id_infos,
-                     dpyd_drugs, dpyd_rs_id_to_difference_annotations),
-            GeneInfo("FAKE", "*1", None, fake_haplotypes, fake_rs_id_infos,
-                     fake_drugs, fake_rs_id_to_difference_annotations),
-            GeneInfo("FAKE2", "*1", None, fake2_haplotypes, fake2_rs_id_infos,
-                     fake2_drugs, fake2_rs_id_to_difference_annotations),
-        })
-        name = "Panel"
-        version = "0.2"
-        return Panel(name, version, gene_infos)
-
     def test_genotype_reporter_empty(self) -> None:
         pgx_analysis = PgxAnalysis(FullCallData(frozenset()), {})
         panel_id = "Panel_v0.2"
@@ -181,7 +121,7 @@ class TestPgxReporter(unittest.TestCase):
 
     def test_haplotype_reporter_empty(self) -> None:
         pgx_analysis = PgxAnalysis(FullCallData(frozenset()), {})
-        panel = Panel("EmptyPanel", "0.3", frozenset())
+        panel = get_empty_panel()
         version = "V1"
         result = HaplotypeReporter.get_genotype_tsv_text(pgx_analysis, panel, version)
 
@@ -197,18 +137,18 @@ class TestPgxReporter(unittest.TestCase):
             "FAKE2": {HaplotypeCall("*1", 1), HaplotypeCall("*4A", 1)},
         }
         pgx_analysis = PgxAnalysis(FullCallData(frozenset()), gene_to_haplotype_calls)
-        panel = self.__get_example_panel()
+        panel = get_wide_example_panel()
         version = "V1"
         result = HaplotypeReporter.get_genotype_tsv_text(pgx_analysis, panel, version)
 
         result_expected = (
             "gene\thaplotype\tfunction\tlinked_drugs\turl_prescription_info\tpanel_version\trepo_version\thaplotype_only\tzygosity_only\n"
-            "DPYD\t*2A_HET\tNo Function\t5-Fluorouracil;Capecitabine\thttps://www.pharmgkb.org/chemical/PA128406956/guidelineAnnotation/PA166104939;https://www.pharmgkb.org/chemical/PA448771/guidelineAnnotation/PA166104963\tPanel_v0.2\tV1\t*2A\tHET\n"
-            "DPYD\t*2B_HOM\tNo Function\t5-Fluorouracil;Capecitabine\thttps://www.pharmgkb.org/chemical/PA128406956/guidelineAnnotation/PA166104939;https://www.pharmgkb.org/chemical/PA448771/guidelineAnnotation/PA166104963\tPanel_v0.2\tV1\t*2B\tHOM\n"
-            "DPYD\t*3_HET\tNormal Function\t5-Fluorouracil;Capecitabine\thttps://www.pharmgkb.org/chemical/PA128406956/guidelineAnnotation/PA166104939;https://www.pharmgkb.org/chemical/PA448771/guidelineAnnotation/PA166104963\tPanel_v0.2\tV1\t*3\tHET\n"
-            "FAKE\tUnresolved Haplotype\tUnknown Function\tAspirin\thttps://www.pharmgkb.org/some_other_url\tPanel_v0.2\tV1\tUnresolved Haplotype\tN/A\n"
-            "FAKE2\t*1_HET\tNormal Function\tAspirin\thttps://www.pharmgkb.org/some_other_url\tPanel_v0.2\tV1\t*1\tHET\n"
-            "FAKE2\t*4A_HET\tReduced Function\tAspirin\thttps://www.pharmgkb.org/some_other_url\tPanel_v0.2\tV1\t*4A\tHET\n"
+            "DPYD\t*2A_HET\tNo Function\t5-Fluorouracil;Capecitabine\thttps://www.pharmgkb.org/chemical/PA128406956/guidelineAnnotation/PA166104939;https://www.pharmgkb.org/chemical/PA448771/guidelineAnnotation/PA166104963\tWideTestPanel_v1.0\tV1\t*2A\tHET\n"
+            "DPYD\t*2B_HOM\tNo Function\t5-Fluorouracil;Capecitabine\thttps://www.pharmgkb.org/chemical/PA128406956/guidelineAnnotation/PA166104939;https://www.pharmgkb.org/chemical/PA448771/guidelineAnnotation/PA166104963\tWideTestPanel_v1.0\tV1\t*2B\tHOM\n"
+            "DPYD\t*3_HET\tNormal Function\t5-Fluorouracil;Capecitabine\thttps://www.pharmgkb.org/chemical/PA128406956/guidelineAnnotation/PA166104939;https://www.pharmgkb.org/chemical/PA448771/guidelineAnnotation/PA166104963\tWideTestPanel_v1.0\tV1\t*3\tHET\n"
+            "FAKE\tUnresolved Haplotype\tUnknown Function\tAspirin\thttps://www.pharmgkb.org/some_other_url\tWideTestPanel_v1.0\tV1\tUnresolved Haplotype\tN/A\n"
+            "FAKE2\t*1_HET\tNormal Function\tAspirin\thttps://www.pharmgkb.org/some_other_url\tWideTestPanel_v1.0\tV1\t*1\tHET\n"
+            "FAKE2\t*4A_HET\tReduced Function\tAspirin\thttps://www.pharmgkb.org/some_other_url\tWideTestPanel_v1.0\tV1\t*4A\tHET\n"
         )
         self.assertEqual(result_expected, result)
 

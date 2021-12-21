@@ -1,6 +1,6 @@
 {
-  "panelName": "fake_panel",
-  "panelVersion": "0.3",
+  "panelName": "WideTestPanel",
+  "panelVersion": "1.0",
   "genes": [
     {
       "gene": "DPYD",
@@ -72,23 +72,16 @@
           "rsid": "rs72549303",
           "referenceAlleleV37": "TG",
           "referenceAlleleV38": "TC"
-        },
-        {
-          "positionV37": "98348885",
-          "positionV38": "97883329",
-          "rsid": "rs1801265",
-          "referenceAlleleV37": "G",
-          "referenceAlleleV38": "A"
         }
       ],
       "drugs": [
         {
           "name": "5-Fluorouracil",
-          "urlPrescriptionInfo": "https://www.source_url.org/5-Fluorouracil"
+          "urlPrescriptionInfo": "https://www.pharmgkb.org/chemical/PA128406956/guidelineAnnotation/PA166104939"
         },
         {
           "name": "Capecitabine",
-          "urlPrescriptionInfo": "https://www.source_url.org/Capecitabine"
+          "urlPrescriptionInfo": "https://www.pharmgkb.org/chemical/PA448771/guidelineAnnotation/PA166104963"
         }
       ],
       "refSeqDifferenceAnnotations": [
@@ -96,11 +89,6 @@
           "rsid": "rs72549303",
           "annotationV37": "6744CA>GA",
           "annotationV38": "6744GA>CA"
-        },
-        {
-          "rsid": "rs1801265",
-          "annotationV37": "85C>T",
-          "annotationV38": "85T>C"
         }
       ]
     },
@@ -133,7 +121,7 @@
       "drugs": [
         {
           "name": "Aspirin",
-          "urlPrescriptionInfo": "https://www.source_url.org/Aspirin"
+          "urlPrescriptionInfo": "https://www.pharmgkb.org/some_other_url"
         }
       ],
       "refSeqDifferenceAnnotations": [
@@ -168,7 +156,7 @@
       "drugs": [
         {
           "name": "Aspirin",
-          "urlPrescriptionInfo": "https://www.source_url.org/Aspirin"
+          "urlPrescriptionInfo": "https://www.pharmgkb.org/some_other_url"
         }
       ],
       "refSeqDifferenceAnnotations": [

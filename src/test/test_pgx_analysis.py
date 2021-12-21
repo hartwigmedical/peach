@@ -14,135 +14,13 @@ from config.panel import Panel
 from config.rs_id_info import RsIdInfo
 from config.variant import Variant
 from analysis.pgx_analysis import PgxAnalyser, PgxAnalysis
+from test.util_for_test import get_wide_example_panel, get_narrow_example_panel
 
 
 class TestPgxAnalysis(unittest.TestCase):
-    @classmethod
-    def __get_wide_example_panel(cls) -> Panel:
-        dpyd_two_a_variant = Variant("rs3918290", "T")
-        dpyd_two_b_variant = Variant("rs1801159", "C")
-        dpyd_three_variant = Variant("rs72549303", "TG")
-        fake_variant = Variant("rs1212125", "C")
-        fake2_variant = Variant("rs1212127", "C")
-
-        dpyd_haplotypes = frozenset({
-            Haplotype("*2A", "No Function", frozenset({dpyd_two_a_variant})),
-            Haplotype("*2B", "No Function", frozenset({dpyd_two_a_variant, dpyd_two_b_variant})),
-            Haplotype("*3", "Normal Function", frozenset({dpyd_three_variant})),
-        })
-        dpyd_rs_id_infos = frozenset({
-            RsIdInfo("rs3918290", ReferenceSite(GeneCoordinate("1", 97915614), "C"), ReferenceSite(GeneCoordinate("chr1", 97450058), "C")),
-            RsIdInfo("rs72549309", ReferenceSite(GeneCoordinate("1", 98205966), "GATGA"), ReferenceSite(GeneCoordinate("chr1", 97740410), "GATGA")),
-            RsIdInfo("rs1801159", ReferenceSite(GeneCoordinate("1", 97981395), "T"), ReferenceSite(GeneCoordinate("chr1", 97515839), "T")),
-            RsIdInfo("rs72549303", ReferenceSite(GeneCoordinate("1", 97915621), "TG"), ReferenceSite(GeneCoordinate("chr1", 97450065), "TC")),
-        })
-        dpyd_drugs = frozenset({
-            DrugInfo("5-Fluorouracil", "https://www.pharmgkb.org/chemical/PA128406956/guidelineAnnotation/PA166104939"),
-            DrugInfo("Capecitabine", "https://www.pharmgkb.org/chemical/PA448771/guidelineAnnotation/PA166104963"),
-        })
-        dpyd_rs_id_to_ref_seq_difference_annotations = {
-            "rs72549303": Annotation("6744CA>GA", "6744GA>CA"),
-        }
-
-        fake_haplotypes = frozenset({
-            Haplotype("*4A", "Reduced Function", frozenset({fake_variant})),
-        })
-        fake_rs_id_infos = frozenset({
-            RsIdInfo("rs1212125", ReferenceSite(GeneCoordinate("5", 97915617), "T"), ReferenceSite(GeneCoordinate("chr5", 97450060), "T")),
-        })
-        fake_drugs = frozenset({
-            DrugInfo("Aspirin", "https://www.pharmgkb.org/some_other_url"),
-        })
-        fake_rs_id_to_ref_seq_difference_annotations: Dict[str, Annotation] = {}
-
-        fake2_haplotypes = frozenset({
-            Haplotype("*4A", "Reduced Function", frozenset({fake2_variant})),
-        })
-        fake2_rs_id_infos = frozenset({
-            RsIdInfo("rs1212127", ReferenceSite(GeneCoordinate("16", 97915617), "C"), ReferenceSite(GeneCoordinate("chr16", 97450060), "T")),
-        })
-        fake2_drugs = frozenset({
-            DrugInfo("Aspirin", "https://www.pharmgkb.org/some_other_url"),
-        })
-        fake2_rs_id_to_ref_seq_difference_annotations = {"rs1212127": Annotation("1324C>T", "1324T>C")}
-
-        dpyd_gene_info = GeneInfo(
-            "DPYD", "*1", "ENST00000370192", dpyd_haplotypes, dpyd_rs_id_infos,
-            dpyd_drugs, dpyd_rs_id_to_ref_seq_difference_annotations,
-        )
-        fake_gene_info = GeneInfo(
-            "FAKE", "*1", None, fake_haplotypes, fake_rs_id_infos,
-            fake_drugs, fake_rs_id_to_ref_seq_difference_annotations,
-        )
-        fake2_gene_info = GeneInfo(
-            "FAKE2", "*1", None, fake2_haplotypes, fake2_rs_id_infos,
-            fake2_drugs, fake2_rs_id_to_ref_seq_difference_annotations,
-        )
-        gene_infos = frozenset({dpyd_gene_info, fake_gene_info, fake2_gene_info})
-
-        name = "WideTestPanel"
-        version = "1.0"
-        return Panel(name, version, gene_infos)
-
-    @classmethod
-    def __get_narrow_example_panel(cls, included_haplotypes: Set[str]) -> Panel:
-        dpyd_two_a_variant = Variant("rs3918290", "T")
-        dpyd_five_variant = Variant("rs1801159", "C")
-        dpyd_three_variant = Variant("rs72549303", "TG")
-        dpyd_seven_variant = Variant("rs2938101", "AGT")
-
-        possible_dpyd_haplotypes = [
-            Haplotype("*2A", "No Function", frozenset({dpyd_two_a_variant})),
-            Haplotype("*2B", "No Function", frozenset({dpyd_two_a_variant, dpyd_five_variant})),
-            Haplotype("*3", "Normal Function", frozenset({dpyd_three_variant})),
-            Haplotype("*5", "Normal Function", frozenset({dpyd_five_variant})),
-            Haplotype("*7", "Normal Function", frozenset({dpyd_seven_variant})),
-            Haplotype("*9", "Normal Function", frozenset({dpyd_two_a_variant, dpyd_three_variant})),
-            Haplotype("*10", "Normal Function", frozenset({dpyd_three_variant, dpyd_five_variant})),
-        ]
-        possible_rs_id_infos = [
-            RsIdInfo("rs3918290", ReferenceSite(GeneCoordinate("1", 97915614), "C"), ReferenceSite(GeneCoordinate("chr1", 97450058), "C")),
-            RsIdInfo("rs72549309", ReferenceSite(GeneCoordinate("1", 98205966), "GATGA"), ReferenceSite(GeneCoordinate("chr1", 97740410), "GATGA")),
-            RsIdInfo("rs1801159", ReferenceSite(GeneCoordinate("1", 97981395), "T"), ReferenceSite(GeneCoordinate("chr1", 97515839), "T")),
-            RsIdInfo("rs72549303", ReferenceSite(GeneCoordinate("1", 97915621), "TG"), ReferenceSite(GeneCoordinate("chr1", 97450065), "TC")),
-            RsIdInfo("rs2938101", ReferenceSite(GeneCoordinate("1", 97912838), "A"), ReferenceSite(GeneCoordinate("chr1", 97453984), "A")),
-        ]
-
-        unknown_haplotypes = included_haplotypes.difference({haplotype.name for haplotype in possible_dpyd_haplotypes})
-        if unknown_haplotypes:
-            raise ValueError(f"Not all dpyd haplotype names recognized: unknown={unknown_haplotypes}")
-
-        # use a set to cause the order of haplotypes to be random, to make sure this order will not matter.
-        included_dpyd_haplotypes = frozenset(
-            {haplotype for haplotype in possible_dpyd_haplotypes if haplotype.name in included_haplotypes}
-        )
-        included_dpyd_rs_ids = {"rs72549303"}.union(
-            {variant.rs_id for haplotype in included_dpyd_haplotypes for variant in haplotype.variants}
-        )
-        included_dpyd_rs_id_infos = frozenset(
-            {rs_id_info for rs_id_info in possible_rs_id_infos if rs_id_info.rs_id in included_dpyd_rs_ids}
-        )
-        dpyd_drugs = frozenset({
-            DrugInfo("5-Fluorouracil", "https://www.pharmgkb.org/chemical/PA128406956/guidelineAnnotation/PA166104939"),
-            DrugInfo("Capecitabine", "https://www.pharmgkb.org/chemical/PA448771/guidelineAnnotation/PA166104963"),
-        })
-        dpyd_rs_id_to_difference_annotations = {
-            "rs72549303": Annotation("6744CA>GA", "6744GA>CA"),
-        }
-
-        gene_infos = frozenset({
-            GeneInfo(
-                "DPYD", "*1", "ENST00000370192", included_dpyd_haplotypes, included_dpyd_rs_id_infos,
-                dpyd_drugs, dpyd_rs_id_to_difference_annotations,
-            ),
-        })
-        name = "NarrowTestPanel"
-        version = "1.0"
-        return Panel(name, version, gene_infos)
-
     def test_empty_v37(self) -> None:
         """No variants wrt v37"""
-        panel = self.__get_wide_example_panel()
+        panel = get_wide_example_panel()
         simple_call_data = SimpleCallData(frozenset(), ReferenceAssembly.V37)
         pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
 
@@ -187,7 +65,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
     def test_empty_v38(self) -> None:
         """No variants wrt v38"""
-        panel = self.__get_wide_example_panel()
+        panel = get_wide_example_panel()
         simple_call_data = SimpleCallData(frozenset(), ReferenceAssembly.V38)
         pgx_analysis = PgxAnalyser.create_pgx_analysis(simple_call_data, panel)
 
@@ -232,7 +110,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
     def test_hom_ref_from_v37(self) -> None:
         """All haplotypes are  *1_HOM with v37 input data"""
-        panel = self.__get_wide_example_panel()
+        panel = get_wide_example_panel()
         simple_call_data = SimpleCallData(frozenset({
             SimpleCall(
                 ReferenceSite(GeneCoordinate("16", 97915617), "C"), ("T", "T"),
@@ -286,7 +164,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
     def test_heterozygous_v37(self) -> None:
         """All haplotypes are heterozygous, both with single and multiple non-ref haplotypes. Uses v37 input"""
-        panel = self.__get_wide_example_panel()
+        panel = get_wide_example_panel()
         simple_call_data = SimpleCallData(frozenset({
             SimpleCall(
                 ReferenceSite(GeneCoordinate("16", 97915617), "C"), ("C", "T"),
@@ -348,7 +226,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
     def test_heterozygous_v38(self) -> None:
         """All haplotypes are heterozygous, both with single and multiple non-ref haplotypes. Uses v38 input"""
-        panel = self.__get_wide_example_panel()
+        panel = get_wide_example_panel()
         simple_call_data = SimpleCallData(frozenset({
             SimpleCall(
                 ReferenceSite(GeneCoordinate("chr16", 97450060), "T"), ("C", "T"),
@@ -410,7 +288,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
     def test_more_than_two_haplotypes_present(self) -> None:
         """More than two haplotypes are present, specifically three. Uses v37 input"""
-        panel = self.__get_narrow_example_panel({"*2A", "*3", "*7"})
+        panel = get_narrow_example_panel({"*2A", "*3", "*7"})
         simple_call_data = SimpleCallData(frozenset({
             SimpleCall(
                 ReferenceSite(GeneCoordinate("1", 97915614), "C"), ("C", "T"),
@@ -446,7 +324,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
     def test_ambiguous_haplotype_with_clear_winner_homozygous(self) -> None:
         """Ambiguous homozygous haplotype, where the simpler possibility should be preferred. Uses v38 input"""
-        panel = self.__get_narrow_example_panel({"*2A", "*5", "*2B"})
+        panel = get_narrow_example_panel({"*2A", "*5", "*2B"})
         simple_call_data = SimpleCallData(frozenset({
             SimpleCall(
                 ReferenceSite(GeneCoordinate("chr1", 97450058), "C"), ("T", "T"),
@@ -483,7 +361,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
     def test_ambiguous_haplotype_with_clear_winner_heterozygous(self) -> None:
         """Ambiguous heterozygous haplotype, where the simpler possibility should be preferred. Uses v37 input."""
-        panel = self.__get_narrow_example_panel({"*2A", "*5", "*2B"})
+        panel = get_narrow_example_panel({"*2A", "*5", "*2B"})
         simple_call_data = SimpleCallData(frozenset({
             SimpleCall(
                 ReferenceSite(GeneCoordinate("1", 97915614), "C"), ("C", "T"),
@@ -523,7 +401,7 @@ class TestPgxAnalysis(unittest.TestCase):
         Ambiguous mix of homozygous and heterozygous haplotype, where the simplest possibility should be preferred.
         Uses v38 input
         """
-        panel = self.__get_narrow_example_panel({"*2A", "*5", "*2B"})
+        panel = get_narrow_example_panel({"*2A", "*5", "*2B"})
         simple_call_data = SimpleCallData(frozenset({
             SimpleCall(
                 ReferenceSite(GeneCoordinate("chr1", 97450058), "C"), ("T", "T"),
@@ -560,7 +438,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
     def test_complicated_ambiguous_haplotype_with_a_clear_winner(self) -> None:
         """Ambiguous set of haplotypes, with no haplotype that is simplest. Uses v37 input"""
-        panel = self.__get_narrow_example_panel({"*2A", "*5", "*2B", "*3", "*9", "*10", "*7"})
+        panel = get_narrow_example_panel({"*2A", "*5", "*2B", "*3", "*9", "*10", "*7"})
         simple_call_data = SimpleCallData(frozenset({
             SimpleCall(
                 ReferenceSite(GeneCoordinate("1", 97915614), "C"), ("T", "T"),
@@ -607,7 +485,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
     def test_ambiguous_homozygous_haplotype_with_a_less_clear_winner(self) -> None:
         """Ambiguous set of homozygous haplotypes, with winning haplotype that might not be ideal. Uses v38 input"""
-        panel = self.__get_narrow_example_panel({"*2A", "*5", "*2B", "*3", "*9", "*10"})
+        panel = get_narrow_example_panel({"*2A", "*5", "*2B", "*3", "*9", "*10"})
         simple_call_data = SimpleCallData(frozenset({
             SimpleCall(
                 ReferenceSite(GeneCoordinate("chr1", 97450058), "C"), ("T", "T"),
@@ -650,7 +528,7 @@ class TestPgxAnalysis(unittest.TestCase):
         Could be {*2A_HET,*10_HET}, {*5_HET,*9_HET} or {*3_HET,*2B_HET}.
         Uses v37 input.
         """
-        panel = self.__get_narrow_example_panel({"*2A", "*5", "*2B", "*3", "*9", "*10"})
+        panel = get_narrow_example_panel({"*2A", "*5", "*2B", "*3", "*9", "*10"})
         simple_call_data = SimpleCallData(frozenset({
             SimpleCall(
                 ReferenceSite(GeneCoordinate("1", 97915614), "C"), ("C", "T"),
@@ -687,7 +565,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
     def test_unknown_variants_v37(self) -> None:
         """Variants that are completely unknown, including with unknown rs id. Uses v37 input"""
-        panel = self.__get_wide_example_panel()
+        panel = get_wide_example_panel()
         simple_call_data = SimpleCallData(frozenset({
             SimpleCall(
                 ReferenceSite(GeneCoordinate("16", 39593405), "A"), ("A", "G"),
@@ -750,7 +628,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
     def test_unknown_variants_v38(self) -> None:
         """Variants that are completely unknown, including with unknown rs id. Uses v38 input"""
-        panel = self.__get_wide_example_panel()
+        panel = get_wide_example_panel()
         simple_call_data = SimpleCallData(frozenset({
             SimpleCall(
                 ReferenceSite(GeneCoordinate("chr16", 39593405), "A"), ("A", "G"),
@@ -813,7 +691,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
     def test_unknown_gene(self) -> None:
         """Variants that are of an unknown gene. Uses v37 input"""
-        panel = self.__get_wide_example_panel()
+        panel = get_wide_example_panel()
         reference_assembly = ReferenceAssembly.V37
 
         good_calls = {
@@ -836,7 +714,7 @@ class TestPgxAnalysis(unittest.TestCase):
     @unittest.skip("WIP")
     def test_incorrect_gene(self) -> None:
         """Variants that are assigned to an incorrect gene. Uses v37 input"""
-        panel = self.__get_wide_example_panel()
+        panel = get_wide_example_panel()
         reference_assembly = ReferenceAssembly.V37
 
         good_calls = {
@@ -859,7 +737,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
     def test_known_variants_with_incorrect_rs_id(self) -> None:
         """Known variant with one incorrect rs id. Uses v38 input"""
-        panel = self.__get_wide_example_panel()
+        panel = get_wide_example_panel()
         reference_assembly = ReferenceAssembly.V38
 
         good_calls = {
@@ -888,7 +766,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
     def test_known_variant_with_incorrect_position(self) -> None:
         """Known variant with incorrect position. Uses v37 input."""
-        panel = self.__get_wide_example_panel()
+        panel = get_wide_example_panel()
         reference_assembly = ReferenceAssembly.V37
 
         good_calls = {
@@ -919,7 +797,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
     def test_known_variant_with_incorrect_chromosome(self) -> None:
         """Known variants with one incorrect chromosome. Uses v38 input"""
-        panel = self.__get_wide_example_panel()
+        panel = get_wide_example_panel()
         reference_assembly = ReferenceAssembly.V38
 
         good_calls = {
@@ -950,7 +828,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
     def test_known_variant_with_multiple_rs_ids_not_matching_panel(self) -> None:
         """Multiple rs ids when panel says there should be one. Uses v37 input."""
-        panel = self.__get_wide_example_panel()
+        panel = get_wide_example_panel()
         reference_assembly = ReferenceAssembly.V37
         good_calls = {
             SimpleCall(
@@ -977,7 +855,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
     def test_unresolved_haplotype_because_of_unexpected_base_v37(self) -> None:
         """No haplotype call because of unexpected base at known variant location, for v37 input."""
-        panel = self.__get_narrow_example_panel({"*2A", "*5", "*2B"})
+        panel = get_narrow_example_panel({"*2A", "*5", "*2B"})
         reference_assembly = ReferenceAssembly.V37
 
         call_that_ref_seq_diff_is_ref_v38 = SimpleCall(
@@ -1032,7 +910,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
     def test_unresolved_haplotype_because_of_unexpected_base_v38(self) -> None:
         """No haplotype call because of unexpected base at known variant location, for v38 input."""
-        panel = self.__get_narrow_example_panel({"*2A", "*5", "*2B"})
+        panel = get_narrow_example_panel({"*2A", "*5", "*2B"})
         reference_assembly = ReferenceAssembly.V38
 
         normal_call = SimpleCall(
@@ -1090,7 +968,7 @@ class TestPgxAnalysis(unittest.TestCase):
         No haplotype call because of missing half of haplotype.
         One half is present twice, other once. Uses v37 data.
         """
-        panel = self.__get_narrow_example_panel({"*2B"})
+        panel = get_narrow_example_panel({"*2B"})
         simple_call_data = SimpleCallData(frozenset({
             SimpleCall(
                 ReferenceSite(GeneCoordinate("1", 97915614), "C"), ("T", "T"),
@@ -1130,7 +1008,7 @@ class TestPgxAnalysis(unittest.TestCase):
         Unresolved haplotype because MNV covers where SNV was expected, where MNV starts before this location.
         Uses v38 input.
         """
-        panel = self.__get_narrow_example_panel({"*2A", "*5", "*2B"})
+        panel = get_narrow_example_panel({"*2A", "*5", "*2B"})
         simple_call_data = SimpleCallData(frozenset({
             SimpleCall(
                 ReferenceSite(GeneCoordinate("chr1", 97450057), "GC"), ("CT", "CT"),
@@ -1170,7 +1048,7 @@ class TestPgxAnalysis(unittest.TestCase):
         Unresolved haplotype because MNV covers where SNV was expected, where MNV starts at this location.
         Uses v37 input.
         """
-        panel = self.__get_narrow_example_panel({"*2A", "*5", "*2B"})
+        panel = get_narrow_example_panel({"*2A", "*5", "*2B"})
         simple_call_data = SimpleCallData(frozenset({
             SimpleCall(
                 ReferenceSite(GeneCoordinate("1", 97915614), "CG"), ("TC", "TC"),
@@ -1207,7 +1085,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
     def test_ref_call_on_ref_seq_differences_v37(self) -> None:
         """Explicit ref calls wrt v37 at differences between v37 and v38"""
-        panel = self.__get_wide_example_panel()
+        panel = get_wide_example_panel()
         simple_call_data = SimpleCallData(frozenset({
             SimpleCall(
                 ReferenceSite(GeneCoordinate("16", 97915617), "C"), ("C", "C"),
@@ -1258,7 +1136,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
     def test_ref_call_on_ref_seq_differences_v38(self) -> None:
         """Explicit ref calls wrt v38 at differences between v37 and v38"""
-        panel = self.__get_wide_example_panel()
+        panel = get_wide_example_panel()
         simple_call_data = SimpleCallData(frozenset({
             SimpleCall(
                 ReferenceSite(GeneCoordinate("chr16", 97450060), "T"), ("T", "T"),
@@ -1309,7 +1187,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
     def test_homozygous_call_on_ref_seq_differences_v38(self) -> None:
         """Explicit ref calls wrt v38 at differences between v37 and v38"""
-        panel = self.__get_wide_example_panel()
+        panel = get_wide_example_panel()
         simple_call_data = SimpleCallData(frozenset({
             SimpleCall(
                 ReferenceSite(GeneCoordinate("chr16", 97450060), "T"), ("C", "C"),
@@ -1360,7 +1238,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
     def test_only_position_match_on_ref_seq_differences_v37(self) -> None:
         """At reference sequence differences: heterozygous between ref v37 and v38, and no rs_id provided"""
-        panel = self.__get_wide_example_panel()
+        panel = get_wide_example_panel()
         simple_call_data = SimpleCallData(frozenset({
             SimpleCall(ReferenceSite(GeneCoordinate("16", 97915617), "C"), ("C", "T"),
                        "FAKE2", tuple(), "1324C>T", SimpleCallFilter.PASS),
@@ -1411,7 +1289,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
     def test_only_position_match_on_ref_seq_differences_v38(self) -> None:
         """At reference sequence differences: heterozygous between ref v37 and v38, and no rs_id provided"""
-        panel = self.__get_wide_example_panel()
+        panel = get_wide_example_panel()
         simple_call_data = SimpleCallData(frozenset({
             SimpleCall(ReferenceSite(GeneCoordinate("chr16", 97450060), "T"), ("C", "T"),
                        "FAKE2", tuple(), "1324T>C", SimpleCallFilter.PASS),
@@ -1465,7 +1343,7 @@ class TestPgxAnalysis(unittest.TestCase):
         At reference sequence differences: single allele that is ref v37 or v38, other allele is neither.
         Uses v38 input.
         """
-        panel = self.__get_wide_example_panel()
+        panel = get_wide_example_panel()
         simple_call_data = SimpleCallData(frozenset({
             SimpleCall(
                 ReferenceSite(GeneCoordinate("chr16", 97450060), "T"), ("C", "A"),
@@ -1516,7 +1394,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
     def test_double_different_allele_on_ref_seq_differences(self) -> None:
         """At reference sequence differences: both alleles not ref v37 or v38. Uses v37 input."""
-        panel = self.__get_wide_example_panel()
+        panel = get_wide_example_panel()
         simple_call_data = SimpleCallData(frozenset({
             SimpleCall(
                 ReferenceSite(GeneCoordinate("16", 97915617), "C"), ("A", "G"),
@@ -1567,7 +1445,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
     def test_overlapping_mnv_and_snv(self) -> None:
         """Overlapping SNV and unrecognized MNV do not cause errors. Uses v38 input."""
-        panel = self.__get_narrow_example_panel({"*2A", "*5", "*2B"})
+        panel = get_narrow_example_panel({"*2A", "*5", "*2B"})
         simple_call_data = SimpleCallData(frozenset({
             SimpleCall(
                 ReferenceSite(GeneCoordinate("chr1", 97450058), "C"), ("T", "T"),
@@ -1612,7 +1490,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
     def test_overlapping_mnv_and_snv_at_ref_seq_difference(self) -> None:
         """Overlapping SNV and unrecognized MNV at ref seq difference do not cause error. Uses v37 input."""
-        panel = self.__get_narrow_example_panel({"*2A", "*5", "*2B"})
+        panel = get_narrow_example_panel({"*2A", "*5", "*2B"})
         simple_call_data = SimpleCallData(frozenset({
             SimpleCall(
                 ReferenceSite(GeneCoordinate("1", 97915614), "C"), ("T", "T"),
