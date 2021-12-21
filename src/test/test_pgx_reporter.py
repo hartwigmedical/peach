@@ -13,7 +13,7 @@ from config.haplotype import Haplotype
 from config.panel import Panel
 from config.rs_id_info import RsIdInfo
 from config.variant import Variant
-from pgx_analysis import PgxAnalysis
+from analysis.pgx_analysis import PgxAnalysis
 from pgx_reporter import GenotypeReporter, HaplotypeReporter
 
 

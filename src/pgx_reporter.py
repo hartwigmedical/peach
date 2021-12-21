@@ -7,7 +7,7 @@ from base.constants import UNKNOWN_FUNCTION_STRING
 from base.reference_assembly import ReferenceAssembly
 from call_data import HaplotypeCall
 from config.panel import Panel
-from pgx_analysis import PgxAnalysis
+from analysis.pgx_analysis import PgxAnalysis
 
 
 class GenotypeReporter(object):

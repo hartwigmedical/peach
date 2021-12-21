@@ -6,7 +6,7 @@ import sys
 from argument_parser import ArgumentParser
 from config.tool_config import ToolConfig
 from config.panel import Panel
-from pgx_analysis import PgxAnalyser, PgxAnalysis
+from analysis.pgx_analysis import PgxAnalyser, PgxAnalysis
 from pgx_reporter import HaplotypeReporter, GenotypeReporter
 from vcf_reader import VcfReader
 

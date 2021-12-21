@@ -3,9 +3,9 @@ from copy import deepcopy
 from typing import Dict, Set, FrozenSet
 
 from call_data import SimpleCallData, FullCall, HaplotypeCall, FullCallData
-from call_translator import SimpleCallTranslator
+from analysis.call_translator import SimpleCallTranslator
 from config.panel import Panel
-from haplotype_caller import HaplotypeCaller
+from analysis.haplotype_caller import HaplotypeCaller
 
 
 class PgxAnalysis(object):
