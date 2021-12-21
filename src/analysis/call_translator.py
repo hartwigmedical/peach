@@ -49,20 +49,21 @@ class SimpleCallTranslator(object):
         }
 
         uncalled_calls = set()
-        for gene_info in panel.get_gene_infos():
-            for rs_id_info in gene_info.rs_id_infos:
-                relevant_coordinates = rs_id_info.get_reference_site(reference_assembly).get_covered_coordinates()
+        for gene in panel.get_genes():
+            for rs_id in panel.get_rs_ids_for_gene(gene):
+                reference_site = panel.get_reference_site(rs_id, reference_assembly)
+                relevant_coordinates = reference_site.get_covered_coordinates()
                 coordinates_partially_handled = bool(
                     relevant_coordinates.intersection(ref_coordinates_covered_by_found_calls)
                 )
-                if rs_id_info.rs_id not in rs_ids_found_in_patient and not coordinates_partially_handled:
+                if rs_id not in rs_ids_found_in_patient and not coordinates_partially_handled:
                     # Assuming REF/REF relative to reference assembly
-                    reference_site = rs_id_info.get_reference_site(reference_assembly)
+
                     uncalled_ref_call = SimpleCall(
                         reference_site,
                         (reference_site.allele, reference_site.allele),
-                        gene_info.gene,
-                        (rs_id_info.rs_id,),
+                        gene,
+                        (rs_id,),
                         REF_CALL_ANNOTATION_STRING,
                         SimpleCallFilter.NO_CALL,
                     )

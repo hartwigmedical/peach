@@ -49,6 +49,15 @@ class Panel(object):
     def get_drug_prescription_url(self, gene: str, drug_name: str) -> str:
         return self.__get_gene_info(gene).get_prescription_url(drug_name)
 
+    def get_reference_site(self, rs_id: str, reference_assembly: ReferenceAssembly) -> ReferenceSite:
+        return self.__get_rs_id_info(rs_id).get_reference_site(reference_assembly)
+
+    def get_genes(self) -> Set[str]:
+        return {info.gene for info in self.__gene_infos}
+
+    def get_rs_ids_for_gene(self, gene: str) -> Set[str]:
+        return self.__get_gene_info(gene).get_rs_ids()
+
     def has_ref_seq_difference_annotation(
         self, gene: str, reference_site: ReferenceSite, reference_assembly: ReferenceAssembly
     ) -> bool:
@@ -116,9 +125,6 @@ class Panel(object):
     def is_empty(self) -> bool:
         return not self.__gene_infos
 
-    def get_genes(self) -> Set[str]:
-        return {info.gene for info in self.__gene_infos}
-
     def get_haplotype_function(self, gene: str, haplotype_name: str) -> str:
         gene_info = self.__get_gene_info(gene)
         return gene_info.get_haplotype_function(haplotype_name)
@@ -132,6 +138,13 @@ class Panel(object):
             return matching_gene_infos[0]
         else:
             raise ValueError(f"Not exactly one matching gene info in panel: gene={gene}")
+
+    def __get_rs_id_info(self, rs_id: str) -> RsIdInfo:
+        matching_rs_id_infos = [rs_id_info for rs_id_info in self.__get_rs_id_infos() if rs_id_info.rs_id == rs_id]
+        if len(matching_rs_id_infos) == 1:
+            return matching_rs_id_infos[0]
+        else:
+            raise ValueError(f"Not exactly one matching rs id info in panel: rs_id={rs_id}")
 
     def __get_rs_ids(self) -> Set[str]:
         return {info.rs_id for info in self.__get_rs_id_infos()}

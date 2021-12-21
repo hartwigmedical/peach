@@ -1,6 +1,6 @@
 import itertools
 import logging
-from typing import List, Dict, Collection, FrozenSet, Optional
+from typing import List, Dict, Collection, FrozenSet, Optional, Set
 
 from base.constants import NORMAL_FUNCTION_STRING
 from base.reference_assembly import ReferenceAssembly
@@ -135,6 +135,9 @@ class GeneInfo(object):
             return matching_drug_infos[0].url_prescription_info
         else:
             raise ValueError(f"Not exactly one matching drug info in panel for gene={self.gene}: drug_name={drug_name}")
+
+    def get_rs_ids(self) -> Set[str]:
+        return {rs_id_info.rs_id for rs_id_info in self.rs_id_infos}
 
     def __get_haplotype(self, haplotype_name: str) -> Haplotype:
         matching_haplotypes = [haplotype for haplotype in self.__haplotypes if haplotype.name == haplotype_name]
