@@ -1,7 +1,6 @@
-from typing import Optional
+from typing import Optional, Any
 
 from base.gene_coordinate import GeneCoordinate
-from base.json_alias import Json
 from base.reference_site import ReferenceSite
 from config.annotation import Annotation
 from config.drug_info import DrugInfo
@@ -10,6 +9,8 @@ from config.haplotype import Haplotype
 from config.panel import Panel
 from config.rs_id_info import RsIdInfo
 from config.variant import Variant
+
+Json = Any
 
 
 class JsonParser(object):
