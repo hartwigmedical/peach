@@ -13,9 +13,9 @@ class VcfCall(NamedTuple):
     """
     reference_site: ReferenceSite
     alleles: Tuple[str, str]  # The order is (ref, alt) when there is one of each
-    gene: Optional[str]
+    gene: Optional[str]  # Is None if unknown
     rs_ids: Tuple[str, ...]
-    variant_annotation: Optional[str]
+    variant_annotation: Optional[str]  # Is None if unknown
     filter: VcfCallFilter
 
 
@@ -37,7 +37,7 @@ class SimpleCall(NamedTuple):
     alleles: Tuple[str, str]  # The order is (ref, alt) when there is one of each
     gene: str
     rs_ids: Tuple[str, ...]
-    variant_annotation: Optional[str]
+    variant_annotation: Optional[str]  # Is None if unknown
     filter: VcfCallFilter
 
     def is_pass(self) -> bool:
@@ -95,14 +95,14 @@ class AnnotatedAllele(object):
 
 class FullCall(NamedTuple):
     # Call with both v37 and v38 data and annotation
-    reference_site_v37: Optional[ReferenceSite]  # is None if unknown
-    reference_site_v38: Optional[ReferenceSite]  # is None if unknown
+    reference_site_v37: Optional[ReferenceSite]  # Is None if unknown
+    reference_site_v38: Optional[ReferenceSite]  # Is None if unknown
     alleles: Tuple[str, str]
     gene: str
     rs_ids: Tuple[str, ...]
-    variant_annotation_v37: Optional[str]
+    variant_annotation_v37: Optional[str]  # Is None if unknown
     filter_v37: FullCallFilter
-    variant_annotation_v38: Optional[str]
+    variant_annotation_v38: Optional[str]  # Is None if unknown
     filter_v38: FullCallFilter
 
     def get_annotated_alleles(self) -> Tuple[AnnotatedAllele, AnnotatedAllele]:

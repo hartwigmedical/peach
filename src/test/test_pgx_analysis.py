@@ -1148,10 +1148,12 @@ class TestPgxAnalysis(unittest.TestCase):
         """At reference sequence differences: heterozygous between ref v37 and v38, and no rs_id provided"""
         panel = get_wide_example_panel()
         vcf_call_data = VcfCallData(frozenset({
-            VcfCall(ReferenceSite(GeneCoordinate("16", 97915617), "C"), ("C", "T"),
-                       "FAKE2", tuple(), "1324C>T", VcfCallFilter.PASS),
-            VcfCall(ReferenceSite(GeneCoordinate("1", 97915621), "TG"), ("TG", "TC"),
-                       "DPYD", tuple(), "6744CA>GA", VcfCallFilter.PASS),
+            VcfCall(
+                ReferenceSite(GeneCoordinate("16", 97915617), "C"), ("C", "T"),
+                "FAKE2", tuple(), "1324C>T", VcfCallFilter.PASS),
+            VcfCall(
+                ReferenceSite(GeneCoordinate("1", 97915621), "TG"), ("TG", "TC"),
+                "DPYD", tuple(), "6744CA>GA", VcfCallFilter.PASS),
         }), ReferenceAssembly.V37)
         pgx_analysis = PgxAnalyser().create_pgx_analysis(vcf_call_data, panel)
 
@@ -1199,10 +1201,12 @@ class TestPgxAnalysis(unittest.TestCase):
         """At reference sequence differences: heterozygous between ref v37 and v38, and no rs_id provided"""
         panel = get_wide_example_panel()
         vcf_call_data = VcfCallData(frozenset({
-            VcfCall(ReferenceSite(GeneCoordinate("chr16", 97450060), "T"), ("C", "T"),
-                       "FAKE2", tuple(), "1324T>C", VcfCallFilter.PASS),
-            VcfCall(ReferenceSite(GeneCoordinate("chr1", 97450065), "TC"), ("TG", "TC"),
-                       "DPYD", tuple(), "6744GA>CA", VcfCallFilter.PASS),
+            VcfCall(
+                ReferenceSite(GeneCoordinate("chr16", 97450060), "T"), ("C", "T"),
+                "FAKE2", tuple(), "1324T>C", VcfCallFilter.PASS),
+            VcfCall(
+                ReferenceSite(GeneCoordinate("chr1", 97450065), "TC"), ("TG", "TC"),
+                "DPYD", tuple(), "6744GA>CA", VcfCallFilter.PASS),
         }), ReferenceAssembly.V38)
         pgx_analysis = PgxAnalyser().create_pgx_analysis(vcf_call_data, panel)
 

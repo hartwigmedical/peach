@@ -24,10 +24,18 @@ def get_wide_example_panel() -> Panel:
         Haplotype("*3", "Normal Function", frozenset({dpyd_three_variant})),
     })
     dpyd_rs_id_infos = frozenset({
-        RsIdInfo("rs3918290", ReferenceSite(GeneCoordinate("1", 97915614), "C"), ReferenceSite(GeneCoordinate("chr1", 97450058), "C")),
-        RsIdInfo("rs72549309", ReferenceSite(GeneCoordinate("1", 98205966), "GATGA"), ReferenceSite(GeneCoordinate("chr1", 97740410), "GATGA")),
-        RsIdInfo("rs1801159", ReferenceSite(GeneCoordinate("1", 97981395), "T"), ReferenceSite(GeneCoordinate("chr1", 97515839), "T")),
-        RsIdInfo("rs72549303", ReferenceSite(GeneCoordinate("1", 97915621), "TG"), ReferenceSite(GeneCoordinate("chr1", 97450065), "TC")),
+        RsIdInfo(
+            "rs3918290", ReferenceSite(GeneCoordinate("1", 97915614), "C"),
+            ReferenceSite(GeneCoordinate("chr1", 97450058), "C")),
+        RsIdInfo(
+            "rs72549309", ReferenceSite(GeneCoordinate("1", 98205966), "GATGA"),
+            ReferenceSite(GeneCoordinate("chr1", 97740410), "GATGA")),
+        RsIdInfo(
+            "rs1801159", ReferenceSite(GeneCoordinate("1", 97981395), "T"),
+            ReferenceSite(GeneCoordinate("chr1", 97515839), "T")),
+        RsIdInfo(
+            "rs72549303", ReferenceSite(GeneCoordinate("1", 97915621), "TG"),
+            ReferenceSite(GeneCoordinate("chr1", 97450065), "TC")),
     })
     dpyd_drugs = frozenset({
         DrugInfo("5-Fluorouracil", "https://www.pharmgkb.org/chemical/PA128406956/guidelineAnnotation/PA166104939"),
@@ -41,7 +49,9 @@ def get_wide_example_panel() -> Panel:
         Haplotype("*4A", "Reduced Function", frozenset({fake_variant})),
     })
     fake_rs_id_infos = frozenset({
-        RsIdInfo("rs1212125", ReferenceSite(GeneCoordinate("5", 97915617), "T"), ReferenceSite(GeneCoordinate("chr5", 97450060), "T")),
+        RsIdInfo(
+            "rs1212125", ReferenceSite(GeneCoordinate("5", 97915617), "T"),
+            ReferenceSite(GeneCoordinate("chr5", 97450060), "T")),
     })
     fake_drugs = frozenset({
         DrugInfo("Aspirin", "https://www.pharmgkb.org/some_other_url"),
@@ -52,7 +62,9 @@ def get_wide_example_panel() -> Panel:
         Haplotype("*4A", "Reduced Function", frozenset({fake2_variant})),
     })
     fake2_rs_id_infos = frozenset({
-        RsIdInfo("rs1212127", ReferenceSite(GeneCoordinate("16", 97915617), "C"), ReferenceSite(GeneCoordinate("chr16", 97450060), "T")),
+        RsIdInfo(
+            "rs1212127", ReferenceSite(GeneCoordinate("16", 97915617), "C"),
+            ReferenceSite(GeneCoordinate("chr16", 97450060), "T")),
     })
     fake2_drugs = frozenset({
         DrugInfo("Aspirin", "https://www.pharmgkb.org/some_other_url"),
@@ -94,11 +106,21 @@ def get_narrow_example_panel(included_haplotypes: Set[str]) -> Panel:
         Haplotype("*10", "Normal Function", frozenset({dpyd_three_variant, dpyd_five_variant})),
     ]
     possible_rs_id_infos = [
-        RsIdInfo("rs3918290", ReferenceSite(GeneCoordinate("1", 97915614), "C"), ReferenceSite(GeneCoordinate("chr1", 97450058), "C")),
-        RsIdInfo("rs72549309", ReferenceSite(GeneCoordinate("1", 98205966), "GATGA"), ReferenceSite(GeneCoordinate("chr1", 97740410), "GATGA")),
-        RsIdInfo("rs1801159", ReferenceSite(GeneCoordinate("1", 97981395), "T"), ReferenceSite(GeneCoordinate("chr1", 97515839), "T")),
-        RsIdInfo("rs72549303", ReferenceSite(GeneCoordinate("1", 97915621), "TG"), ReferenceSite(GeneCoordinate("chr1", 97450065), "TC")),
-        RsIdInfo("rs2938101", ReferenceSite(GeneCoordinate("1", 97912838), "A"), ReferenceSite(GeneCoordinate("chr1", 97453984), "A")),
+        RsIdInfo(
+            "rs3918290", ReferenceSite(GeneCoordinate("1", 97915614), "C"),
+            ReferenceSite(GeneCoordinate("chr1", 97450058), "C")),
+        RsIdInfo(
+            "rs72549309", ReferenceSite(GeneCoordinate("1", 98205966), "GATGA"),
+            ReferenceSite(GeneCoordinate("chr1", 97740410), "GATGA")),
+        RsIdInfo(
+            "rs1801159", ReferenceSite(GeneCoordinate("1", 97981395), "T"),
+            ReferenceSite(GeneCoordinate("chr1", 97515839), "T")),
+        RsIdInfo(
+            "rs72549303", ReferenceSite(GeneCoordinate("1", 97915621), "TG"),
+            ReferenceSite(GeneCoordinate("chr1", 97450065), "TC")),
+        RsIdInfo(
+            "rs2938101", ReferenceSite(GeneCoordinate("1", 97912838), "A"),
+            ReferenceSite(GeneCoordinate("chr1", 97453984), "A")),
     ]
 
     unknown_haplotypes = included_haplotypes.difference({haplotype.name for haplotype in possible_dpyd_haplotypes})

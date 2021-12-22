@@ -70,7 +70,7 @@ def assert_no_overlap_haplotype_variant_combinations(haplotypes: Collection[Hapl
     if variant_combinations_of_haplotypes_overlap(haplotypes):
         variant_combination_to_multiple_haplotypes = get_variant_combination_to_multiple_haplotypes(haplotypes)
         error_msg = (
-            f"The {source_name} contains haplotypes with the same variaant combination but different names. "
+            f"The {source_name} contains haplotypes with the same variant combination but different names. "
             f"Duplicates: {variant_combination_to_multiple_haplotypes}"
         )
         raise ValueError(error_msg)

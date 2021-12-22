@@ -89,7 +89,7 @@ class SimpleCallTranslator(object):
                     warning_msg = (
                         f"Call involves at least one v37 position that has already been handled:\n"
                         f"call={vcf_call}\n"
-                        f"handled_coords={handled_v37_coordinates}"
+                        f"handled_coordinates={handled_v37_coordinates}"
                     )
                     logging.warning(warning_msg)
                 handled_v37_coordinates.update(relevant_v37_coordinates)
@@ -103,7 +103,7 @@ class SimpleCallTranslator(object):
                     warning_msg = (
                         f"Call involves at least one v38 position that has already been handled:\n"
                         f"call={vcf_call}\n"
-                        f"handled_coords={handled_v38_coordinates}"
+                        f"handled_coordinates={handled_v38_coordinates}"
                     )
                     logging.warning(warning_msg)
                 handled_v38_coordinates.update(relevant_v38_coordinates)

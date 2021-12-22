@@ -1,15 +1,6 @@
 import unittest
-from typing import Dict, FrozenSet
 
-from base.gene_coordinate import GeneCoordinate
-from base.reference_site import ReferenceSite
-from config.annotation import Annotation
-from config.drug_info import DrugInfo
-from config.gene_info import GeneInfo
-from config.haplotype import Haplotype
 from config.panel import Panel
-from config.rs_id_info import RsIdInfo
-from config.variant import Variant
 from json_parser import JsonParser
 from main import load_panel
 from test.util_for_test import get_wide_example_panel
