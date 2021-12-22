@@ -80,6 +80,7 @@ class VcfReader(object):
         alleles = self.__get_called_alleles_from_variants(call_index, sample_r_id, variants)
         rs_ids = self.__get_rs_ids_from_variants(call_index, variants)
 
+        variant_annotation: Optional[str]
         if alleles == (reference_allele, reference_allele):
             gene_name, _ = self.__get_gene_name_and_variant_annotation_from_variants(call_index, variants)
             variant_annotation = REF_CALL_ANNOTATION_STRING
@@ -121,9 +122,11 @@ class VcfReader(object):
 
     def __get_gene_name_and_variant_annotation_from_variants(
             self, call_index: int, variants: Dict[str, Any]
-    ) -> Tuple[Optional[str], str]:
+    ) -> Tuple[Optional[str], Optional[str]]:
         complete_annotation = str(variants[self.ANNOTATION_FIELD_NAME][call_index])
+
         gene_name: Optional[str]
+        variant_annotation: Optional[str]
         if complete_annotation:
             gene_name = complete_annotation.split("|")[3]
             full_variant_annotation = complete_annotation.split("|")[9]
@@ -135,7 +138,7 @@ class VcfReader(object):
                 raise ValueError(f"Unexpected annotation prefix: {full_variant_annotation}")
         else:
             gene_name = None
-            variant_annotation = ""
+            variant_annotation = None
 
         return gene_name, variant_annotation
 

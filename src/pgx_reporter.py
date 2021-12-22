@@ -50,6 +50,7 @@ class GenotypeReporter(object):
     UNKNOWN_CHROMOSOME_STRING = "UNKNOWN"
     UNKNOWN_POSITION_STRING = "UNKNOWN"
     UNKNOWN_REF_ALLELE_STRING = "UNKNOWN"
+    UNKNOWN_VARIANT_ANNOTATION_STRING = "UNKNOWN"
 
     TSV_SEPARATOR = "\t"
     RS_ID_SEPARATOR = ";"
@@ -92,6 +93,16 @@ class GenotypeReporter(object):
             else:
                 rs_id_string = self.RS_ID_EMPTY_INDICATOR
 
+            if full_call.variant_annotation_v37 is None:
+                variant_annotation_v37 = self.UNKNOWN_VARIANT_ANNOTATION_STRING
+            else:
+                variant_annotation_v37 = full_call.variant_annotation_v37
+
+            if full_call.variant_annotation_v38 is None:
+                variant_annotation_v38 = self.UNKNOWN_VARIANT_ANNOTATION_STRING
+            else:
+                variant_annotation_v38 = full_call.variant_annotation_v38
+
             line_data: Dict[str, Union[str, int]] = {
                 self.GENE_COLUMN_NAME: full_call.gene,
                 self.CHROMOSOME_V37_COLUMN_NAME: chromosome_v37,
@@ -103,9 +114,9 @@ class GenotypeReporter(object):
                 self.FIRST_ALLELE_COLUMN_NAME: sorted_alleles[0],
                 self.SECOND_ALLELE_COLUMN_NAME: sorted_alleles[1],
                 self.RS_IDS_COLUMN_NAME: rs_id_string,
-                self.ANNOTATION_V37_COLUMN_NAME: full_call.variant_annotation_v37,
+                self.ANNOTATION_V37_COLUMN_NAME: variant_annotation_v37,
                 self.FILTER_V37_COLUMN_NAME: full_call.filter_v37.name,
-                self.ANNOTATION_V38_COLUMN_NAME: full_call.variant_annotation_v38,
+                self.ANNOTATION_V38_COLUMN_NAME: variant_annotation_v38,
                 self.FILTER_V38_COLUMN_NAME: full_call.filter_v38.name,
                 self.PANEL_VERSION_COLUMN_NAME: panel_id,
                 self.TOOL_VERSION_COLUMN_NAME: version,

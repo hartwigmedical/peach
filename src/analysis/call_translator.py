@@ -12,7 +12,7 @@ from config.panel import Panel
 
 class Translation(NamedTuple):
     reference_site: Optional[ReferenceSite]
-    variant_annotation: str
+    variant_annotation: Optional[str]
     filter: FullCallFilter
 
 
@@ -187,7 +187,10 @@ class SimpleCallTranslator(object):
         else:
             # no matching panel variants
             translated_reference_site = None
-            translated_variant_annotation = simple_call.variant_annotation + "?"
+            if simple_call.variant_annotation is None:
+                translated_variant_annotation = None
+            else:
+                translated_variant_annotation = simple_call.variant_annotation + "?"
             translated_filter = FullCallFilter.UNKNOWN
             translation = Translation(translated_reference_site, translated_variant_annotation, translated_filter)
 
@@ -205,7 +208,7 @@ class SimpleCallTranslator(object):
             matching_rs_id: str,
             panel: Panel,
             translated_reference_site: Optional[ReferenceSite],
-    ) -> Tuple[FullCallFilter, str]:
+    ) -> Tuple[FullCallFilter, Optional[str]]:
         annotated_alleles = self.__get_annotated_alleles(
             simple_call.reference_site,
             simple_call.alleles,
@@ -222,6 +225,7 @@ class SimpleCallTranslator(object):
             self.__allele_is_ref_to_a_reference_assembly(annotated_allele, call_reference_assembly)
             for annotated_allele in annotated_alleles
         )
+        translated_variant_annotation: Optional[str]
         if annotate_as_ref:
             translated_variant_annotation = REF_CALL_ANNOTATION_STRING
             translated_filter = FullCallFilter.PASS
@@ -234,7 +238,10 @@ class SimpleCallTranslator(object):
             else:
                 translated_filter = FullCallFilter.INFERRED_PASS
         else:
-            translated_variant_annotation = simple_call.variant_annotation + "?"
+            if simple_call.variant_annotation is None:
+                translated_variant_annotation = None
+            else:
+                translated_variant_annotation = simple_call.variant_annotation + "?"
             translated_filter = FullCallFilter.UNKNOWN
             logging.warning(
                 f"Unexpected allele in ref seq difference location. Check whether annotation is correct: "
@@ -251,8 +258,6 @@ class SimpleCallTranslator(object):
             panel: Panel,
     ) -> SimpleCall:
         rs_ids_tuple = self.__get_correct_rs_ids_for_vcf_call(vcf_call, matching_rs_id)
-
-        # get genes from panel to which the call is relevant, and then compare with gene names from VCF
         gene = self.__get_correct_gene_for_vcf_call(vcf_call, call_reference_assembly, panel)
 
         return SimpleCall(
