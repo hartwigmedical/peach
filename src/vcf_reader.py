@@ -41,11 +41,11 @@ class VcfReader(object):
             return VcfCallData(frozenset(), tool_config.vcf_reference_assembly)
 
     def __get_variants_from_vcf(self, vcf: str) -> Optional[Dict[str, Any]]:
-        # variants is None precisely when the vcf file has no variants
+        # variants is None precisely when the VCF file has no variants
         try:
             variants = allel.read_vcf(vcf, fields="*")
         except IOError:
-            raise FileNotFoundError("File " + vcf + " not found or cannot be opened.")
+            raise FileNotFoundError(f"File {vcf} not found or cannot be opened.")
         return variants
 
     def __get_call_data_from_variants(
@@ -79,15 +79,13 @@ class VcfReader(object):
         reference_allele = self.__get_reference_allele_from_variants(call_index, variants)
         alleles = self.__get_called_alleles_from_variants(call_index, sample_r_id, variants)
         rs_ids = self.__get_rs_ids_from_variants(call_index, variants)
+        gene_name = self.__get_gene_name_from_variants(call_index, variants)
 
         variant_annotation: Optional[str]
         if alleles == (reference_allele, reference_allele):
-            gene_name, _ = self.__get_gene_name_and_variant_annotation_from_variants(call_index, variants)
             variant_annotation = REF_CALL_ANNOTATION_STRING
         else:
-            gene_name, variant_annotation = self.__get_gene_name_and_variant_annotation_from_variants(
-                call_index, variants
-            )
+            variant_annotation = self.__get_variant_annotation_from_variants(call_index, variants)
 
         call = VcfCall(
             ReferenceSite(gene_coordinate, reference_allele),
@@ -120,15 +118,26 @@ class VcfReader(object):
             raise ValueError(error_msg)
         return alleles
 
-    def __get_gene_name_and_variant_annotation_from_variants(
+    def __get_gene_name_from_variants(
             self, call_index: int, variants: Dict[str, Any]
-    ) -> Tuple[Optional[str], Optional[str]]:
+    ) -> Optional[str]:
         complete_annotation = str(variants[self.ANNOTATION_FIELD_NAME][call_index])
 
         gene_name: Optional[str]
-        variant_annotation: Optional[str]
         if complete_annotation:
             gene_name = complete_annotation.split("|")[3]
+        else:
+            gene_name = None
+
+        return gene_name
+
+    def __get_variant_annotation_from_variants(
+            self, call_index: int, variants: Dict[str, Any]
+    ) -> Optional[str]:
+        complete_annotation = str(variants[self.ANNOTATION_FIELD_NAME][call_index])
+
+        variant_annotation: Optional[str]
+        if complete_annotation:
             full_variant_annotation = complete_annotation.split("|")[9]
             if full_variant_annotation.startswith(self.CODING_VARIANT_ANNOTATION_PREFIX):
                 variant_annotation = strip_prefix(full_variant_annotation, self.CODING_VARIANT_ANNOTATION_PREFIX)
@@ -137,10 +146,9 @@ class VcfReader(object):
             else:
                 raise ValueError(f"Unexpected annotation prefix: {full_variant_annotation}")
         else:
-            gene_name = None
             variant_annotation = None
 
-        return gene_name, variant_annotation
+        return variant_annotation
 
     def __get_rs_ids_from_variants(self, call_index: int, variants: Dict[str, Any]) -> Tuple[str, ...]:
         rs_ids_string = str(variants[self.RS_IDS_FIELD_NAME][call_index])
