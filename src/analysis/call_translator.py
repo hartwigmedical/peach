@@ -120,13 +120,22 @@ class SimpleCallTranslator(object):
     def __get_full_call_from_simple_call(
         self, simple_call: SimpleCall, panel: Panel, call_reference_assembly: ReferenceAssembly
     ) -> FullCall:
+        translated_reference_site: Optional[ReferenceSite]
         if panel.contains_rs_id_with_reference_site(simple_call.reference_site, call_reference_assembly):
             # TODO: change this
             matching_rs_id = panel.get_rs_id_with_reference_site(simple_call.reference_site, call_reference_assembly)
-            if matching_rs_id in simple_call.rs_ids:
+
+            rs_ids_tuple: Tuple[str, ...]
+            if simple_call.rs_ids == tuple():
+                rs_ids_tuple = (matching_rs_id,)
+            elif simple_call.rs_ids == (matching_rs_id,):
                 rs_ids_tuple = simple_call.rs_ids
             else:
-                rs_ids_tuple = tuple(list(simple_call.rs_ids) + [matching_rs_id])
+                error_msg = (
+                    f"Rs id from panel does not match rs ids from VCF: "
+                    f"panel_rs_id={matching_rs_id}, vcf_rs_ids={simple_call.rs_ids}"
+                )
+                raise ValueError(error_msg)
 
             complete_simple_call = SimpleCall(
                 simple_call.reference_site,
@@ -136,7 +145,12 @@ class SimpleCallTranslator(object):
                 simple_call.variant_annotation,
                 simple_call.filter,
             )
-            translation = self.__get_translation_to_other_assembly(complete_simple_call, panel, call_reference_assembly)
+
+            translated_reference_site = panel.get_reference_site(matching_rs_id, call_reference_assembly.opposite())
+            translated_filter, translated_variant_annotation = self.__get_translated_filter_and_variant_annotation(
+                complete_simple_call, panel, call_reference_assembly, translated_reference_site
+            )
+            translation = Translation(translated_reference_site, translated_variant_annotation, translated_filter)
         else:
             # TODO: change this
             if any(panel.contains_rs_id(rs_id) for rs_id in simple_call.rs_ids):
@@ -144,7 +158,11 @@ class SimpleCallTranslator(object):
                 raise ValueError(error_msg)
 
             complete_simple_call = simple_call
-            translation = self.__get_translation_to_other_assembly(complete_simple_call, panel, call_reference_assembly)
+            translated_reference_site = None
+            translated_filter, translated_variant_annotation = self.__get_translated_filter_and_variant_annotation(
+                complete_simple_call, panel, call_reference_assembly, translated_reference_site
+            )
+            translation = Translation(translated_reference_site, translated_variant_annotation, translated_filter)
 
         if call_reference_assembly == ReferenceAssembly.V37:
             filter_v37 = self.__get_full_call_filter(complete_simple_call.filter)
@@ -177,27 +195,6 @@ class SimpleCallTranslator(object):
 
         self.__assert_gene_in_panel(full_call.gene, panel)
         return full_call
-
-    def __get_translation_to_other_assembly(
-        self, call: SimpleCall, panel: Panel, call_reference_assembly: ReferenceAssembly
-    ) -> Translation:
-        translated_reference_site = self.__get_translated_reference_site(call, panel, call_reference_assembly)
-        translated_filter, translated_variant_annotation = self.__get_translated_filter_and_variant_annotation(
-            call, panel, call_reference_assembly, translated_reference_site
-        )
-        translation = Translation(translated_reference_site, translated_variant_annotation, translated_filter)
-        return translation
-
-    def __get_translated_reference_site(
-        self, call: SimpleCall, panel: Panel, call_reference_assembly: ReferenceAssembly
-    ) -> Optional[ReferenceSite]:
-        if panel.contains_rs_id_matching_call(call, call_reference_assembly):
-            rs_id_info = panel.get_matching_rs_id_info(call.reference_site, call_reference_assembly)
-            self.__assert_rs_id_call_matches_info(call.rs_ids, (rs_id_info.rs_id,))
-            return rs_id_info.get_reference_site(call_reference_assembly.opposite())
-        else:
-            # unknown variant
-            return None
 
     def __get_translated_filter_and_variant_annotation(
         self,
@@ -287,14 +284,6 @@ class SimpleCallTranslator(object):
 
     def __get_full_call_filter(self, direct_filter: SimpleCallFilter) -> FullCallFilter:
         return FullCallFilter[direct_filter.name]
-
-    def __assert_rs_id_call_matches_info(self, rs_ids_call: Tuple[str, ...], rs_ids_info: Tuple[str, ...]) -> None:
-        if rs_ids_call != tuple() and rs_ids_call != rs_ids_info:
-            # TODO: make this more flexible, if necessary
-            error_msg = (
-                f"Given rs id does not match rs id from panel: from call={rs_ids_call}, from panel={rs_ids_info}"
-            )
-            raise ValueError(error_msg)
 
     def __assert_gene_in_panel(self, gene: str, panel: Panel) -> None:
         if gene not in panel.get_genes():
