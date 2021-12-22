@@ -1,4 +1,5 @@
 import logging
+from enum import Enum, auto
 from typing import Dict, Any, Tuple, Optional
 
 import allel
@@ -14,6 +15,13 @@ from calls.vcf_call import VcfCall, VcfCallData
 from panel.panel import Panel
 
 
+class AnnotationType(Enum):
+    # For calls with respect to the vcf reference assembly
+    SNPEFF = auto()
+    PAVE = auto()
+    NONE = auto()
+
+
 class VcfReader(object):
     CHROMOSOME_FIELD_NAME = "variants/CHROM"
     POSITION_FIELD_NAME = "variants/POS"
@@ -21,9 +29,11 @@ class VcfReader(object):
     REF_ALLELE_FIELD_NAME = "variants/REF"
     ALT_ALLELE_FIELD_NAME = "variants/ALT"
     FILTER_FIELD_NAME = "variants/FILTER"
-    ANNOTATION_FIELD_NAME = "variants/ANN"
     GENOTYPE_FIELD_NAME = "calldata/GT"
     SAMPLE_FIELD_NAME = "samples"
+
+    SNPEFF_ANNOTATION_FIELD_NAME = "variants/ANN"
+    PAVE_ANNOTATION_FIELD_NAME = "variants/PAVE_TI"
 
     RS_ID_SEPARATOR = ";"
     RS_ID_EMPTY_INDICATOR = "."
@@ -51,16 +61,18 @@ class VcfReader(object):
     def __get_call_data_from_variants(
         self, variants: Dict[str, Any], panel: Panel, sample_r_id: str, vcf_reference_assembly: ReferenceAssembly
     ) -> VcfCallData:
-        filtered_calls = set()
-
         total_variant_count = self.__get_variant_count(variants)
         logging.info(f"VCF calls: {total_variant_count}")
+
+        annotation_type = self.__get_annotation_type(variants)
+
+        filtered_calls = set()
         for call_index in range(total_variant_count):
             if not self.__filter_is_pass(call_index, variants):
                 # Ignore all calls with filter != PASS
                 continue
 
-            call = self.__get_call_from_variants(call_index, sample_r_id, variants)
+            call = self.__get_call_from_variants(call_index, sample_r_id, variants, annotation_type)
             if panel.is_relevant_to_panel(call, vcf_reference_assembly):
                 filtered_calls.add(call)
 
@@ -71,7 +83,9 @@ class VcfReader(object):
     def __filter_is_pass(self, call_index: int, variants: Dict[str, Any]) -> bool:
         return bool(variants[f"{self.FILTER_FIELD_NAME}_PASS"][call_index])
 
-    def __get_call_from_variants(self, call_index: int, sample_r_id: str, variants: Dict[str, Any]) -> VcfCall:
+    def __get_call_from_variants(
+            self, call_index: int, sample_r_id: str, variants: Dict[str, Any], annotation_type: AnnotationType
+    ) -> VcfCall:
         chromosome = self.__get_chromosome_from_variants(call_index, variants)
         position = self.__get_position_from_variants(call_index, variants)
         gene_coordinate = GeneCoordinate(chromosome, position)
@@ -79,13 +93,13 @@ class VcfReader(object):
         reference_allele = self.__get_reference_allele_from_variants(call_index, variants)
         alleles = self.__get_called_alleles_from_variants(call_index, sample_r_id, variants)
         rs_ids = self.__get_rs_ids_from_variants(call_index, variants)
-        gene_name = self.__get_gene_name_from_variants(call_index, variants)
+        gene_name = self.__get_gene_name_from_variants(call_index, variants, annotation_type)
 
         variant_annotation: Optional[str]
         if alleles == (reference_allele, reference_allele):
             variant_annotation = REF_CALL_ANNOTATION_STRING
         else:
-            variant_annotation = self.__get_variant_annotation_from_variants(call_index, variants)
+            variant_annotation = self.__get_variant_annotation_from_variants(call_index, variants, annotation_type)
 
         call = VcfCall(
             ReferenceSite(gene_coordinate, reference_allele),
@@ -119,35 +133,46 @@ class VcfReader(object):
         return alleles
 
     def __get_gene_name_from_variants(
-            self, call_index: int, variants: Dict[str, Any]
+            self, call_index: int, variants: Dict[str, Any], annotation_type: AnnotationType
     ) -> Optional[str]:
-        complete_annotation = str(variants[self.ANNOTATION_FIELD_NAME][call_index])
-
         gene_name: Optional[str]
-        if complete_annotation:
-            gene_name = complete_annotation.split("|")[3]
-        else:
-            gene_name = None
+        if annotation_type == AnnotationType.SNPEFF:
+            complete_annotation = str(variants[self.SNPEFF_ANNOTATION_FIELD_NAME][call_index])
 
+            if complete_annotation:
+                gene_name = complete_annotation.split("|")[3]
+            else:
+                gene_name = None
+        elif annotation_type == AnnotationType.PAVE:
+            raise NotImplementedError()
+        elif annotation_type == AnnotationType.NONE:
+            gene_name = None
+        else:
+            raise ValueError(f"Unrecognized annotation type: {annotation_type}")
         return gene_name
 
     def __get_variant_annotation_from_variants(
-            self, call_index: int, variants: Dict[str, Any]
+            self, call_index: int, variants: Dict[str, Any], annotation_type: AnnotationType
     ) -> Optional[str]:
-        complete_annotation = str(variants[self.ANNOTATION_FIELD_NAME][call_index])
-
         variant_annotation: Optional[str]
-        if complete_annotation:
-            full_variant_annotation = complete_annotation.split("|")[9]
-            if full_variant_annotation.startswith(self.CODING_VARIANT_ANNOTATION_PREFIX):
-                variant_annotation = strip_prefix(full_variant_annotation, self.CODING_VARIANT_ANNOTATION_PREFIX)
-            elif full_variant_annotation.startswith(self.NON_CODING_VARIANT_ANNOTATION_PREFIX):
-                variant_annotation = strip_prefix(full_variant_annotation, self.NON_CODING_VARIANT_ANNOTATION_PREFIX)
+        if annotation_type == AnnotationType.SNPEFF:
+            complete_annotation = str(variants[self.SNPEFF_ANNOTATION_FIELD_NAME][call_index])
+            if complete_annotation:
+                full_variant_annotation = complete_annotation.split("|")[9]
+                if full_variant_annotation.startswith(self.CODING_VARIANT_ANNOTATION_PREFIX):
+                    variant_annotation = strip_prefix(full_variant_annotation, self.CODING_VARIANT_ANNOTATION_PREFIX)
+                elif full_variant_annotation.startswith(self.NON_CODING_VARIANT_ANNOTATION_PREFIX):
+                    variant_annotation = strip_prefix(full_variant_annotation, self.NON_CODING_VARIANT_ANNOTATION_PREFIX)
+                else:
+                    raise ValueError(f"Unexpected annotation prefix: {full_variant_annotation}")
             else:
-                raise ValueError(f"Unexpected annotation prefix: {full_variant_annotation}")
-        else:
+                variant_annotation = None
+        elif annotation_type == AnnotationType.PAVE:
+            raise NotImplementedError()
+        elif annotation_type == AnnotationType.NONE:
             variant_annotation = None
-
+        else:
+            raise ValueError(f"Unrecognized annotation type: {annotation_type}")
         return variant_annotation
 
     def __get_rs_ids_from_variants(self, call_index: int, variants: Dict[str, Any]) -> Tuple[str, ...]:
@@ -170,3 +195,20 @@ class VcfReader(object):
 
     def __get_variant_count(self, variants: Dict[str, Any]) -> int:
         return len(variants[self.RS_IDS_FIELD_NAME])
+
+    def __get_annotation_type(self, variants: Dict[str, Any]) -> AnnotationType:
+        has_snpeff_annotation = self.SNPEFF_ANNOTATION_FIELD_NAME in variants.keys()
+        has_pave_annotation = self.PAVE_ANNOTATION_FIELD_NAME in variants.keys()
+        if has_snpeff_annotation and has_pave_annotation:
+            logging.warning(
+                f"Both SNPEFF and PAVE annotation detected. When both are present, PAVE annotation is preferred."
+            )
+            return AnnotationType.PAVE
+        elif has_snpeff_annotation and not has_pave_annotation:
+            return AnnotationType.SNPEFF
+        elif not has_snpeff_annotation and has_pave_annotation:
+            return AnnotationType.PAVE
+        else:
+            logging.warning(f"No annotation detected in the VCF. Annotation with SNPEFF or PAVE is preferred.")
+            return AnnotationType.NONE
+
