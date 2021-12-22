@@ -100,47 +100,13 @@ class Panel(object):
         else:
             raise ValueError("Multiple rs id infos match position and ref allele. This should be impossible.")
 
-    def has_ref_seq_difference_annotation(
-        self, gene: str, reference_site: ReferenceSite, reference_assembly: ReferenceAssembly
-    ) -> bool:
-        rs_id_is_known = self.contains_rs_id_with_reference_site(reference_site, reference_assembly)
-        if not rs_id_is_known:
-            return False
-        else:
-            rs_id = self.get_matching_rs_id_info(reference_site, reference_assembly).rs_id
-            return self.__get_gene_info(gene).has_ref_sequence_difference_annotation(rs_id)
+    def has_ref_seq_difference_annotation(self, rs_id: str) -> bool:
+        gene_for_rs_id = self.__get_gene_for_rs_id(rs_id)
+        return self.__get_gene_info(gene_for_rs_id).has_ref_sequence_difference_annotation(rs_id)
 
-    def get_ref_seq_difference_annotation(
-        self, gene: str, reference_site: ReferenceSite, reference_assembly: ReferenceAssembly
-    ) -> str:
-        rs_id = self.get_matching_rs_id_info(reference_site, reference_assembly).rs_id
-        return self.__get_gene_info(gene).get_ref_sequence_difference_annotation(rs_id, reference_assembly.opposite())
-
-    def contains_rs_id_matching_call(self, call: SimpleCall, reference_assembly: ReferenceAssembly) -> bool:
-        if self.contains_rs_id_with_reference_site(call.reference_site, reference_assembly):
-            return True
-        elif any(self.contains_rs_id(rs_id) for rs_id in call.rs_ids):
-            error_msg = (
-                f"Match call with rs id info from panel on an rs id but not position and reference allele:\n"
-                f"rs ids: {call.rs_ids}, input file position: {call.reference_site.start_coordinate}, "
-                f"reference assembly: {reference_assembly}"
-            )
-            raise ValueError(error_msg)
-        else:
-            return False
-
-    def get_matching_rs_id_info(self, reference_site: ReferenceSite, reference_assembly: ReferenceAssembly) -> RsIdInfo:
-        matching_rs_id_infos = []
-        for info in self.__get_rs_id_infos():
-            if info.get_reference_site(reference_assembly) == reference_site:
-                matching_rs_id_infos.append(info)
-
-        if matching_rs_id_infos and len(matching_rs_id_infos) == 1:
-            return matching_rs_id_infos.pop()
-        elif not matching_rs_id_infos:
-            raise ValueError("No rs id infos match position and ref allele")
-        else:
-            raise ValueError("Multiple rs id infos match position and ref allele")
+    def get_ref_seq_difference_annotation(self, rs_id: str, reference_assembly: ReferenceAssembly) -> str:
+        gene_for_rs_id = self.__get_gene_for_rs_id(rs_id)
+        return self.__get_gene_info(gene_for_rs_id).get_ref_sequence_difference_annotation(rs_id, reference_assembly)
 
     def contains_rs_id(self, rs_id: str) -> bool:
         return rs_id in self.__get_rs_ids()
@@ -154,6 +120,17 @@ class Panel(object):
 
     def get_id(self) -> str:
         return f"{self.__name}_v{self.__version}"
+
+    def __get_gene_for_rs_id(self, rs_id: str) -> str:
+        matching_genes = []
+        for gene_info in self.__gene_infos:
+            for rs_id_info in gene_info.rs_id_infos:
+                if rs_id_info.rs_id == rs_id:
+                    matching_genes.append(gene_info.gene)
+        if len(matching_genes) == 1:
+            return matching_genes[0]
+        else:
+            raise ValueError(f"Not exactly one gene for rs_id: rs_id={rs_id}, genes={sorted(matching_genes)}")
 
     def __get_gene_info(self, gene: str) -> GeneInfo:
         matching_gene_infos = [gene_info for gene_info in self.__gene_infos if gene_info.gene == gene]
