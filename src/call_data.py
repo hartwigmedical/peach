@@ -1,8 +1,7 @@
 from copy import deepcopy
-from typing import NamedTuple, Tuple, Optional, Set, FrozenSet, Dict
+from typing import NamedTuple, Tuple, Optional, FrozenSet, Dict
 
 from base.filter import FullCallFilter, VcfCallFilter
-from base.gene_coordinate import GeneCoordinate
 from base.reference_site import ReferenceSite
 from base.reference_assembly import ReferenceAssembly
 
@@ -18,14 +17,6 @@ class VcfCall(NamedTuple):
     rs_ids: Tuple[str, ...]
     variant_annotation: str
     filter: VcfCallFilter
-
-    def is_pass(self) -> bool:
-        if self.filter == VcfCallFilter.PASS:
-            return True
-        elif self.filter == VcfCallFilter.NO_CALL:
-            return False
-        else:
-            raise NotImplementedError("Unrecognized filer value")
 
 
 class VcfCallData(NamedTuple):
@@ -55,7 +46,7 @@ class SimpleCall(NamedTuple):
         elif self.filter == VcfCallFilter.NO_CALL:
             return False
         else:
-            raise NotImplementedError("Unrecognized filer value")
+            raise NotImplementedError("Unrecognized filter value")
 
 
 class AnnotatedAllele(object):
