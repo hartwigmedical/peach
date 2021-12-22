@@ -1,37 +1,61 @@
 from copy import deepcopy
 from typing import NamedTuple, Tuple, Optional, Set, FrozenSet, Dict
 
-from base.filter import FullCallFilter, SimpleCallFilter
+from base.filter import FullCallFilter, VcfCallFilter
 from base.gene_coordinate import GeneCoordinate
 from base.reference_site import ReferenceSite
 from base.reference_assembly import ReferenceAssembly
 
 
-class SimpleCall(NamedTuple):
-    # Call with data and annotation for only a single reference assembly version. So only v37 or v38
+class VcfCall(NamedTuple):
+    """
+    Call as it was extracted from the input VCF.
+    Has data and annotation for only a single reference assembly version. So only v37 or v38.
+    """
     reference_site: ReferenceSite
     alleles: Tuple[str, str]  # The order is (ref, alt) when there is one of each
-    gene: str
+    gene: Optional[str]
     rs_ids: Tuple[str, ...]
     variant_annotation: str
-    filter: SimpleCallFilter
+    filter: VcfCallFilter
 
     def is_pass(self) -> bool:
-        if self.filter == SimpleCallFilter.PASS:
+        if self.filter == VcfCallFilter.PASS:
             return True
-        elif self.filter == SimpleCallFilter.NO_CALL:
+        elif self.filter == VcfCallFilter.NO_CALL:
             return False
         else:
             raise NotImplementedError("Unrecognized filer value")
 
 
-class SimpleCallData(NamedTuple):
-    calls: FrozenSet[SimpleCall]
+class VcfCallData(NamedTuple):
+    calls: FrozenSet[VcfCall]
     reference_assembly: ReferenceAssembly
 
     def __repr__(self) -> str:  # pragma: no cover
         calls_string = "frozenset(" + ", ".join(sorted([repr(call) for call in self.calls])) + ")"
         return f"SimpleCallData({calls_string}, {self.reference_assembly!r})"
+
+
+class SimpleCall(NamedTuple):
+    """
+    Call with data and annotation for only a single reference assembly version. So only v37 or v38.
+    Annotation fixes etc. with data from the panel has already been done at this point.
+    """
+    reference_site: ReferenceSite
+    alleles: Tuple[str, str]  # The order is (ref, alt) when there is one of each
+    gene: str
+    rs_ids: Tuple[str, ...]
+    variant_annotation: str
+    filter: VcfCallFilter
+
+    def is_pass(self) -> bool:
+        if self.filter == VcfCallFilter.PASS:
+            return True
+        elif self.filter == VcfCallFilter.NO_CALL:
+            return False
+        else:
+            raise NotImplementedError("Unrecognized filer value")
 
 
 class AnnotatedAllele(object):

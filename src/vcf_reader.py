@@ -7,10 +7,10 @@ from base.reference_site import ReferenceSite
 from base.util import strip_prefix
 from config.tool_config import ToolConfig
 from base.constants import REF_CALL_ANNOTATION_STRING
-from base.filter import SimpleCallFilter
+from base.filter import VcfCallFilter
 from base.gene_coordinate import GeneCoordinate
 from base.reference_assembly import ReferenceAssembly
-from call_data import SimpleCallData, SimpleCall
+from call_data import VcfCallData, VcfCall
 from config.panel import Panel
 
 
@@ -30,7 +30,7 @@ class VcfReader(object):
     CODING_VARIANT_ANNOTATION_PREFIX = "c."
     NON_CODING_VARIANT_ANNOTATION_PREFIX = "n."
 
-    def get_call_data(self, tool_config: ToolConfig, panel: Panel) -> SimpleCallData:
+    def get_call_data(self, tool_config: ToolConfig, panel: Panel) -> VcfCallData:
         variants = self.__get_variants_from_vcf(tool_config.vcf_path)
         if variants is not None:
             return self.__get_call_data_from_variants(
@@ -38,7 +38,7 @@ class VcfReader(object):
             )
         else:
             logging.warning("No variants found in vcf")
-            return SimpleCallData(frozenset(), tool_config.vcf_reference_assembly)
+            return VcfCallData(frozenset(), tool_config.vcf_reference_assembly)
 
     def __get_variants_from_vcf(self, vcf: str) -> Optional[Dict[str, Any]]:
         # variants is None precisely when the vcf file has no variants
@@ -50,7 +50,7 @@ class VcfReader(object):
 
     def __get_call_data_from_variants(
         self, variants: Dict[str, Any], panel: Panel, sample_r_id: str, vcf_reference_assembly: ReferenceAssembly
-    ) -> SimpleCallData:
+    ) -> VcfCallData:
         filtered_calls = set()
 
         total_variant_count = self.__get_variant_count(variants)
@@ -66,12 +66,12 @@ class VcfReader(object):
 
         logging.info(f"VCF calls QC-PASS and matching panel: {len(filtered_calls)}")
 
-        return SimpleCallData(frozenset(filtered_calls), vcf_reference_assembly)
+        return VcfCallData(frozenset(filtered_calls), vcf_reference_assembly)
 
     def __filter_is_pass(self, call_index: int, variants: Dict[str, Any]) -> bool:
         return bool(variants[f"{self.FILTER_FIELD_NAME}_PASS"][call_index])
 
-    def __get_call_from_variants(self, call_index: int, sample_r_id: str, variants: Dict[str, Any]) -> SimpleCall:
+    def __get_call_from_variants(self, call_index: int, sample_r_id: str, variants: Dict[str, Any]) -> VcfCall:
         chromosome = self.__get_chromosome_from_variants(call_index, variants)
         position = self.__get_position_from_variants(call_index, variants)
         gene_coordinate = GeneCoordinate(chromosome, position)
@@ -88,13 +88,13 @@ class VcfReader(object):
                 call_index, variants
             )
 
-        call = SimpleCall(
+        call = VcfCall(
             ReferenceSite(gene_coordinate, reference_allele),
             alleles,
             gene_name,
             rs_ids,
             variant_annotation,
-            SimpleCallFilter.PASS,
+            VcfCallFilter.PASS,
         )
         return call
 
@@ -121,8 +121,9 @@ class VcfReader(object):
 
     def __get_gene_name_and_variant_annotation_from_variants(
             self, call_index: int, variants: Dict[str, Any]
-    ) -> Tuple[str, str]:
+    ) -> Tuple[Optional[str], str]:
         complete_annotation = str(variants[self.ANNOTATION_FIELD_NAME][call_index])
+        gene_name: Optional[str]
         if complete_annotation:
             gene_name = complete_annotation.split("|")[3]
             full_variant_annotation = complete_annotation.split("|")[9]
@@ -133,8 +134,7 @@ class VcfReader(object):
             else:
                 raise ValueError(f"Unexpected annotation prefix: {full_variant_annotation}")
         else:
-            # TODO: solve this in a better way, or assert later that none of the returned simple calls have this
-            gene_name = ""
+            gene_name = None
             variant_annotation = ""
 
         return gene_name, variant_annotation

@@ -2,7 +2,7 @@ import logging
 from copy import deepcopy
 from typing import Dict, Set, FrozenSet
 
-from call_data import SimpleCallData, FullCall, HaplotypeCall, FullCallData
+from call_data import FullCall, HaplotypeCall, FullCallData, VcfCallData
 from analysis.call_translator import SimpleCallTranslator
 from config.panel import Panel
 from analysis.haplotype_caller import HaplotypeCaller
@@ -36,7 +36,7 @@ class PgxAnalysis(object):
 
 
 class PgxAnalyser(object):
-    def create_pgx_analysis(self, vcf_call_data: SimpleCallData, panel: Panel) -> PgxAnalysis:
+    def create_pgx_analysis(self, vcf_call_data: VcfCallData, panel: Panel) -> PgxAnalysis:
         logging.info(f"Annotating call data for reference assembly {vcf_call_data.reference_assembly.opposite().name}")
         full_call_data = SimpleCallTranslator().get_all_full_call_data(vcf_call_data, panel)
         logging.info(f"Calling haplotypes")

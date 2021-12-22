@@ -1,7 +1,7 @@
 from enum import Enum, auto
 
 
-class SimpleCallFilter(Enum):
+class VcfCallFilter(Enum):
     # For calls with respect to the vcf reference assembly
     PASS = auto()
     NO_CALL = auto()

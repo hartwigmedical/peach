@@ -1,10 +1,9 @@
 import itertools
 from typing import Set, FrozenSet
 
-from base.gene_coordinate import GeneCoordinate
 from base.reference_assembly import ReferenceAssembly
 from base.reference_site import ReferenceSite
-from call_data import SimpleCall
+from call_data import VcfCall
 from config.gene_info import GeneInfo, assert_no_overlap_gene_names
 from config.haplotype import Haplotype
 from config.rs_id_info import RsIdInfo
@@ -66,16 +65,22 @@ class Panel(object):
     def get_haplotypes(self, gene: str) -> Set[Haplotype]:
         return set(self.__get_gene_info(gene).haplotypes)
 
-    def is_relevant_to_panel(self, call: SimpleCall, reference_assembly: ReferenceAssembly) -> bool:
+    def is_relevant_to_panel(self, call: VcfCall, reference_assembly: ReferenceAssembly) -> bool:
         covered_coordinates_call = call.reference_site.get_covered_coordinates()
         for info in self.__get_rs_id_infos():
             rs_id_covered_coordinates = info.get_reference_site(reference_assembly).get_covered_coordinates()
-            info_matches = (
-                    rs_id_covered_coordinates.intersection(covered_coordinates_call) or info.rs_id in call.rs_ids
-            )
-            if info_matches:
+            if rs_id_covered_coordinates.intersection(covered_coordinates_call) or info.rs_id in call.rs_ids:
                 return True
         return False
+
+    def get_relevant_rs_ids(self, call: VcfCall, reference_assembly: ReferenceAssembly) -> Set[str]:
+        relevant_rs_ids = set()
+        covered_coordinates_call = call.reference_site.get_covered_coordinates()
+        for info in self.__get_rs_id_infos():
+            rs_id_covered_coordinates = info.get_reference_site(reference_assembly).get_covered_coordinates()
+            if rs_id_covered_coordinates.intersection(covered_coordinates_call) or info.rs_id in call.rs_ids:
+                relevant_rs_ids.add(info.rs_id)
+        return relevant_rs_ids
 
     def contains_rs_id_with_reference_site(
             self, reference_site: ReferenceSite, reference_assembly: ReferenceAssembly
@@ -101,12 +106,23 @@ class Panel(object):
             raise ValueError("Multiple rs id infos match position and ref allele. This should be impossible.")
 
     def has_ref_seq_difference_annotation(self, rs_id: str) -> bool:
-        gene_for_rs_id = self.__get_gene_for_rs_id(rs_id)
+        gene_for_rs_id = self.get_gene_for_rs_id(rs_id)
         return self.__get_gene_info(gene_for_rs_id).has_ref_sequence_difference_annotation(rs_id)
 
     def get_ref_seq_difference_annotation(self, rs_id: str, reference_assembly: ReferenceAssembly) -> str:
-        gene_for_rs_id = self.__get_gene_for_rs_id(rs_id)
+        gene_for_rs_id = self.get_gene_for_rs_id(rs_id)
         return self.__get_gene_info(gene_for_rs_id).get_ref_sequence_difference_annotation(rs_id, reference_assembly)
+
+    def get_gene_for_rs_id(self, rs_id: str) -> str:
+        matching_genes = []
+        for gene_info in self.__gene_infos:
+            for rs_id_info in gene_info.rs_id_infos:
+                if rs_id_info.rs_id == rs_id:
+                    matching_genes.append(gene_info.gene)
+        if len(matching_genes) == 1:
+            return matching_genes[0]
+        else:
+            raise ValueError(f"Not exactly one gene for rs_id: rs_id={rs_id}, genes={sorted(matching_genes)}")
 
     def contains_rs_id(self, rs_id: str) -> bool:
         return rs_id in self.__get_rs_ids()
@@ -120,17 +136,6 @@ class Panel(object):
 
     def get_id(self) -> str:
         return f"{self.__name}_v{self.__version}"
-
-    def __get_gene_for_rs_id(self, rs_id: str) -> str:
-        matching_genes = []
-        for gene_info in self.__gene_infos:
-            for rs_id_info in gene_info.rs_id_infos:
-                if rs_id_info.rs_id == rs_id:
-                    matching_genes.append(gene_info.gene)
-        if len(matching_genes) == 1:
-            return matching_genes[0]
-        else:
-            raise ValueError(f"Not exactly one gene for rs_id: rs_id={rs_id}, genes={sorted(matching_genes)}")
 
     def __get_gene_info(self, gene: str) -> GeneInfo:
         matching_gene_infos = [gene_info for gene_info in self.__gene_infos if gene_info.gene == gene]
