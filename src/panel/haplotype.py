@@ -1,7 +1,7 @@
 from typing import Collection, Dict, List, FrozenSet
 
 from base.util import get_key_to_multiple_values
-from config.variant import Variant, assert_no_overlap_variant_rs_ids
+from panel.variant import Variant, assert_no_overlap_variant_rs_ids
 
 
 class Haplotype(object):

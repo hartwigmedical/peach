@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 from argument_parser import ArgumentParser
 from base.reference_assembly import ReferenceAssembly
-from config.tool_config import ToolConfig
+from tool_config import ToolConfig
 
 
 class TestArgumentParser(unittest.TestCase):

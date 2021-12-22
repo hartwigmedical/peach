@@ -2,13 +2,13 @@ from typing import Dict, Set
 
 from base.gene_coordinate import GeneCoordinate
 from base.reference_site import ReferenceSite
-from config.annotation import Annotation
-from config.drug_info import DrugInfo
-from config.gene_info import GeneInfo
-from config.haplotype import Haplotype
-from config.panel import Panel
-from config.rs_id_info import RsIdInfo
-from config.variant import Variant
+from panel.annotation import Annotation
+from panel.drug_info import DrugInfo
+from panel.gene_info import GeneInfo
+from panel.haplotype import Haplotype
+from panel.panel import Panel
+from panel.rs_id_info import RsIdInfo
+from panel.variant import Variant
 
 
 def get_wide_example_panel() -> Panel:

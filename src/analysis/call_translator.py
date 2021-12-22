@@ -6,8 +6,10 @@ from base.filter import FullCallFilter, VcfCallFilter
 from base.gene_coordinate import GeneCoordinate
 from base.reference_assembly import ReferenceAssembly
 from base.reference_site import ReferenceSite
-from call_data import FullCall, AnnotatedAllele, SimpleCall, FullCallData, VcfCallData, VcfCall
-from config.panel import Panel
+from calls.full_call import AnnotatedAllele, FullCall, FullCallData
+from calls.simple_call import SimpleCall
+from calls.vcf_call import VcfCall, VcfCallData
+from panel.panel import Panel
 
 
 class Translation(NamedTuple):

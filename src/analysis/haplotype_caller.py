@@ -4,10 +4,11 @@ from copy import deepcopy
 from typing import Dict, Set, DefaultDict, FrozenSet, Tuple
 
 from base.reference_assembly import ReferenceAssembly
-from call_data import FullCall, HaplotypeCall, FullCallData
-from config.haplotype import Haplotype
-from config.panel import Panel
-from config.variant import Variant
+from calls.haplotype_call import HaplotypeCall
+from calls.full_call import FullCall, FullCallData
+from panel.haplotype import Haplotype
+from panel.panel import Panel
+from panel.variant import Variant
 
 
 class HaplotypeCaller(object):

@@ -5,13 +5,13 @@ import allel
 
 from base.reference_site import ReferenceSite
 from base.util import strip_prefix
-from config.tool_config import ToolConfig
+from tool_config import ToolConfig
 from base.constants import REF_CALL_ANNOTATION_STRING
 from base.filter import VcfCallFilter
 from base.gene_coordinate import GeneCoordinate
 from base.reference_assembly import ReferenceAssembly
-from call_data import VcfCallData, VcfCall
-from config.panel import Panel
+from calls.vcf_call import VcfCall, VcfCallData
+from panel.panel import Panel
 
 
 class VcfReader(object):

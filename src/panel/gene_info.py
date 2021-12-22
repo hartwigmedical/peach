@@ -5,14 +5,14 @@ from typing import List, Dict, Collection, FrozenSet, Optional, Set
 from base.constants import NORMAL_FUNCTION_STRING
 from base.reference_assembly import ReferenceAssembly
 from base.util import get_key_to_multiple_values
-from config.annotation import Annotation
-from config.drug_info import DrugInfo, assert_no_overlap_drug_names
-from config.haplotype import (
+from panel.annotation import Annotation
+from panel.drug_info import DrugInfo, assert_no_overlap_drug_names
+from panel.haplotype import (
     Haplotype,
     assert_no_overlap_haplotype_names,
     assert_no_overlap_haplotype_variant_combinations,
 )
-from config.rs_id_info import RsIdInfo
+from panel.rs_id_info import RsIdInfo
 
 
 class GeneInfo(object):

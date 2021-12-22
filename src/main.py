@@ -4,8 +4,8 @@ import os
 import sys
 
 from argument_parser import ArgumentParser
-from config.tool_config import ToolConfig
-from config.panel import Panel
+from tool_config import ToolConfig
+from panel.panel import Panel
 from analysis.pgx_analysis import PgxAnalyser, PgxAnalysis
 from json_parser import JsonParser
 from pgx_reporter import HaplotypeReporter, GenotypeReporter

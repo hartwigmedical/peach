@@ -3,15 +3,15 @@ from typing import Set, FrozenSet
 
 from base.reference_assembly import ReferenceAssembly
 from base.reference_site import ReferenceSite
-from call_data import VcfCall
-from config.gene_info import GeneInfo, assert_no_overlap_gene_names
-from config.haplotype import Haplotype
-from config.rs_id_info import RsIdInfo
+from calls.vcf_call import VcfCall
+from panel.gene_info import GeneInfo, assert_no_overlap_gene_names
+from panel.haplotype import Haplotype
+from panel.rs_id_info import RsIdInfo
 
 
 class Panel(object):
     def __init__(self, name: str, version: str, gene_infos: FrozenSet[GeneInfo]) -> None:
-        assert_no_overlap_gene_names(gene_infos, "config json")
+        assert_no_overlap_gene_names(gene_infos, "panel json")
         self.__assert_rs_ids_all_different(gene_infos)
         self.__assert_all_rs_id_infos_compatible(gene_infos)
 
@@ -163,7 +163,7 @@ class Panel(object):
             for left_info in left_gene_info.rs_id_infos:
                 for right_info in right_gene_info.rs_id_infos:
                     if not left_info.is_compatible(right_info):
-                        error_msg = f"Incompatible rs id infos in config. left: {left_info}, right: {right_info}"
+                        error_msg = f"Incompatible rs id infos in panel. left: {left_info}, right: {right_info}"
                         raise ValueError(error_msg)
 
     @staticmethod

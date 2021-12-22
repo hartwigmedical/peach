@@ -3,7 +3,7 @@ from enum import Enum
 from typing import List, Optional, Any
 
 from base.reference_assembly import ReferenceAssembly
-from config.tool_config import ToolConfig
+from tool_config import ToolConfig
 
 
 class EnumAction(argparse.Action):

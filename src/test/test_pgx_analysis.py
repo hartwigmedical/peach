@@ -5,7 +5,9 @@ from base.filter import FullCallFilter, VcfCallFilter
 from base.gene_coordinate import GeneCoordinate
 from base.reference_assembly import ReferenceAssembly
 from base.reference_site import ReferenceSite
-from call_data import VcfCallData, VcfCall, HaplotypeCall, FullCall, FullCallData
+from calls.haplotype_call import HaplotypeCall
+from calls.full_call import FullCall, FullCallData
+from calls.vcf_call import VcfCall, VcfCallData
 from analysis.pgx_analysis import PgxAnalyser, PgxAnalysis
 from test.util_for_test import get_wide_example_panel, get_narrow_example_panel
 

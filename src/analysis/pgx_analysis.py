@@ -2,9 +2,11 @@ import logging
 from copy import deepcopy
 from typing import Dict, Set, FrozenSet
 
-from call_data import FullCall, HaplotypeCall, FullCallData, VcfCallData
+from calls.haplotype_call import HaplotypeCall
+from calls.full_call import FullCall, FullCallData
+from calls.vcf_call import VcfCallData
 from analysis.call_translator import SimpleCallTranslator
-from config.panel import Panel
+from panel.panel import Panel
 from analysis.haplotype_caller import HaplotypeCaller
 
 
