@@ -166,7 +166,7 @@ class VcfReader(object):
     def __get_variant_annotation_from_variants(
             self, call_index: int, variants: Dict[str, Any], annotation_type: AnnotationType, panel: Panel
     ) -> Optional[str]:
-        variant_annotation: Optional[str]
+        full_variant_annotation: Optional[str]
         if annotation_type == AnnotationType.SNPEFF:
             complete_annotation = self.__get_snpeff_annotation_string(call_index, variants)
             if complete_annotation is not None:
@@ -184,6 +184,7 @@ class VcfReader(object):
         else:
             raise ValueError(f"Unrecognized annotation type: {annotation_type}")
 
+        variant_annotation: Optional[str]
         if full_variant_annotation is None:
             variant_annotation = None
         elif full_variant_annotation.startswith(self.CODING_VARIANT_ANNOTATION_PREFIX):
@@ -207,6 +208,8 @@ class VcfReader(object):
             self.__get_transcript_id_from_pave_annotation(annotation): annotation for annotation in all_annotations
         }
         common_transcript_ids = transcript_ids.intersection(set(transcript_id_to_annotation.keys()))
+        
+        pave_annotation: Optional[str]
         if len(common_transcript_ids) == 1:
             pave_annotation = transcript_id_to_annotation[common_transcript_ids.pop()]
         elif not common_transcript_ids:
