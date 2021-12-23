@@ -203,12 +203,12 @@ class VcfReader(object):
                 f"For PEACH to handle PAVE annotations, the transcript ID needs to be set for all genes in the panel!"
             )
             raise ValueError(error_msg)
-        all_annotations = [str(annotation) for annotation in variants[self.SNPEFF_ANNOTATION_FIELD_NAME][call_index]]
+        all_annotations = [str(annotation) for annotation in variants[self.PAVE_ANNOTATION_FIELD_NAME][call_index]]
         transcript_id_to_annotation = {
             self.__get_transcript_id_from_pave_annotation(annotation): annotation for annotation in all_annotations
         }
         common_transcript_ids = transcript_ids.intersection(set(transcript_id_to_annotation.keys()))
-        
+
         pave_annotation: Optional[str]
         if len(common_transcript_ids) == 1:
             pave_annotation = transcript_id_to_annotation[common_transcript_ids.pop()]
