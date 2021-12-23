@@ -5,6 +5,9 @@ the [Hartwig Medical Foundation pipeline](https://github.com/hartwigmedical/pipe
 It imports haplotypes and related variants from a curated JSON file, reports the presence of these variants in a 
 germline VCF, and infers the simplest combination of haplotypes that explains the presence of these variants. 
 
+The germline VCF file can be annotated by either [SNPEFF](https://pcingola.github.io/SnpEff/) or [PAVE](https://github.com/hartwigmedical/hmftools/tree/master/pave).
+When the VCF has been annotated by both, the PAVE annotations are used.
+
 The two output files are:
 * A file that contains the determined genotype of the sample for each gene in the JSON, expressed in terms of haplotypes.
 * A file that contains calls for all positions of variants in the JSON file, including annotation and filters wrt both v37 and v38 reference genomes.
@@ -18,7 +21,6 @@ The two output files are:
 * [Input](#input)
   + [VCF](#vcf)
   + [JSON](#json)
-  + [Datastore file locations](#datastore-file-locations)
 * [Output](#output)
   + [Genotype TSV file](#genotype-tsv-file)
   + [Calls TSV file](#calls-tsv-file)
@@ -84,18 +86,29 @@ Currently, the only optional argument enables an experimental feature.
 ### VCF
 PEACH has been designed to work with VCF files that follow the VCF Version 4.2 format, see 
 [specification](https://samtools.github.io/hts-specs/VCFv4.2.pdf). In addition to the required fields, 
-each row should contain an annotation field "ANN", as described in 
+each row should contain either an annotation field "ANN", as described in 
 [annotation format specification](http://snpeff.sourceforge.net/VCFannotationformat_v1.0.pdf), that contains
-the subsections "Gene Name" and "HGVS.c". One of the samples in the VCF should have a label 
+the subsections "Gene Name" and "HGVS.c", 
+or annotation as created by [PAVE v1.0](https://github.com/hartwigmedical/hmftools/tree/master/pave). 
+One of the samples in the VCF should have a label 
 equal to the `sample_r_id` argument,
 and the "GT" sub-field for this sample should be included and filled in with diploid calls.
 
 The calls in the VCF should be with respect to a v37 reference genome. Support for calls wrt v38 is experimental.
 
+One subtlety with the annotations has to do with calls with multiple sets of annotations. 
+For SNPEFF annotations, PEACH simply uses the first of the annotations. 
+For PAVE annotations, PEACH uses only the annotations corresponding to the transcript ID's 
+in the "canonicalTranscript" fields in the panel JSON.
+If a call has multiple PAVE annotations with a transript ID matching one of the transcript ID's in the panel JSON,
+then an error is raised.
+
 ### JSON
 For an example of a valid panel JSON (with fake data), see 
 [example](https://github.com/hartwigmedical/scripts/blob/master/peach/src/test_resources/test_panel.json).
-All fields in the example JSON are required. Additional fields are ignored. 
+Almost all fields in the example JSON are required. The only exception is "canonicalTranscript", 
+which is required for handling PAVE annotations, but ignored for SNPEFF annotations. Additional fields are ignored. 
+
 Relevant differences between the v37 and v38 reference sequences for a gene should be included as an entry in the "variants" field
 of that gene where the "referenceAlleleV37" and "referenceAlleleV38" fields are different. The set of rs id's with such entries 
 has to be equal to the set of rs id's with entries in the "refSeqDifferenceAnnotations" field of that gene.
@@ -103,13 +116,6 @@ This ensures that the variant annotation for variants at these locations can be 
 
 PEACH does not (properly) support panel JSON files that contain (partially) overlapping genes.
 Variants in a panel JSON file are not allowed to (partially) overlap.
-
-### Datastore file locations 
-(Only relevant for internal use)
-
-Panel:
-* Smaller panel for DPYD with haplotypes and haplotypes restricted to those in SOC tests (`/data/common/dbs/peach/panelfiles/min_DPYD.json`).
-* Panel with common DPYD haplotypes and variants (`/data/common/dbs/peach/panelfiles/DPYD.json`).
 
 ## Output
 PEACH outputs two TSV files. One contains genotypes/haplotypes for each gene, the other contains calls for all variants from the panel JSON.
@@ -206,9 +212,13 @@ For each of the combined VCF calls, an attempt is made to find a variant in the 
 
 If successful:
 * If the rs id of the call has not been set, then it is set to the value from the matching variant.
+* If the gene of the call has been set based on the VCF, then compare with the gene from the panel and error out if they are different.
+* If the gene of the call has not been set based on the VCF, then it is set to the gene from the matching variant.
 * The reference allele and position wrt the non-VCF RG version are determined from the matching variant.
 
 If unsuccessful:
+* If the rs id of the call has not been set, set it to "UNKNOWN".
+* If the gene of the call has not been set based on the VCF, then it is set to "UNKNOWN".
 * Set reference allele and position wrt non-VCF RG version to "UNKNOWN".
 
 Also, the correct annotation and filter wrt the non-VCF RG version are determined according to the following table, 
@@ -223,6 +233,9 @@ where an asterisk (*) indicates that any value is allowed:
 | True                          | Observed     | False                                               | True                                        | *                                         | Variant Annotation VCF RG Version                      | PASS                      |
 | True                          | Observed     | False                                               | False                                       | True                                      | From "refSeqDifferenceAnnotations" field in panel JSON | PASS                      |
 | True                          | Observed     | False                                               | False                                       | False                                     | Variant Annotation VCF RG Version + "?"                | UNKNOWN                   |
+
+The only exception to the above table is that when the Variant Annotation VCF RG Version is equal to "UNKNOWN", 
+we do not actually add a question mark when the table says we should.
 
 Note that an asterisk does not indicate that every value is actually possible. 
 For instance, calls that do not match any variants from the panel JSON can only be observed calls, not inferred calls.
@@ -376,6 +389,10 @@ To run PEACH's test suite, including mypy, run the script `test_peach`.
 If you have installed PEACH's requirements into a venv, then remember to source the venv before running `test_peach`.
 
 ## Version History and Download Links
+* [1.5](https://github.com/hartwigmedical/peach/releases/tag/v1.5)
+  * Add support for [PAVE](https://github.com/hartwigmedical/hmftools/tree/master/pave) annotations.
+  * Add optional "canonicalTranscript" entry in panel JSON. 
+    * This entry is required for parsing PAVE annotations, and ignored for SNPEFF annotations.
 * [1.4](https://github.com/hartwigmedical/peach/releases/tag/v1.4)
   * Change formats of output files to essentially being PEACH v1.0 output files with some additional columns, 
     to avoid breaking the expectations from downstream tools based on semantic versioning.
