@@ -203,10 +203,7 @@ class VcfReader(object):
                 f"For PEACH to handle PAVE annotations, the transcript ID needs to be set for all genes in the panel!"
             )
             raise ValueError(error_msg)
-        all_annotations = [str(annotation) for annotation in variants[self.PAVE_ANNOTATION_FIELD_NAME][call_index]]
-        transcript_id_to_annotation = {
-            self.__get_transcript_id_from_pave_annotation(annotation): annotation for annotation in all_annotations
-        }
+        transcript_id_to_annotation = self.__get_transcript_id_to_pave_annotation(call_index, variants)
         common_transcript_ids = transcript_ids.intersection(set(transcript_id_to_annotation.keys()))
 
         pave_annotation: Optional[str]
@@ -223,8 +220,27 @@ class VcfReader(object):
             raise ValueError(error_msg)
         return pave_annotation
 
-    def __get_transcript_id_from_pave_annotation(self, annotation: str) -> str:
-        return annotation.split(self.PAVE_ANNOTATION_SEPARATOR)[2]
+    def __get_transcript_id_to_pave_annotation(self, call_index: int, variants: Dict[str, Any]) -> Dict[str, str]:
+        all_annotations = [str(annotation) for annotation in variants[self.PAVE_ANNOTATION_FIELD_NAME][call_index]]
+        transcript_id_to_annotation = {}
+        for annotation in all_annotations:
+            transcript_id = self.__get_transcript_id_from_pave_annotation(annotation)
+            if transcript_id is not None:
+                if transcript_id in transcript_id_to_annotation.keys():
+                    error_msg = (
+                        f"Call is annotated with a transcript ID multiple times: "
+                        f"transcript_id={transcript_id}, call_index={call_index}"
+                    )
+                    raise ValueError(error_msg)
+                transcript_id_to_annotation[transcript_id] = annotation
+        return transcript_id_to_annotation
+
+    def __get_transcript_id_from_pave_annotation(self, annotation: str) -> Optional[str]:
+        # The list of PAVE annotations is padded with empty strings so all calls have the same number of annotations
+        if annotation:
+            return annotation.split(self.PAVE_ANNOTATION_SEPARATOR)[2]
+        else:
+            return None
 
     def __get_snpeff_annotation_string(self, call_index: int, variants: Dict[str, Any]) -> Optional[str]:
         complete_annotation = str(variants[self.SNPEFF_ANNOTATION_FIELD_NAME][call_index])
