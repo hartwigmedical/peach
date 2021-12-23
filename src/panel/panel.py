@@ -1,5 +1,5 @@
 import itertools
-from typing import Set, FrozenSet, Optional
+from typing import Set, FrozenSet
 
 from base.reference_assembly import ReferenceAssembly
 from base.reference_site import ReferenceSite
@@ -65,21 +65,8 @@ class Panel(object):
     def get_haplotypes(self, gene: str) -> Set[Haplotype]:
         return set(self.__get_gene_info(gene).haplotypes)
 
-    def get_transcript_ids(self) -> Optional[Set[str]]:
-        set_transcript_ids = {gene_info.transcript_id for gene_info in self.__gene_infos if gene_info.transcript_id is not None}
-        if len(set_transcript_ids) == 0:
-            # No transcript ID's have been set
-            return None
-        elif len(set_transcript_ids) == len(self.__gene_infos):
-            # All transcript ID's have been set
-            return set_transcript_ids
-        else:
-            error_msg = (
-                f"The transcript ID needs to be set for all genes in the panel JSON, or for none of them. "
-                f"The {len(self.__gene_infos)} genes in the panel JSON currently have {len(set_transcript_ids)} "
-                f"different transcript ID's set."
-            )
-            raise ValueError(error_msg)
+    def get_transcript_ids(self) -> Set[str]:
+        return {gene_info.transcript_id for gene_info in self.__gene_infos if gene_info.transcript_id is not None}
 
     def is_relevant_to_panel(self, call: VcfCall, reference_assembly: ReferenceAssembly) -> bool:
         covered_coordinates_call = call.reference_site.get_covered_coordinates()
