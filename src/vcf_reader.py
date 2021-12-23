@@ -222,7 +222,7 @@ class VcfReader(object):
 
     def __get_transcript_id_to_pave_annotation(self, call_index: int, variants: Dict[str, Any]) -> Dict[str, str]:
         all_annotations = [str(annotation) for annotation in variants[self.PAVE_ANNOTATION_FIELD_NAME][call_index]]
-        transcript_id_to_annotation = {}
+        transcript_id_to_annotation: Dict[str, str] = {}
         for annotation in all_annotations:
             transcript_id = self.__get_transcript_id_from_pave_annotation(annotation)
             if transcript_id is not None:
