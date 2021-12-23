@@ -131,7 +131,7 @@ class TestPgxReporter(unittest.TestCase):
             "FAKE2": {HaplotypeCall("*1", 1), HaplotypeCall("*4A", 1)},
         }
         pgx_analysis = PgxAnalysis(FullCallData(frozenset()), gene_to_haplotype_calls)
-        panel = get_wide_example_panel()
+        panel = get_wide_example_panel(include_transcript_ids=True)
         version = "V1"
         result = HaplotypeReporter().get_genotype_tsv_text(pgx_analysis, panel, version)
 

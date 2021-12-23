@@ -11,7 +11,7 @@ from panel.rs_id_info import RsIdInfo
 from panel.variant import Variant
 
 
-def get_wide_example_panel() -> Panel:
+def get_wide_example_panel(include_transcript_ids: bool) -> Panel:
     dpyd_two_a_variant = Variant("rs3918290", "T")
     dpyd_two_b_variant = Variant("rs1801159", "C")
     dpyd_three_variant = Variant("rs72549303", "TG")
@@ -72,15 +72,15 @@ def get_wide_example_panel() -> Panel:
     fake2_rs_id_to_ref_seq_difference_annotations = {"rs1212127": Annotation("1324C>T", "1324T>C")}
 
     dpyd_gene_info = GeneInfo(
-        "DPYD", "*1", "ENST00000370192", dpyd_haplotypes, dpyd_rs_id_infos,
+        "DPYD", "*1", "ENST00000370192" if include_transcript_ids else None, dpyd_haplotypes, dpyd_rs_id_infos,
         dpyd_drugs, dpyd_rs_id_to_ref_seq_difference_annotations,
     )
     fake_gene_info = GeneInfo(
-        "FAKE", "*1", None, fake_haplotypes, fake_rs_id_infos,
+        "FAKE", "*1", "ENST00000192883" if include_transcript_ids else None, fake_haplotypes, fake_rs_id_infos,
         fake_drugs, fake_rs_id_to_ref_seq_difference_annotations,
     )
     fake2_gene_info = GeneInfo(
-        "FAKE2", "*1", None, fake2_haplotypes, fake2_rs_id_infos,
+        "FAKE2", "*1", "ENST0000021918" if include_transcript_ids else None, fake2_haplotypes, fake2_rs_id_infos,
         fake2_drugs, fake2_rs_id_to_ref_seq_difference_annotations,
     )
     gene_infos = frozenset({dpyd_gene_info, fake_gene_info, fake2_gene_info})
@@ -147,7 +147,7 @@ def get_narrow_example_panel(included_haplotypes: Set[str]) -> Panel:
 
     gene_infos = frozenset({
         GeneInfo(
-            "DPYD", "*1", "ENST00000370192", included_dpyd_haplotypes, included_dpyd_rs_id_infos,
+            "DPYD", "*1", None, included_dpyd_haplotypes, included_dpyd_rs_id_infos,
             dpyd_drugs, dpyd_rs_id_to_difference_annotations,
         ),
     })

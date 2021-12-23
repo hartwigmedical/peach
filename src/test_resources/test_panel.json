@@ -97,6 +97,7 @@
       "chromosomeV37": "5",
       "chromosomeV38": "chr5",
       "wildTypeHaplotype": "*1",
+      "canonicalTranscript": "ENST00000192883",
       "haplotypes": [
         {
           "haplotypeName": "*4A",
@@ -132,6 +133,7 @@
       "chromosomeV37": "16",
       "chromosomeV38": "chr16",
       "wildTypeHaplotype": "*1",
+      "canonicalTranscript": "ENST0000021918",
       "haplotypes": [
         {
           "haplotypeName": "*4A",

@@ -15,7 +15,7 @@ from test.util_for_test import get_wide_example_panel, get_narrow_example_panel
 class TestPgxAnalysis(unittest.TestCase):
     def test_empty_v37(self) -> None:
         """No variants wrt v37"""
-        panel = get_wide_example_panel()
+        panel = get_wide_example_panel(include_transcript_ids=False)
         vcf_call_data = VcfCallData(frozenset(), ReferenceAssembly.V37)
         pgx_analysis = PgxAnalyser().create_pgx_analysis(vcf_call_data, panel)
 
@@ -60,7 +60,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
     def test_empty_v38(self) -> None:
         """No variants wrt v38"""
-        panel = get_wide_example_panel()
+        panel = get_wide_example_panel(include_transcript_ids=True)
         vcf_call_data = VcfCallData(frozenset(), ReferenceAssembly.V38)
         pgx_analysis = PgxAnalyser().create_pgx_analysis(vcf_call_data, panel)
 
@@ -105,7 +105,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
     def test_hom_ref_from_v37(self) -> None:
         """All haplotypes are  *1_HOM with v37 input data"""
-        panel = get_wide_example_panel()
+        panel = get_wide_example_panel(include_transcript_ids=True)
         vcf_call_data = VcfCallData(frozenset({
             VcfCall(
                 ReferenceSite(GeneCoordinate("16", 97915617), "C"), ("T", "T"),
@@ -159,7 +159,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
     def test_heterozygous_v37(self) -> None:
         """All haplotypes are heterozygous, both with single and multiple non-ref haplotypes. Uses v37 input"""
-        panel = get_wide_example_panel()
+        panel = get_wide_example_panel(include_transcript_ids=False)
         vcf_call_data = VcfCallData(frozenset({
             VcfCall(
                 ReferenceSite(GeneCoordinate("16", 97915617), "C"), ("C", "T"),
@@ -221,7 +221,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
     def test_heterozygous_v38(self) -> None:
         """All haplotypes are heterozygous, both with single and multiple non-ref haplotypes. Uses v38 input"""
-        panel = get_wide_example_panel()
+        panel = get_wide_example_panel(include_transcript_ids=True)
         vcf_call_data = VcfCallData(frozenset({
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr16", 97450060), "T"), ("C", "T"),
@@ -564,7 +564,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
         This should never happen because these calls should not be extracted from the VCF in the first place.
         """
-        panel = get_wide_example_panel()
+        panel = get_wide_example_panel(include_transcript_ids=False)
         vcf_call_data = VcfCallData(frozenset({
             VcfCall(
                 ReferenceSite(GeneCoordinate("16", 39593405), "A"), ("A", "G"),
@@ -586,7 +586,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
         This should never happen because these calls should not be extracted from the VCF in the first place.
         """
-        panel = get_wide_example_panel()
+        panel = get_wide_example_panel(include_transcript_ids=True)
         vcf_call_data = VcfCallData(frozenset({
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr16", 39593405), "A"), ("A", "G"),
@@ -603,7 +603,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
     def test_unknown_gene(self) -> None:
         """Variants that are of an unknown gene. Uses v37 input"""
-        panel = get_wide_example_panel()
+        panel = get_wide_example_panel(include_transcript_ids=True)
         reference_assembly = ReferenceAssembly.V37
 
         good_calls = {
@@ -625,7 +625,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
     def test_incorrect_gene(self) -> None:
         """Variants that are assigned to an incorrect gene. Uses v37 input"""
-        panel = get_wide_example_panel()
+        panel = get_wide_example_panel(include_transcript_ids=True)
         reference_assembly = ReferenceAssembly.V37
 
         good_calls = {
@@ -647,7 +647,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
     def test_known_variants_with_incorrect_rs_id(self) -> None:
         """Known variant with one incorrect rs id. Uses v38 input"""
-        panel = get_wide_example_panel()
+        panel = get_wide_example_panel(include_transcript_ids=True)
         reference_assembly = ReferenceAssembly.V38
 
         good_calls = {
@@ -676,7 +676,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
     def test_known_variant_with_incorrect_position(self) -> None:
         """Known variant with incorrect position. Uses v37 input."""
-        panel = get_wide_example_panel()
+        panel = get_wide_example_panel(include_transcript_ids=True)
         reference_assembly = ReferenceAssembly.V37
 
         good_calls = {
@@ -707,7 +707,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
     def test_known_variant_with_incorrect_chromosome(self) -> None:
         """Known variants with one incorrect chromosome. Uses v38 input"""
-        panel = get_wide_example_panel()
+        panel = get_wide_example_panel(include_transcript_ids=False)
         reference_assembly = ReferenceAssembly.V38
 
         good_calls = {
@@ -738,7 +738,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
     def test_known_variant_with_multiple_rs_ids_not_matching_panel(self) -> None:
         """Multiple rs ids when panel says there should be one. Uses v37 input."""
-        panel = get_wide_example_panel()
+        panel = get_wide_example_panel(include_transcript_ids=False)
         reference_assembly = ReferenceAssembly.V37
         good_calls = {
             VcfCall(
@@ -995,7 +995,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
     def test_ref_call_on_ref_seq_differences_v37(self) -> None:
         """Explicit ref calls wrt v37 at differences between v37 and v38"""
-        panel = get_wide_example_panel()
+        panel = get_wide_example_panel(include_transcript_ids=False)
         vcf_call_data = VcfCallData(frozenset({
             VcfCall(
                 ReferenceSite(GeneCoordinate("16", 97915617), "C"), ("C", "C"),
@@ -1046,7 +1046,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
     def test_ref_call_on_ref_seq_differences_v38(self) -> None:
         """Explicit ref calls wrt v38 at differences between v37 and v38"""
-        panel = get_wide_example_panel()
+        panel = get_wide_example_panel(include_transcript_ids=True)
         vcf_call_data = VcfCallData(frozenset({
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr16", 97450060), "T"), ("T", "T"),
@@ -1097,7 +1097,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
     def test_homozygous_call_on_ref_seq_differences_v38(self) -> None:
         """Explicit ref calls wrt v38 at differences between v37 and v38"""
-        panel = get_wide_example_panel()
+        panel = get_wide_example_panel(include_transcript_ids=False)
         vcf_call_data = VcfCallData(frozenset({
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr16", 97450060), "T"), ("C", "C"),
@@ -1148,7 +1148,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
     def test_only_position_match_on_ref_seq_differences_v37(self) -> None:
         """At reference sequence differences: heterozygous between ref v37 and v38, and no rs_id provided"""
-        panel = get_wide_example_panel()
+        panel = get_wide_example_panel(include_transcript_ids=False)
         vcf_call_data = VcfCallData(frozenset({
             VcfCall(
                 ReferenceSite(GeneCoordinate("16", 97915617), "C"), ("C", "T"),
@@ -1201,7 +1201,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
     def test_only_position_match_on_ref_seq_differences_v38(self) -> None:
         """At reference sequence differences: heterozygous between ref v37 and v38, and no rs_id provided"""
-        panel = get_wide_example_panel()
+        panel = get_wide_example_panel(include_transcript_ids=True)
         vcf_call_data = VcfCallData(frozenset({
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr16", 97450060), "T"), ("C", "T"),
@@ -1257,7 +1257,7 @@ class TestPgxAnalysis(unittest.TestCase):
         At reference sequence differences: single allele that is ref v37 or v38, other allele is neither.
         Uses v38 input.
         """
-        panel = get_wide_example_panel()
+        panel = get_wide_example_panel(include_transcript_ids=False)
         vcf_call_data = VcfCallData(frozenset({
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr16", 97450060), "T"), ("C", "A"),
@@ -1308,7 +1308,7 @@ class TestPgxAnalysis(unittest.TestCase):
 
     def test_double_different_allele_on_ref_seq_differences(self) -> None:
         """At reference sequence differences: both alleles not ref v37 or v38. Uses v37 input."""
-        panel = get_wide_example_panel()
+        panel = get_wide_example_panel(include_transcript_ids=True)
         vcf_call_data = VcfCallData(frozenset({
             VcfCall(
                 ReferenceSite(GeneCoordinate("16", 97915617), "C"), ("A", "G"),
