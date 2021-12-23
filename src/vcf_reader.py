@@ -283,5 +283,7 @@ class VcfReader(object):
         elif not has_snpeff_annotation and has_pave_annotation:
             return AnnotationType.PAVE
         else:
-            logging.warning(f"No annotation detected in the VCF. Annotation with SNPEFF or PAVE is preferred.")
-            return AnnotationType.NONE
+            error_msg = f"No annotation detected in the VCF. Annotate the VCF with either SNPEFF or PAVE."
+            raise ValueError(error_msg)
+            # logging.warning(f"No annotation detected in the VCF. Annotation with SNPEFF or PAVE is preferred.")
+            # return AnnotationType.NONE
