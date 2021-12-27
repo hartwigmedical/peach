@@ -38,7 +38,7 @@ class Panel(object):
             f"Panel("
             f"name={self.__name!r}, "
             f"version={self.__version!r}, "
-            f"gene_infos={set(self.__gene_to_gene_info.values())!r}, "
+            f"gene_infos={frozenset(self.__gene_to_gene_info.values())!r}, "
             f")"
         )
 
@@ -145,8 +145,7 @@ class Panel(object):
         return not self.__gene_to_gene_info.keys()
 
     def get_haplotype_function(self, gene: str, haplotype_name: str) -> str:
-        gene_info = self.__gene_to_gene_info[gene]
-        return gene_info.get_haplotype_function(haplotype_name)
+        return self.__gene_to_gene_info[gene].get_haplotype_function(haplotype_name)
 
     def get_id(self) -> str:
         return f"{self.__name}_v{self.__version}"

@@ -1,14 +1,10 @@
 import itertools
 import logging
-from typing import FrozenSet, Optional, Set
+from typing import FrozenSet, Optional, Set, Dict
 
 from base.constants import NORMAL_FUNCTION_STRING
-from panel.drug_info import DrugInfo, assert_no_overlap_drug_names
-from panel.haplotype import (
-    Haplotype,
-    assert_no_overlap_haplotype_names,
-    assert_no_overlap_haplotype_variant_combinations,
-)
+from panel.drug_info import DrugInfo
+from panel.haplotype import Haplotype, assert_no_overlap_haplotype_variant_combinations
 from panel.rs_id_info import RsIdInfo
 
 
@@ -24,9 +20,7 @@ class GeneInfo(object):
         rs_id_infos: FrozenSet[RsIdInfo],
         drugs: FrozenSet[DrugInfo],
     ) -> None:
-        assert_no_overlap_haplotype_names(haplotypes, f"gene info for {gene}")
         assert_no_overlap_haplotype_variant_combinations(haplotypes, f"gene info for {gene}")
-        assert_no_overlap_drug_names(drugs, f"GeneInfo json for {gene}")
         self.__assert_rs_ids_all_different(rs_id_infos)
         self.__assert_rs_id_infos_compatible(rs_id_infos)
         self.__assert_rs_id_infos_match_chromosome(rs_id_infos, gene)
@@ -36,12 +30,31 @@ class GeneInfo(object):
         if not haplotypes:
             logging.warning(f"No alternate haplotypes configured for gene {gene}\n")
 
+        drug_name_to_drug_info: Dict[str, DrugInfo] = {}
+        for drug_info in drugs:
+            if drug_info.name in drug_name_to_drug_info.keys():
+                error_msg = f"The gene '{gene}' has multiple drugs with the name '{drug_info.name}'."
+                raise ValueError(error_msg)
+            drug_name_to_drug_info[drug_info.name] = drug_info
+
+        haplotype_name_to_haplotype: Dict[str, Haplotype] = {}
+        for haplotype in haplotypes:
+            if haplotype.name in haplotype_name_to_haplotype.keys():
+                error_msg = f"The gene '{gene}' has multiple haplotypes with the name '{haplotype.name}'."
+                raise ValueError(error_msg)
+            haplotype_name_to_haplotype[haplotype.name] = haplotype
+
+        # public through @property decorator
         self.__gene = gene
         self.__wild_type_haplotype_name = wild_type_haplotype_name
         self.__transcript_id = transcript_id
         self.__haplotypes = haplotypes
         self.__rs_id_infos = rs_id_infos
         self.__drugs = drugs
+
+        # truly private
+        self.__drug_name_to_drug_info = drug_name_to_drug_info
+        self.__haplotype_name_to_haplotype = haplotype_name_to_haplotype
 
     def __eq__(self, other: object) -> bool:
         return (
@@ -106,25 +119,13 @@ class GeneInfo(object):
         if haplotype_name == self.__wild_type_haplotype_name:
             return NORMAL_FUNCTION_STRING
         else:
-            return self.__get_haplotype(haplotype_name).function
+            return self.__haplotype_name_to_haplotype[haplotype_name].function
 
     def get_prescription_url(self, drug_name: str) -> str:
-        matching_drug_infos = [drug_info for drug_info in self.__drugs if drug_info.name == drug_name]
-        if len(matching_drug_infos) == 1:
-            return matching_drug_infos[0].url_prescription_info
-        else:
-            raise ValueError(f"Not exactly one matching drug info in panel for gene={self.gene}: drug_name={drug_name}")
+        return self.__drug_name_to_drug_info[drug_name].url_prescription_info
 
     def get_rs_ids(self) -> Set[str]:
         return {rs_id_info.rs_id for rs_id_info in self.rs_id_infos}
-
-    def __get_haplotype(self, haplotype_name: str) -> Haplotype:
-        matching_haplotypes = [haplotype for haplotype in self.__haplotypes if haplotype.name == haplotype_name]
-        assert len(matching_haplotypes) == 1, (
-            f"No unique haplotype with name: {haplotype_name} for gene {self.gene}:\n"
-            f"matching_haplotypes={matching_haplotypes}"
-        )
-        return matching_haplotypes[0]
 
     @staticmethod
     def __assert_info_exists_for_all_rs_ids_in_haplotypes(

@@ -12,9 +12,7 @@ class Haplotype(object):
         seen_rs_ids: Set[str] = set()
         for variant in variants:
             if variant.rs_id in seen_rs_ids:
-                error_msg = (
-                    f"The haplotype '{name}' contains multiple variants with the same rs_id '{variant.rs_id}'."
-                )
+                error_msg = f"The haplotype '{name}' contains multiple variants with the same rs_id '{variant.rs_id}'."
                 raise ValueError(error_msg)
             seen_rs_ids.add(variant.rs_id)
 
@@ -53,24 +51,6 @@ class Haplotype(object):
     @property
     def variants(self) -> FrozenSet[Variant]:
         return self.__variants
-
-
-def assert_no_overlap_haplotype_names(haplotypes: Collection[Haplotype], source_name: str) -> None:
-    if names_of_haplotypes_overlap(haplotypes):
-        name_to_multiple_haplotypes = get_name_to_multiple_haplotypes(haplotypes)
-        error_msg = (
-            f"The {source_name} contains haplotypes with the same name but different summaries. "
-            f"Duplicates: {name_to_multiple_haplotypes}"
-        )
-        raise ValueError(error_msg)
-
-
-def names_of_haplotypes_overlap(haplotypes: Collection[Haplotype]) -> bool:
-    return len({haplotype.name for haplotype in haplotypes}) != len(haplotypes)
-
-
-def get_name_to_multiple_haplotypes(haplotypes: Collection[Haplotype]) -> Dict[str, List[Haplotype]]:
-    return get_key_to_multiple_values([(haplotype.name, haplotype) for haplotype in haplotypes])
 
 
 def assert_no_overlap_haplotype_variant_combinations(haplotypes: Collection[Haplotype], source_name: str) -> None:
