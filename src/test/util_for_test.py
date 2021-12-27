@@ -1,4 +1,4 @@
-from typing import Dict, Set
+from typing import Set
 
 from base.gene_coordinate import GeneCoordinate
 from base.reference_site import ReferenceSite
@@ -26,24 +26,21 @@ def get_wide_example_panel(include_transcript_ids: bool) -> Panel:
     dpyd_rs_id_infos = frozenset({
         RsIdInfo(
             "rs3918290", ReferenceSite(GeneCoordinate("1", 97915614), "C"),
-            ReferenceSite(GeneCoordinate("chr1", 97450058), "C")),
+            ReferenceSite(GeneCoordinate("chr1", 97450058), "C"), None),
         RsIdInfo(
             "rs72549309", ReferenceSite(GeneCoordinate("1", 98205966), "GATGA"),
-            ReferenceSite(GeneCoordinate("chr1", 97740410), "GATGA")),
+            ReferenceSite(GeneCoordinate("chr1", 97740410), "GATGA"), None),
         RsIdInfo(
             "rs1801159", ReferenceSite(GeneCoordinate("1", 97981395), "T"),
-            ReferenceSite(GeneCoordinate("chr1", 97515839), "T")),
+            ReferenceSite(GeneCoordinate("chr1", 97515839), "T"), None),
         RsIdInfo(
             "rs72549303", ReferenceSite(GeneCoordinate("1", 97915621), "TG"),
-            ReferenceSite(GeneCoordinate("chr1", 97450065), "TC")),
+            ReferenceSite(GeneCoordinate("chr1", 97450065), "TC"), Annotation("6744CA>GA", "6744GA>CA")),
     })
     dpyd_drugs = frozenset({
         DrugInfo("5-Fluorouracil", "https://www.pharmgkb.org/chemical/PA128406956/guidelineAnnotation/PA166104939"),
         DrugInfo("Capecitabine", "https://www.pharmgkb.org/chemical/PA448771/guidelineAnnotation/PA166104963"),
     })
-    dpyd_rs_id_to_ref_seq_difference_annotations = {
-        "rs72549303": Annotation("6744CA>GA", "6744GA>CA"),
-    }
 
     fake_haplotypes = frozenset({
         Haplotype("*4A", "Reduced Function", frozenset({fake_variant})),
@@ -51,12 +48,11 @@ def get_wide_example_panel(include_transcript_ids: bool) -> Panel:
     fake_rs_id_infos = frozenset({
         RsIdInfo(
             "rs1212125", ReferenceSite(GeneCoordinate("5", 97915617), "T"),
-            ReferenceSite(GeneCoordinate("chr5", 97450060), "T")),
+            ReferenceSite(GeneCoordinate("chr5", 97450060), "T"), None),
     })
     fake_drugs = frozenset({
         DrugInfo("Aspirin", "https://www.pharmgkb.org/some_other_url"),
     })
-    fake_rs_id_to_ref_seq_difference_annotations: Dict[str, Annotation] = {}
 
     fake2_haplotypes = frozenset({
         Haplotype("*4A", "Reduced Function", frozenset({fake2_variant})),
@@ -64,24 +60,23 @@ def get_wide_example_panel(include_transcript_ids: bool) -> Panel:
     fake2_rs_id_infos = frozenset({
         RsIdInfo(
             "rs1212127", ReferenceSite(GeneCoordinate("16", 97915617), "C"),
-            ReferenceSite(GeneCoordinate("chr16", 97450060), "T")),
+            ReferenceSite(GeneCoordinate("chr16", 97450060), "T"), Annotation("1324C>T", "1324T>C")),
     })
     fake2_drugs = frozenset({
         DrugInfo("Aspirin", "https://www.pharmgkb.org/some_other_url"),
     })
-    fake2_rs_id_to_ref_seq_difference_annotations = {"rs1212127": Annotation("1324C>T", "1324T>C")}
 
     dpyd_gene_info = GeneInfo(
-        "DPYD", "*1", "ENST00000370192" if include_transcript_ids else None, dpyd_haplotypes, dpyd_rs_id_infos,
-        dpyd_drugs, dpyd_rs_id_to_ref_seq_difference_annotations,
+        "DPYD", "*1", "ENST00000370192" if include_transcript_ids else None,
+        dpyd_haplotypes, dpyd_rs_id_infos, dpyd_drugs,
     )
     fake_gene_info = GeneInfo(
-        "FAKE", "*1", "ENST00000192883" if include_transcript_ids else None, fake_haplotypes, fake_rs_id_infos,
-        fake_drugs, fake_rs_id_to_ref_seq_difference_annotations,
+        "FAKE", "*1", "ENST00000192883" if include_transcript_ids else None,
+        fake_haplotypes, fake_rs_id_infos, fake_drugs,
     )
     fake2_gene_info = GeneInfo(
-        "FAKE2", "*1", "ENST0000021918" if include_transcript_ids else None, fake2_haplotypes, fake2_rs_id_infos,
-        fake2_drugs, fake2_rs_id_to_ref_seq_difference_annotations,
+        "FAKE2", "*1", "ENST0000021918" if include_transcript_ids else None,
+        fake2_haplotypes, fake2_rs_id_infos, fake2_drugs,
     )
     gene_infos = frozenset({dpyd_gene_info, fake_gene_info, fake2_gene_info})
 
@@ -108,19 +103,19 @@ def get_narrow_example_panel(included_haplotypes: Set[str]) -> Panel:
     possible_rs_id_infos = [
         RsIdInfo(
             "rs3918290", ReferenceSite(GeneCoordinate("1", 97915614), "C"),
-            ReferenceSite(GeneCoordinate("chr1", 97450058), "C")),
+            ReferenceSite(GeneCoordinate("chr1", 97450058), "C"), None),
         RsIdInfo(
             "rs72549309", ReferenceSite(GeneCoordinate("1", 98205966), "GATGA"),
-            ReferenceSite(GeneCoordinate("chr1", 97740410), "GATGA")),
+            ReferenceSite(GeneCoordinate("chr1", 97740410), "GATGA"), None),
         RsIdInfo(
             "rs1801159", ReferenceSite(GeneCoordinate("1", 97981395), "T"),
-            ReferenceSite(GeneCoordinate("chr1", 97515839), "T")),
+            ReferenceSite(GeneCoordinate("chr1", 97515839), "T"), None),
         RsIdInfo(
             "rs72549303", ReferenceSite(GeneCoordinate("1", 97915621), "TG"),
-            ReferenceSite(GeneCoordinate("chr1", 97450065), "TC")),
+            ReferenceSite(GeneCoordinate("chr1", 97450065), "TC"), Annotation("6744CA>GA", "6744GA>CA")),
         RsIdInfo(
             "rs2938101", ReferenceSite(GeneCoordinate("1", 97912838), "A"),
-            ReferenceSite(GeneCoordinate("chr1", 97453984), "A")),
+            ReferenceSite(GeneCoordinate("chr1", 97453984), "A"), None),
     ]
 
     unknown_haplotypes = included_haplotypes.difference({haplotype.name for haplotype in possible_dpyd_haplotypes})
@@ -141,14 +136,11 @@ def get_narrow_example_panel(included_haplotypes: Set[str]) -> Panel:
         DrugInfo("5-Fluorouracil", "https://www.pharmgkb.org/chemical/PA128406956/guidelineAnnotation/PA166104939"),
         DrugInfo("Capecitabine", "https://www.pharmgkb.org/chemical/PA448771/guidelineAnnotation/PA166104963"),
     })
-    dpyd_rs_id_to_difference_annotations = {
-        "rs72549303": Annotation("6744CA>GA", "6744GA>CA"),
-    }
 
     gene_infos = frozenset({
         GeneInfo(
             "DPYD", "*1", None, included_dpyd_haplotypes, included_dpyd_rs_id_infos,
-            dpyd_drugs, dpyd_rs_id_to_difference_annotations,
+            dpyd_drugs,
         ),
     })
     name = "NarrowTestPanel"

@@ -1,4 +1,4 @@
-from typing import Optional, Any
+from typing import Optional, Any, Dict, FrozenSet
 
 from base.gene_coordinate import GeneCoordinate
 from base.reference_site import ReferenceSite
@@ -70,18 +70,14 @@ class JsonParser(object):
             transcript_id = str(data[self.TRANSCRIPT_ID])
         else:
             transcript_id = None
-        rs_id_infos = frozenset(
-            {
-                self.get_rs_id_info(rs_id_info_json, chromosome_v37, chromosome_v38)
-                for rs_id_info_json in data[self.RSID_INFOS_KEY]
-            }
+        rs_id_infos = self.get_rs_id_infos(
+            data[self.RSID_INFOS_KEY],
+            data[self.REF_SEQ_DIFF_KEY],
+            chromosome_v37,
+            chromosome_v38,
         )
         haplotypes = frozenset({self.get_haplotype(haplotype_json) for haplotype_json in data[self.HAPLOTYPES_KEY]})
         drugs = frozenset({self.get_drug_info(drug_json) for drug_json in data[self.DRUG_INFOS_KEY]})
-        rs_id_to_ref_seq_difference_annotation_v38 = {
-            str(annotation_json[self.RS_ID_KEY]): self.get_annotation(annotation_json)
-            for annotation_json in data[self.REF_SEQ_DIFF_KEY]
-        }
         gene_info = GeneInfo(
             gene,
             wild_type_haplotype,
@@ -89,20 +85,56 @@ class JsonParser(object):
             haplotypes,
             rs_id_infos,
             drugs,
-            rs_id_to_ref_seq_difference_annotation_v38,
         )
         return gene_info
 
-    def get_rs_id_info(self, data: Json, chromosome_v37: str, chromosome_v38: str) -> RsIdInfo:
+    def get_rs_id_infos(
+            self,
+            rs_id_infos_data: Json,
+            ref_seq_difference_annotation_data: Json,
+            chromosome_v37: str,
+            chromosome_v38: str,
+    ) -> FrozenSet[RsIdInfo]:
+        rs_id_to_ref_seq_difference_annotation = {
+            str(annotation_json[self.RS_ID_KEY]): self.get_annotation(annotation_json)
+            for annotation_json in ref_seq_difference_annotation_data
+        }
+        rs_id_infos = frozenset(
+            {
+                self.get_rs_id_info(
+                    rs_id_info_json,
+                    chromosome_v37,
+                    chromosome_v38,
+                    rs_id_to_ref_seq_difference_annotation,
+                )
+                for rs_id_info_json in rs_id_infos_data
+            }
+        )
+        return rs_id_infos
+
+    def get_rs_id_info(
+            self,
+            data: Json,
+            chromosome_v37: str,
+            chromosome_v38: str,
+            rs_id_to_ref_seq_difference_annotation: Dict[str, Annotation],
+    ) -> RsIdInfo:
         rs_id = str(data[self.RS_ID_KEY])
         reference_allele_v37 = str(data[self.REFERENCE_ALLELE_V37])
         reference_allele_v38 = str(data[self.REFERENCE_ALLELE_V38])
         start_coordinate_v37 = GeneCoordinate(chromosome_v37, int(data[self.POSITION_V37]))
         start_coordinate_v38 = GeneCoordinate(chromosome_v38, int(data[self.POSITION_V38]))
+        annotation: Optional[Annotation]
+        if reference_allele_v37 != reference_allele_v38 and rs_id in rs_id_to_ref_seq_difference_annotation.keys():
+            # ignore annotation when alleles are identical, since we ignore additional fields in the panel json
+            annotation = rs_id_to_ref_seq_difference_annotation[rs_id]
+        else:
+            annotation = None
         info = RsIdInfo(
             rs_id,
             ReferenceSite(start_coordinate_v37, reference_allele_v37),
             ReferenceSite(start_coordinate_v38, reference_allele_v38),
+            annotation,
         )
         return info
 

@@ -119,13 +119,13 @@ class Panel(object):
             raise ValueError("Multiple rs id infos match position and ref allele. This should be impossible.")
 
     def has_ref_seq_difference_annotation(self, rs_id: str) -> bool:
-        gene_for_rs_id = self.get_gene_for_rs_id(rs_id)
-        return self.__gene_to_gene_info[gene_for_rs_id].has_ref_sequence_difference_annotation(rs_id)
+        return self.__get_rs_id_info(rs_id).ref_seq_difference_annotation is not None
 
     def get_ref_seq_difference_annotation(self, rs_id: str, reference_assembly: ReferenceAssembly) -> str:
-        gene_for_rs_id = self.get_gene_for_rs_id(rs_id)
-        gene_info = self.__gene_to_gene_info[gene_for_rs_id]
-        return gene_info.get_ref_sequence_difference_annotation(rs_id, reference_assembly)
+        annotation = self.__get_rs_id_info(rs_id).ref_seq_difference_annotation
+        if annotation is None:
+            raise ValueError(f"No ref seq difference annotation for rs_id: rs_id={rs_id}")
+        return annotation.for_assembly(reference_assembly)
 
     def get_gene_for_rs_id(self, rs_id: str) -> str:
         matching_genes = []

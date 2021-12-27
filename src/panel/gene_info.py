@@ -1,11 +1,8 @@
 import itertools
 import logging
-from typing import List, Dict, Collection, FrozenSet, Optional, Set
+from typing import FrozenSet, Optional, Set
 
 from base.constants import NORMAL_FUNCTION_STRING
-from base.reference_assembly import ReferenceAssembly
-from base.util import get_key_to_multiple_values
-from panel.annotation import Annotation
 from panel.drug_info import DrugInfo, assert_no_overlap_drug_names
 from panel.haplotype import (
     Haplotype,
@@ -26,7 +23,6 @@ class GeneInfo(object):
         haplotypes: FrozenSet[Haplotype],
         rs_id_infos: FrozenSet[RsIdInfo],
         drugs: FrozenSet[DrugInfo],
-        rs_id_to_ref_seq_difference_annotation: Dict[str, Annotation],
     ) -> None:
         assert_no_overlap_haplotype_names(haplotypes, f"gene info for {gene}")
         assert_no_overlap_haplotype_variant_combinations(haplotypes, f"gene info for {gene}")
@@ -36,9 +32,6 @@ class GeneInfo(object):
         self.__assert_rs_id_infos_match_chromosome(rs_id_infos, gene)
         self.__assert_info_exists_for_all_rs_ids_in_haplotypes(haplotypes, rs_id_infos)
         self.__assert_variants_in_haplotypes_compatible_with_rs_id_infos(haplotypes, rs_id_infos)
-        self.__assert_rs_ids_with_ref_seq_differences_match_annotations(
-            rs_id_infos, rs_id_to_ref_seq_difference_annotation
-        )
 
         if not haplotypes:
             logging.warning(f"No alternate haplotypes configured for gene {gene}\n")
@@ -49,7 +42,6 @@ class GeneInfo(object):
         self.__haplotypes = haplotypes
         self.__rs_id_infos = rs_id_infos
         self.__drugs = drugs
-        self.__rs_id_to_ref_seq_difference_annotation = rs_id_to_ref_seq_difference_annotation
 
     def __eq__(self, other: object) -> bool:
         return (
@@ -60,7 +52,6 @@ class GeneInfo(object):
             and self.__haplotypes == other.__haplotypes
             and self.__rs_id_infos == other.__rs_id_infos
             and self.__drugs == other.__drugs
-            and self.__rs_id_to_ref_seq_difference_annotation == other.__rs_id_to_ref_seq_difference_annotation
         )
 
     def __hash__(self) -> int:
@@ -72,7 +63,6 @@ class GeneInfo(object):
                 self.__haplotypes,
                 self.__rs_id_infos,
                 self.__drugs,
-                tuple(sorted(self.__rs_id_to_ref_seq_difference_annotation.items())),
             )
         )
 
@@ -85,7 +75,6 @@ class GeneInfo(object):
             f"haplotypes={self.__haplotypes!r}, "
             f"rs_id_infos={self.__rs_id_infos!r}, "
             f"drugs={self.__drugs!r}, "
-            f"rs_id_to_ref_seq_difference_annotation={self.__rs_id_to_ref_seq_difference_annotation!r}, "
             f")"
         )
 
@@ -112,17 +101,6 @@ class GeneInfo(object):
     @property
     def drugs(self) -> FrozenSet[DrugInfo]:
         return self.__drugs
-
-    def has_ref_sequence_difference_annotation(self, rs_id: str) -> bool:
-        return rs_id in self.__rs_id_to_ref_seq_difference_annotation.keys()
-
-    def get_ref_sequence_difference_annotation(self, rs_id: str, reference_assembly: ReferenceAssembly) -> str:
-        if reference_assembly == ReferenceAssembly.V37:
-            return self.__rs_id_to_ref_seq_difference_annotation[rs_id].annotation_v37
-        elif reference_assembly == ReferenceAssembly.V38:
-            return self.__rs_id_to_ref_seq_difference_annotation[rs_id].annotation_v38
-        else:
-            raise NotImplementedError(f"Unrecognized reference assembly: {reference_assembly}")
 
     def get_haplotype_function(self, haplotype_name: str) -> str:
         if haplotype_name == self.__wild_type_haplotype_name:
@@ -157,23 +135,6 @@ class GeneInfo(object):
         if not rs_ids_in_haplotypes.issubset(rs_ids_with_info):
             rs_ids_without_info = rs_ids_in_haplotypes.difference(rs_ids_with_info)
             error_msg = f"No info available for some of the rs ids in the haplotypes. Rs ids: {rs_ids_without_info}"
-            raise ValueError(error_msg)
-
-    @staticmethod
-    def __assert_rs_ids_with_ref_seq_differences_match_annotations(
-        rs_id_infos: FrozenSet[RsIdInfo], rs_id_to_ref_seq_difference_annotation: Dict[str, Annotation]
-    ) -> None:
-        rs_ids_from_infos = {info.rs_id for info in rs_id_infos if info.has_reference_sequence_difference()}
-        rs_ids_from_annotation = set(rs_id_to_ref_seq_difference_annotation.keys())
-        if rs_ids_from_infos != rs_ids_from_annotation:
-            rs_ids_with_only_info = rs_ids_from_infos.difference(rs_ids_from_annotation)
-            rs_ids_with_only_annotation = rs_ids_from_annotation.difference(rs_ids_from_infos)
-            error_msg = (
-                f"Rs ids with differences between v37 and v38 do not match "
-                f"the rs ids with annotations for these differences. "
-                f"Only info: {rs_ids_with_only_info} "
-                f"Only annotation: {rs_ids_with_only_annotation}"
-            )
             raise ValueError(error_msg)
 
     @staticmethod
