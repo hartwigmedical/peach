@@ -6,6 +6,7 @@ from base.constants import NORMAL_FUNCTION_STRING
 from panel.drug_info import DrugInfo
 from panel.haplotype import Haplotype, assert_no_overlap_haplotype_variant_combinations
 from panel.rs_id_info import RsIdInfo
+from panel.variant import Variant
 
 
 class GeneInfo(object):
@@ -114,6 +115,15 @@ class GeneInfo(object):
     @property
     def drugs(self) -> FrozenSet[DrugInfo]:
         return self.__drugs
+
+    def get_haplotype_names(self) -> Set[str]:
+        return set(self.__haplotype_name_to_haplotype.keys())
+
+    def get_variants(self, haplotype_name: str) -> Set[Variant]:
+        if haplotype_name == self.__wild_type_haplotype_name:
+            return set()
+        else:
+            return set(self.__haplotype_name_to_haplotype[haplotype_name].variants)
 
     def get_haplotype_function(self, haplotype_name: str) -> str:
         if haplotype_name == self.__wild_type_haplotype_name:

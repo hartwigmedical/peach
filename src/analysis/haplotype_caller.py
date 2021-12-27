@@ -1,12 +1,11 @@
 import collections
 import logging
 from copy import deepcopy
-from typing import Dict, Set, DefaultDict, FrozenSet, Tuple
+from typing import Dict, Set, DefaultDict, Tuple
 
 from base.reference_assembly import ReferenceAssembly
 from calls.haplotype_call import HaplotypeCall
 from calls.full_call import FullCall, FullCallData
-from panel.haplotype import Haplotype
 from panel.panel import Panel
 from panel.variant import Variant
 
@@ -26,7 +25,7 @@ class HaplotypeCaller(object):
             variant_to_count = self.__get_variant_to_count_for_gene(full_call_data, gene)
 
             explaining_haplotype_combinations = self.__get_explaining_haplotype_combinations(
-                variant_to_count, frozenset(panel.get_haplotypes(gene))
+                variant_to_count, gene, panel
             )
 
             if not explaining_haplotype_combinations:
@@ -61,7 +60,7 @@ class HaplotypeCaller(object):
         return variant_to_count
 
     def __get_explaining_haplotype_combinations(
-        self, variant_to_count: DefaultDict[Variant, int], haplotypes: FrozenSet[Haplotype]
+        self, variant_to_count: DefaultDict[Variant, int], gene: str, panel: Panel
     ) -> Set[Tuple[str, ...]]:
         """
         Gets combinations of haplotypes that explain all variants in the stated amounts. Uses recursion.
@@ -74,16 +73,16 @@ class HaplotypeCaller(object):
             return {tuple()}
 
         result_set = set()
-        for haplotype in haplotypes:
+        for haplotype_name in panel.get_haplotype_names(gene):
             reduced_variant_to_count = deepcopy(variant_to_count)
-            for variant in haplotype.variants:
+            for variant in panel.get_variants_for_haplotype(gene, haplotype_name):
                 reduced_variant_to_count[variant] -= 1
 
             combinations_for_reduced_variant_set = self.__get_explaining_haplotype_combinations(
-                reduced_variant_to_count, haplotypes
+                reduced_variant_to_count, gene, panel
             )
             for combination in combinations_for_reduced_variant_set:
-                result_set.add(tuple(sorted(list(combination) + [haplotype.name])))
+                result_set.add(tuple(sorted(list(combination) + [haplotype_name])))
 
         return result_set
 

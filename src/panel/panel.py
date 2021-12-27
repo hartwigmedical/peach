@@ -7,6 +7,7 @@ from calls.vcf_call import VcfCall
 from panel.gene_info import GeneInfo
 from panel.haplotype import Haplotype
 from panel.rs_id_info import RsIdInfo
+from panel.variant import Variant
 
 
 class Panel(object):
@@ -70,6 +71,15 @@ class Panel(object):
 
     def get_haplotypes(self, gene: str) -> Set[Haplotype]:
         return set(self.__gene_to_gene_info[gene].haplotypes)
+
+    def get_haplotype_names(self, gene: str) -> Set[str]:
+        return self.__gene_to_gene_info[gene].get_haplotype_names()
+
+    def get_variants_for_haplotype(self, gene: str, haplotype_name: str) -> Set[Variant]:
+        return self.__gene_to_gene_info[gene].get_variants(haplotype_name)
+
+    def get_haplotype_function(self, gene: str, haplotype_name: str) -> str:
+        return self.__gene_to_gene_info[gene].get_haplotype_function(haplotype_name)
 
     def get_transcript_ids(self) -> Set[str]:
         transcript_ids = {
@@ -143,9 +153,6 @@ class Panel(object):
 
     def is_empty(self) -> bool:
         return not self.__gene_to_gene_info.keys()
-
-    def get_haplotype_function(self, gene: str, haplotype_name: str) -> str:
-        return self.__gene_to_gene_info[gene].get_haplotype_function(haplotype_name)
 
     def get_id(self) -> str:
         return f"{self.__name}_v{self.__version}"
