@@ -1,15 +1,22 @@
-from typing import Collection, Dict, List, FrozenSet
+from typing import Collection, Dict, List, FrozenSet, Set
 
 from base.util import get_key_to_multiple_values
-from panel.variant import Variant, assert_no_overlap_variant_rs_ids
+from panel.variant import Variant
 
 
 class Haplotype(object):
     def __init__(self, name: str, function: str, variants: FrozenSet[Variant]) -> None:
-        assert_no_overlap_variant_rs_ids(variants, f"haplotype {name}")
-
         if not variants:
             raise ValueError("Haplotype without variants is not allowed")
+
+        seen_rs_ids: Set[str] = set()
+        for variant in variants:
+            if variant.rs_id in seen_rs_ids:
+                error_msg = (
+                    f"The haplotype '{name}' contains multiple variants with the same rs_id '{variant.rs_id}'."
+                )
+                raise ValueError(error_msg)
+            seen_rs_ids.add(variant.rs_id)
 
         self.__name = name
         self.__function = function
