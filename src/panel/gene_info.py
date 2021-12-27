@@ -221,21 +221,3 @@ class GeneInfo(object):
                 f"Not all rs ids are different: rs_ids={sorted(rs_ids)}"
             )
             raise ValueError(error_msg)
-
-
-def assert_no_overlap_gene_names(gene_infos: Collection[GeneInfo], source_name: str) -> None:
-    if gene_names_overlap(gene_infos):
-        gene_name_to_multiple_infos = get_gene_name_to_multiple_infos(gene_infos)
-        error_msg = (
-            f"The {source_name} contains gene summaries with the same gene names but different contents. "
-            f"Duplicates: {gene_name_to_multiple_infos}"
-        )
-        raise ValueError(error_msg)
-
-
-def gene_names_overlap(gene_infos: Collection[GeneInfo]) -> bool:
-    return len({info.gene for info in gene_infos}) != len(gene_infos)
-
-
-def get_gene_name_to_multiple_infos(gene_infos: Collection[GeneInfo]) -> Dict[str, List[GeneInfo]]:
-    return get_key_to_multiple_values([(info.gene, info) for info in gene_infos])
