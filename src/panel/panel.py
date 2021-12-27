@@ -69,9 +69,6 @@ class Panel(object):
     def get_wild_type_haplotype_name(self, gene: str) -> str:
         return self.__gene_to_gene_info[gene].wild_type_haplotype_name
 
-    def get_haplotypes(self, gene: str) -> Set[Haplotype]:
-        return set(self.__gene_to_gene_info[gene].haplotypes)
-
     def get_haplotype_names(self, gene: str) -> Set[str]:
         return self.__gene_to_gene_info[gene].get_haplotype_names()
 
