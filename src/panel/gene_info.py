@@ -49,9 +49,7 @@ class GeneInfo(object):
         self.__gene = gene
         self.__wild_type_haplotype_name = wild_type_haplotype_name
         self.__transcript_id = transcript_id
-        self.__haplotypes = haplotypes
         self.__rs_id_infos = rs_id_infos
-        self.__drugs = drugs
 
         # truly private
         self.__drug_name_to_drug_info = drug_name_to_drug_info
@@ -63,9 +61,9 @@ class GeneInfo(object):
             and self.__gene == other.__gene
             and self.__wild_type_haplotype_name == other.__wild_type_haplotype_name
             and self.__transcript_id == other.__transcript_id
-            and self.__haplotypes == other.__haplotypes
+            and self.__haplotype_name_to_haplotype == other.__haplotype_name_to_haplotype
             and self.__rs_id_infos == other.__rs_id_infos
-            and self.__drugs == other.__drugs
+            and self.__drug_name_to_drug_info == other.__drug_name_to_drug_info
         )
 
     def __hash__(self) -> int:
@@ -74,9 +72,9 @@ class GeneInfo(object):
                 self.__gene,
                 self.__wild_type_haplotype_name,
                 self.__transcript_id,
-                self.__haplotypes,
+                self.__get_haplotypes(),
                 self.__rs_id_infos,
-                self.__drugs,
+                self.__get_drug_infos(),
             )
         )
 
@@ -86,9 +84,9 @@ class GeneInfo(object):
             f"gene={self.__gene!r}, "
             f"wild_type_haplotype_name={self.__wild_type_haplotype_name!r}, "
             f"transcript_id={self.__transcript_id!r}, "
-            f"haplotypes={self.__haplotypes!r}, "
+            f"haplotypes={self.__get_haplotypes()!r}, "
             f"rs_id_infos={self.__rs_id_infos!r}, "
-            f"drugs={self.__drugs!r}, "
+            f"drugs={self.__get_drug_infos()!r}, "
             f")"
         )
 
@@ -105,16 +103,8 @@ class GeneInfo(object):
         return self.__transcript_id
 
     @property
-    def haplotypes(self) -> FrozenSet[Haplotype]:
-        return self.__haplotypes
-
-    @property
     def rs_id_infos(self) -> FrozenSet[RsIdInfo]:
         return self.__rs_id_infos
-
-    @property
-    def drugs(self) -> FrozenSet[DrugInfo]:
-        return self.__drugs
 
     def get_haplotype_names(self) -> Set[str]:
         return set(self.__haplotype_name_to_haplotype.keys())
@@ -131,11 +121,20 @@ class GeneInfo(object):
         else:
             return self.__haplotype_name_to_haplotype[haplotype_name].function
 
+    def get_drug_names(self) -> Set[str]:
+        return set(self.__drug_name_to_drug_info.keys())
+
     def get_prescription_url(self, drug_name: str) -> str:
         return self.__drug_name_to_drug_info[drug_name].url_prescription_info
 
     def get_rs_ids(self) -> Set[str]:
-        return {rs_id_info.rs_id for rs_id_info in self.rs_id_infos}
+        return {rs_id_info.rs_id for rs_id_info in self.__rs_id_infos}
+
+    def __get_haplotypes(self) -> FrozenSet[Haplotype]:
+        return frozenset(self.__haplotype_name_to_haplotype.values())
+
+    def __get_drug_infos(self) -> FrozenSet[DrugInfo]:
+        return frozenset(self.__drug_name_to_drug_info.values())
 
     @staticmethod
     def __assert_info_exists_for_all_rs_ids_in_haplotypes(

@@ -52,7 +52,7 @@ class Panel(object):
         return self.__version
 
     def get_drugs(self, gene: str) -> Set[str]:
-        return {drug_info.name for drug_info in self.__gene_to_gene_info[gene].drugs}
+        return self.__gene_to_gene_info[gene].get_drug_names()
 
     def get_drug_prescription_url(self, gene: str, drug_name: str) -> str:
         return self.__gene_to_gene_info[gene].get_prescription_url(drug_name)
@@ -178,7 +178,7 @@ class Panel(object):
 
     @staticmethod
     def __assert_rs_ids_all_different(gene_infos: FrozenSet[GeneInfo]) -> None:
-        rs_ids = [rs_id_info.rs_id for gene_info in gene_infos for rs_id_info in gene_info.rs_id_infos]
+        rs_ids = [rs_id for gene_info in gene_infos for rs_id in gene_info.get_rs_ids()]
         if len(rs_ids) != len(set(rs_ids)):
             error_msg = (
                 f"Not all rs ids are different: rs_ids={sorted(rs_ids)}"
