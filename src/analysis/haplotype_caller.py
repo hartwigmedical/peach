@@ -73,7 +73,7 @@ class HaplotypeCaller(object):
             return {tuple()}
 
         result_set = set()
-        for haplotype_name in panel.get_haplotype_names(gene):
+        for haplotype_name in panel.get_non_wild_type_haplotype_names(gene):
             reduced_variant_to_count = deepcopy(variant_to_count)
             for variant in panel.get_variants_for_haplotype(gene, haplotype_name):
                 reduced_variant_to_count[variant] -= 1

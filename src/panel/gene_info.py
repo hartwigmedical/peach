@@ -106,7 +106,7 @@ class GeneInfo(object):
     def rs_id_infos(self) -> FrozenSet[RsIdInfo]:
         return self.__rs_id_infos
 
-    def get_haplotype_names(self) -> Set[str]:
+    def get_non_wild_type_haplotype_names(self) -> Set[str]:
         return set(self.__haplotype_name_to_haplotype.keys())
 
     def get_variants(self, haplotype_name: str) -> Set[Variant]:
