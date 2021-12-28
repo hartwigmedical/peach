@@ -51,12 +51,16 @@ class HaplotypeCaller(object):
         variant_to_count: DefaultDict[Variant, int] = collections.defaultdict(int)
         for call in full_calls_for_gene:
             self.__assert_handleable_call(call)
-            for annotated_allele in call.get_annotated_alleles():
-                if not annotated_allele.is_annotated_vs(self.HAPLOTYPE_CALLING_REFERENCE_ASSEMBLY):
-                    error_msg = f"Unknown variant: allele={annotated_allele}"
-                    raise ValueError(error_msg)
-                if annotated_allele.is_variant_vs(self.HAPLOTYPE_CALLING_REFERENCE_ASSEMBLY):
-                    variant_to_count[Variant(call.rs_ids[0], annotated_allele.allele)] += 1
+            reference_site = call.get_reference_site(self.HAPLOTYPE_CALLING_REFERENCE_ASSEMBLY)
+            if reference_site is None:
+                error_msg = (
+                    f"Cannot call haplotypes, since call is "
+                    f"not annotated vs {self.HAPLOTYPE_CALLING_REFERENCE_ASSEMBLY}: call={call}"
+                )
+                raise ValueError(error_msg)
+            for allele in call.alleles:
+                if allele != reference_site.allele:
+                    variant_to_count[Variant(call.rs_ids[0], allele)] += 1
         return variant_to_count
 
     def __get_explaining_haplotype_combinations(

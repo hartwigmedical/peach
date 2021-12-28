@@ -6,7 +6,7 @@ from base.filter import FullCallFilter, VcfCallFilter
 from base.gene_coordinate import GeneCoordinate
 from base.reference_assembly import ReferenceAssembly
 from base.reference_site import ReferenceSite
-from calls.full_call import AnnotatedAllele, FullCall, FullCallData
+from calls.full_call import FullCall, FullCallData
 from calls.simple_call import SimpleCall
 from calls.vcf_call import VcfCall, VcfCallData
 from panel.panel import Panel
@@ -126,17 +126,25 @@ class SimpleCallTranslator(object):
         translated_reference_site: Optional[ReferenceSite]
         if matching_rs_id is not None:
             translated_reference_site = panel.get_reference_site(matching_rs_id, call_reference_assembly.opposite())
-            if panel.has_ref_seq_difference_annotation(matching_rs_id):
+            has_ref_sequence_difference = panel.has_ref_seq_difference_annotation(matching_rs_id)
+            if has_ref_sequence_difference and translated_reference_site is not None:
                 result_tuple = self.__get_translated_filter_and_variant_annotation_for_ref_seq_difference(
-                    simple_call, call_reference_assembly, matching_rs_id, panel, translated_reference_site)
+                    simple_call, call_reference_assembly, matching_rs_id, panel, translated_reference_site
+                )
                 translated_filter, translated_variant_annotation = result_tuple
-            else:
+            elif not has_ref_sequence_difference:
                 # no ref seq difference involved
                 translated_variant_annotation = simple_call.variant_annotation
                 if simple_call.is_pass():
                     translated_filter = FullCallFilter.PASS
                 else:
                     translated_filter = FullCallFilter.NO_CALL
+            else:
+                error_msg = (
+                    f"Cannot handle ref seq difference without knowing the positions vs the other reference assembly: "
+                    f"translated_reference_site={translated_reference_site}, call={simple_call}"
+                )
+                raise ValueError(error_msg)
             translation = Translation(translated_reference_site, translated_variant_annotation, translated_filter)
         else:
             # no matching panel variants
@@ -161,29 +169,21 @@ class SimpleCallTranslator(object):
             call_reference_assembly: ReferenceAssembly,
             matching_rs_id: str,
             panel: Panel,
-            translated_reference_site: Optional[ReferenceSite],
+            translated_reference_site: ReferenceSite,
     ) -> Tuple[FullCallFilter, Optional[str]]:
-        annotated_alleles = self.__get_annotated_alleles(
-            simple_call.reference_site,
-            simple_call.alleles,
-            call_reference_assembly,
-            translated_reference_site,
+        all_alleles_are_ref_to_opposite_reference_assembly_only = all(
+            allele != simple_call.reference_site.allele and allele == translated_reference_site.allele
+            for allele in simple_call.alleles
         )
-        annotate_as_ref = all(
-            self.__is_ref_allele_to_opposite_assembly_due_to_ref_sequence_difference(
-                annotated_allele, call_reference_assembly
-            )
-            for annotated_allele in annotated_alleles
-        )
-        all_variants_are_ref_to_a_reference_assembly = all(
-            self.__allele_is_ref_to_a_reference_assembly(annotated_allele, call_reference_assembly)
-            for annotated_allele in annotated_alleles
+        all_alleles_are_ref_to_a_reference_assembly = all(
+            allele == simple_call.reference_site.allele or allele == translated_reference_site.allele
+            for allele in simple_call.alleles
         )
         translated_variant_annotation: Optional[str]
-        if annotate_as_ref:
+        if all_alleles_are_ref_to_opposite_reference_assembly_only:
             translated_variant_annotation = REF_CALL_ANNOTATION_STRING
             translated_filter = FullCallFilter.PASS
-        elif all_variants_are_ref_to_a_reference_assembly:
+        elif all_alleles_are_ref_to_a_reference_assembly:
             translated_variant_annotation = panel.get_ref_seq_difference_annotation(
                 matching_rs_id, call_reference_assembly.opposite()
             )
@@ -192,6 +192,7 @@ class SimpleCallTranslator(object):
             else:
                 translated_filter = FullCallFilter.INFERRED_PASS
         else:
+            # Unclear what to do
             if simple_call.variant_annotation is None:
                 translated_variant_annotation = None
             else:
@@ -199,7 +200,7 @@ class SimpleCallTranslator(object):
             translated_filter = FullCallFilter.UNKNOWN
             logging.warning(
                 f"Unexpected allele in ref seq difference location. Check whether annotation is correct: "
-                f"found alleles=({annotated_alleles[0]}, {annotated_alleles[1]}), "
+                f"found alleles=({simple_call.alleles[0]}, {simple_call.alleles[1]}), "
                 f"annotation={translated_variant_annotation}"
             )
         return translated_filter, translated_variant_annotation
@@ -256,37 +257,6 @@ class SimpleCallTranslator(object):
             )
             raise ValueError(error_msg)
         return panel_gene
-
-    def __allele_is_ref_to_a_reference_assembly(
-            self, annotated_allele: AnnotatedAllele, call_reference_assembly: ReferenceAssembly
-    ) -> bool:
-        is_ref_vs_call_reference_assembly = not annotated_allele.is_variant_vs(call_reference_assembly)
-        is_ref_vs_opposite_reference_assembly = not annotated_allele.is_variant_vs(call_reference_assembly.opposite())
-        return is_ref_vs_call_reference_assembly or is_ref_vs_opposite_reference_assembly
-
-    def __is_ref_allele_to_opposite_assembly_due_to_ref_sequence_difference(
-            self, annotated_allele: AnnotatedAllele, call_reference_assembly: ReferenceAssembly
-    ) -> bool:
-        is_variant_vs_call_reference_assembly = annotated_allele.is_variant_vs(call_reference_assembly)
-        is_ref_vs_opposite_reference_assembly = not annotated_allele.is_variant_vs(call_reference_assembly.opposite())
-        return is_variant_vs_call_reference_assembly and is_ref_vs_opposite_reference_assembly
-
-    def __get_annotated_alleles(
-            self,
-            call_reference_site: ReferenceSite,
-            call_alleles: Tuple[str, str],
-            call_reference_assembly: ReferenceAssembly,
-            translated_reference_site: Optional[ReferenceSite],
-    ) -> Tuple[AnnotatedAllele, AnnotatedAllele]:
-        reference_assembly_to_reference_site = {
-            call_reference_assembly: call_reference_site,
-            call_reference_assembly.opposite(): translated_reference_site,
-        }
-        annotated_alleles = (
-            AnnotatedAllele.from_reference_sites(call_alleles[0], reference_assembly_to_reference_site),
-            AnnotatedAllele.from_reference_sites(call_alleles[1], reference_assembly_to_reference_site),
-        )
-        return annotated_alleles
 
     def __get_full_call_filter(self, direct_filter: VcfCallFilter) -> FullCallFilter:
         return FullCallFilter[direct_filter.name]
