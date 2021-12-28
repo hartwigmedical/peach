@@ -1,5 +1,5 @@
 import logging
-from typing import Set, Tuple, Optional, FrozenSet, NamedTuple
+from typing import Set, Tuple, Optional, NamedTuple
 
 from base.constants import REF_CALL_ANNOTATION_STRING
 from base.filter import FullCallFilter, VcfCallFilter
@@ -20,54 +20,6 @@ class Translation(NamedTuple):
 
 class SimpleCallTranslator(object):
     def get_all_full_call_data(self, vcf_call_data: VcfCallData, panel: Panel) -> FullCallData:
-        complete_vcf_call_data = self.__add_calls_for_uncalled_variants_in_panel(vcf_call_data, panel)
-        all_full_calls = self.__get_full_calls_from_vcf_calls(complete_vcf_call_data, panel)
-        return FullCallData(all_full_calls)
-
-    def __add_calls_for_uncalled_variants_in_panel(
-            self, vcf_call_data: VcfCallData, panel: Panel
-    ) -> VcfCallData:
-        missing_calls = self.__get_calls_for_panel_variants_without_calls(vcf_call_data, panel)
-        complete_simple_call_data = VcfCallData(
-            vcf_call_data.calls.union(missing_calls),
-            vcf_call_data.reference_assembly,
-        )
-        return complete_simple_call_data
-
-    def __get_calls_for_panel_variants_without_calls(
-            self, vcf_call_data: VcfCallData, panel: Panel
-    ) -> FrozenSet[VcfCall]:
-        # assume ref call when no call is found. Set filter to NO_CALL
-        rs_ids_found_in_patient = {rs_id for call in vcf_call_data.calls for rs_id in call.rs_ids}
-        ref_coordinates_covered_by_found_calls = {
-            coordinate
-            for call in vcf_call_data.calls
-            for coordinate in call.reference_site.get_covered_coordinates()
-        }
-
-        uncalled_calls = set()
-        for gene in panel.get_genes():
-            for rs_id in panel.get_rs_ids_for_gene(gene):
-                reference_site = panel.get_reference_site(rs_id, vcf_call_data.reference_assembly)
-                relevant_coordinates = reference_site.get_covered_coordinates()
-                coordinates_partially_handled = bool(
-                    relevant_coordinates.intersection(ref_coordinates_covered_by_found_calls)
-                )
-                if rs_id not in rs_ids_found_in_patient and not coordinates_partially_handled:
-                    # Assuming REF/REF relative to reference assembly
-
-                    uncalled_ref_call = VcfCall(
-                        reference_site,
-                        (reference_site.allele, reference_site.allele),
-                        gene,
-                        (rs_id,),
-                        REF_CALL_ANNOTATION_STRING,
-                        VcfCallFilter.NO_CALL,
-                    )
-                    uncalled_calls.add(uncalled_ref_call)
-        return frozenset(uncalled_calls)
-
-    def __get_full_calls_from_vcf_calls(self, vcf_call_data: VcfCallData, panel: Panel) -> FrozenSet[FullCall]:
         handled_v37_coordinates: Set[GeneCoordinate] = set()
         handled_v38_coordinates: Set[GeneCoordinate] = set()
         handled_rs_ids: Set[str] = set()
@@ -115,7 +67,7 @@ class SimpleCallTranslator(object):
 
             full_calls.add(full_call)
 
-        return frozenset(full_calls)
+        return FullCallData(frozenset(full_calls))
 
     def __get_full_call_from_vcf_call(
             self, vcf_call: VcfCall, panel: Panel, call_reference_assembly: ReferenceAssembly
