@@ -1,8 +1,7 @@
 import logging
-from typing import Collection, Dict, List, FrozenSet, Set
+from typing import Collection, Dict, FrozenSet, Set
 
 from base.constants import NORMAL_FUNCTION_STRING
-from base.util import get_key_to_multiple_values
 from panel.variant import Variant
 
 
@@ -132,22 +131,11 @@ class GeneHaplotypePanel(object):
     def __assert_no_overlap_haplotype_variant_combinations(
             cls, haplotypes: Collection[Haplotype], gene: str
     ) -> None:
-        if cls.__variant_combinations_of_haplotypes_overlap(haplotypes):
-            variant_combination_to_multiple_haplotypes = cls.__get_variant_combination_to_multiple_haplotypes(
-                haplotypes
-            )
+        variant_combinations_of_haplotypes_overlap = (
+            len({haplotype.variants for haplotype in haplotypes}) != len(haplotypes)
+        )
+        if variant_combinations_of_haplotypes_overlap:
             error_msg = (
-                f"The gene '{gene}' has haplotypes with the same variant combination but different names. "
-                f"Duplicates: {variant_combination_to_multiple_haplotypes}"
+                f"The gene '{gene}' has haplotypes with the same variant combination but different names."
             )
             raise ValueError(error_msg)
-
-    @classmethod
-    def __variant_combinations_of_haplotypes_overlap(cls, haplotypes: Collection[Haplotype]) -> bool:
-        return len({haplotype.variants for haplotype in haplotypes}) != len(haplotypes)
-
-    @classmethod
-    def __get_variant_combination_to_multiple_haplotypes(
-            cls, haplotypes: Collection[Haplotype]
-    ) -> Dict[FrozenSet[Variant], List[Haplotype]]:
-        return get_key_to_multiple_values([(haplotype.variants, haplotype) for haplotype in haplotypes])

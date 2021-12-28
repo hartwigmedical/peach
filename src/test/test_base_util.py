@@ -1,29 +1,12 @@
 import unittest
-from typing import List, Tuple, Dict, Set
+from typing import Set
 
 from base.gene_coordinate import GeneCoordinate
 from base.reference_site import ReferenceSite
-from base.util import get_key_to_multiple_values, replace_file_extension_of_path, strip_prefix
+from base.util import replace_file_extension_of_path, strip_prefix
 
 
 class TestBaseUtil(unittest.TestCase):
-    def test_get_key_to_multiple_values_empty(self) -> None:
-        key_value_pairs: List[Tuple[str, int]] = []
-        result = get_key_to_multiple_values(key_value_pairs)
-        result_expected: Dict[str, List[int]] = {}
-        self.assertEqual(result_expected, result)
-
-    def test_get_key_to_multiple_values_non_empty(self) -> None:
-        key_value_pairs = [("A", 1), ("A", 2), ("A", 3), ("B", 1), ("B", 5), ("C", 1), ("D", 9)]
-        result = get_key_to_multiple_values(key_value_pairs)
-
-        result_expected = {
-            "A": [1, 2, 3],
-            "B": [1, 5],
-        }
-
-        self.assertEqual(result_expected, result)
-
     def test_get_covered_coordinates_empty(self) -> None:
         reference = ReferenceSite(GeneCoordinate("X", 17), "")
         result = reference.get_covered_coordinates()
