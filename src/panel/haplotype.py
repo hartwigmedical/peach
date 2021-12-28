@@ -1,5 +1,7 @@
+import logging
 from typing import Collection, Dict, List, FrozenSet, Set
 
+from base.constants import NORMAL_FUNCTION_STRING
 from base.util import get_key_to_multiple_values
 from panel.variant import Variant
 
@@ -53,21 +55,99 @@ class Haplotype(object):
         return self.__variants
 
 
-def assert_no_overlap_haplotype_variant_combinations(haplotypes: Collection[Haplotype], source_name: str) -> None:
-    if variant_combinations_of_haplotypes_overlap(haplotypes):
-        variant_combination_to_multiple_haplotypes = get_variant_combination_to_multiple_haplotypes(haplotypes)
-        error_msg = (
-            f"The {source_name} contains haplotypes with the same variant combination but different names. "
-            f"Duplicates: {variant_combination_to_multiple_haplotypes}"
+class GeneHaplotypePanel(object):
+    def __init__(self, gene: str, wild_type_haplotype_name: str, other_haplotypes: FrozenSet[Haplotype]) -> None:
+        self.assert_no_overlap_haplotype_variant_combinations(other_haplotypes, gene)
+
+        if not other_haplotypes:
+            logging.warning(f"No alternate haplotypes configured for gene {gene}\n")
+
+        haplotype_name_to_haplotype: Dict[str, Haplotype] = {}
+        for haplotype in other_haplotypes:
+            if haplotype.name in haplotype_name_to_haplotype.keys():
+                error_msg = f"The gene '{gene}' has multiple haplotypes with the name '{haplotype.name}'."
+                raise ValueError(error_msg)
+            haplotype_name_to_haplotype[haplotype.name] = haplotype
+
+        # public through @property decorator
+        self.__gene = gene
+        self.__wild_type_haplotype_name = wild_type_haplotype_name
+
+        # truly private
+        self.__haplotype_name_to_haplotype = haplotype_name_to_haplotype
+
+    def __eq__(self, other: object) -> bool:
+        return (
+                isinstance(other, GeneHaplotypePanel)
+                and self.__gene == other.__gene
+                and self.__wild_type_haplotype_name == other.__wild_type_haplotype_name
+                and self.__haplotype_name_to_haplotype == other.__haplotype_name_to_haplotype
         )
-        raise ValueError(error_msg)
 
+    def __hash__(self) -> int:
+        return hash(
+            (
+                self.__gene,
+                self.__wild_type_haplotype_name,
+                self.__get_haplotypes(),
+            )
+        )
 
-def variant_combinations_of_haplotypes_overlap(haplotypes: Collection[Haplotype]) -> bool:
-    return len({haplotype.variants for haplotype in haplotypes}) != len(haplotypes)
+    def __repr__(self) -> str:  # pragma: no cover
+        return (
+            f"GeneHaplotypePanel("
+            f"gene={self.__gene!r}, "
+            f"wild_type_haplotype_name={self.__wild_type_haplotype_name!r}, "
+            f"haplotypes={self.__get_haplotypes()!r}, "
+            f")"
+        )
 
+    @property
+    def gene(self) -> str:
+        return self.__gene
 
-def get_variant_combination_to_multiple_haplotypes(
-    haplotypes: Collection[Haplotype],
-) -> Dict[FrozenSet[Variant], List[Haplotype]]:
-    return get_key_to_multiple_values([(haplotype.variants, haplotype) for haplotype in haplotypes])
+    @property
+    def wild_type_haplotype_name(self) -> str:
+        return self.__wild_type_haplotype_name
+
+    def get_non_wild_type_haplotype_names(self) -> Set[str]:
+        return set(self.__haplotype_name_to_haplotype.keys())
+
+    def get_variants(self, haplotype_name: str) -> Set[Variant]:
+        if haplotype_name == self.__wild_type_haplotype_name:
+            return set()
+        else:
+            return set(self.__haplotype_name_to_haplotype[haplotype_name].variants)
+
+    def get_haplotype_function(self, haplotype_name: str) -> str:
+        if haplotype_name == self.__wild_type_haplotype_name:
+            return NORMAL_FUNCTION_STRING
+        else:
+            return self.__haplotype_name_to_haplotype[haplotype_name].function
+
+    def __get_haplotypes(self) -> FrozenSet[Haplotype]:
+        return frozenset(self.__haplotype_name_to_haplotype.values())
+
+    @classmethod
+    def assert_no_overlap_haplotype_variant_combinations(
+            cls, haplotypes: Collection[Haplotype], gene: str
+    ) -> None:
+        if cls.__variant_combinations_of_haplotypes_overlap(haplotypes):
+            variant_combination_to_multiple_haplotypes = cls.__get_variant_combination_to_multiple_haplotypes(
+                haplotypes
+            )
+            error_msg = (
+                f"The gene '{gene}' has haplotypes with the same variant combination but different names. "
+                f"Duplicates: {variant_combination_to_multiple_haplotypes}"
+            )
+            raise ValueError(error_msg)
+
+    @classmethod
+    def __variant_combinations_of_haplotypes_overlap(cls, haplotypes: Collection[Haplotype]) -> bool:
+        return len({haplotype.variants for haplotype in haplotypes}) != len(haplotypes)
+
+    @classmethod
+    def __get_variant_combination_to_multiple_haplotypes(
+            cls, haplotypes: Collection[Haplotype]
+    ) -> Dict[FrozenSet[Variant], List[Haplotype]]:
+        return get_key_to_multiple_values([(haplotype.variants, haplotype) for haplotype in haplotypes])

@@ -4,7 +4,7 @@ from typing import FrozenSet, Optional, Set, Dict
 
 from base.constants import NORMAL_FUNCTION_STRING
 from panel.drug_info import DrugInfo
-from panel.haplotype import Haplotype, assert_no_overlap_haplotype_variant_combinations
+from panel.haplotype import Haplotype, GeneHaplotypePanel
 from panel.rs_id_info import RsIdInfo
 from panel.variant import Variant
 
@@ -21,7 +21,7 @@ class GeneInfo(object):
         rs_id_infos: FrozenSet[RsIdInfo],
         drugs: FrozenSet[DrugInfo],
     ) -> None:
-        assert_no_overlap_haplotype_variant_combinations(haplotypes, f"gene info for {gene}")
+        GeneHaplotypePanel.assert_no_overlap_haplotype_variant_combinations(haplotypes, f"gene info for {gene}")
         self.__assert_rs_ids_all_different(rs_id_infos)
         self.__assert_rs_id_infos_compatible(rs_id_infos)
         self.__assert_rs_id_infos_match_chromosome(rs_id_infos, gene)
