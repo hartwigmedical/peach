@@ -1,19 +1,15 @@
-import itertools
 from typing import Set, FrozenSet, Dict
 
+from base.gene_coordinate import GeneCoordinate
 from base.reference_assembly import ReferenceAssembly
 from base.reference_site import ReferenceSite
 from calls.vcf_call import VcfCall
 from panel.gene_panel import GenePanel
-from panel.rs_id_info import RsIdInfo
 from panel.variant import Variant
 
 
 class Panel(object):
     def __init__(self, name: str, version: str, gene_panels: FrozenSet[GenePanel]) -> None:
-        self.__assert_rs_ids_all_different(gene_panels)
-        self.__assert_all_rs_id_infos_compatible(gene_panels)
-
         gene_to_gene_panel: Dict[str, GenePanel] = {}
         for gene_panel in gene_panels:
             if gene_panel.gene in gene_to_gene_panel.keys():
@@ -21,9 +17,25 @@ class Panel(object):
                 raise ValueError(error_msg)
             gene_to_gene_panel[gene_panel.gene] = gene_panel
 
+        rs_id_to_gene: Dict[str, str] = {}
+        for gene_panel in gene_panels:
+            for rs_id in gene_panel.get_rs_ids():
+                if rs_id in rs_id_to_gene.keys():
+                    error_msg = f"The rs id {rs_id} is included for multiple genes."
+                    raise ValueError(error_msg)
+                rs_id_to_gene[rs_id] = gene_panel.gene
+
         self.__name = name
         self.__version = version
         self.__gene_to_gene_panel = gene_to_gene_panel
+
+        self.__rs_id_to_gene = rs_id_to_gene
+        self.__v37_reference_site_to_rs_id = self.__get_reference_site_to_rs_id(
+            gene_panels, ReferenceAssembly.V37, name
+        )
+        self.__v38_reference_site_to_rs_id = self.__get_reference_site_to_rs_id(
+            gene_panels, ReferenceAssembly.V38, name
+        )
 
     def __eq__(self, other: object) -> bool:
         return (
@@ -57,7 +69,7 @@ class Panel(object):
         return self.__gene_to_gene_panel[gene].get_prescription_url(drug_name)
 
     def get_reference_site(self, rs_id: str, reference_assembly: ReferenceAssembly) -> ReferenceSite:
-        return self.__get_rs_id_info(rs_id).get_reference_site(reference_assembly)
+        return self.__gene_to_gene_panel[self.get_gene_for_rs_id(rs_id)].get_reference_site(rs_id, reference_assembly)
 
     def get_genes(self) -> Set[str]:
         return set(self.__gene_to_gene_panel.keys())
@@ -85,67 +97,50 @@ class Panel(object):
         return transcript_ids
 
     def is_relevant_to_panel(self, call: VcfCall, reference_assembly: ReferenceAssembly) -> bool:
+        reference_site_to_rs_id = self.__get_matching_reference_site_to_rs_id(reference_assembly)
         covered_coordinates_call = call.reference_site.get_covered_coordinates()
-        for info in self.__get_rs_id_infos():
-            rs_id_covered_coordinates = info.get_reference_site(reference_assembly).get_covered_coordinates()
-            if rs_id_covered_coordinates.intersection(covered_coordinates_call) or info.rs_id in call.rs_ids:
+
+        for reference_site, rs_id in reference_site_to_rs_id.items():
+            if reference_site.get_covered_coordinates().intersection(covered_coordinates_call) or rs_id in call.rs_ids:
                 return True
         return False
 
-    def get_relevant_rs_ids(self, call: VcfCall, reference_assembly: ReferenceAssembly) -> Set[str]:
-        relevant_rs_ids = set()
+    def get_relevant_panel_rs_ids(self, call: VcfCall, reference_assembly: ReferenceAssembly) -> Set[str]:
+        reference_site_to_rs_id = self.__get_matching_reference_site_to_rs_id(reference_assembly)
         covered_coordinates_call = call.reference_site.get_covered_coordinates()
-        for info in self.__get_rs_id_infos():
-            rs_id_covered_coordinates = info.get_reference_site(reference_assembly).get_covered_coordinates()
-            if rs_id_covered_coordinates.intersection(covered_coordinates_call) or info.rs_id in call.rs_ids:
-                relevant_rs_ids.add(info.rs_id)
+
+        relevant_rs_ids = set()
+        for reference_site, rs_id in reference_site_to_rs_id.items():
+            if reference_site.get_covered_coordinates().intersection(covered_coordinates_call) or rs_id in call.rs_ids:
+                relevant_rs_ids.add(rs_id)
+
         return relevant_rs_ids
 
     def contains_rs_id_with_reference_site(
             self, reference_site: ReferenceSite, reference_assembly: ReferenceAssembly
     ) -> bool:
-        for info in self.__get_rs_id_infos():
-            if info.get_reference_site(reference_assembly) == reference_site:
-                return True
-        return False
+        return reference_site in self.__get_matching_reference_site_to_rs_id(reference_assembly)
 
     def get_rs_id_with_reference_site(
             self, reference_site: ReferenceSite, reference_assembly: ReferenceAssembly
     ) -> str:
-        matching_rs_ids = set()
-        for info in self.__get_rs_id_infos():
-            if info.get_reference_site(reference_assembly) == reference_site:
-                matching_rs_ids.add(info.rs_id)
-
-        if matching_rs_ids and len(matching_rs_ids) == 1:
-            return matching_rs_ids.pop()
-        elif not matching_rs_ids:
-            raise ValueError("No rs id infos match position and ref allele")
-        else:
-            raise ValueError("Multiple rs id infos match position and ref allele. This should be impossible.")
+        return self.__get_matching_reference_site_to_rs_id(reference_assembly)[reference_site]
 
     def has_ref_seq_difference_annotation(self, rs_id: str) -> bool:
-        return self.__get_rs_id_info(rs_id).ref_seq_difference_annotation is not None
+        annotation = self.__gene_to_gene_panel[self.get_gene_for_rs_id(rs_id)].get_ref_seq_difference_annotation(rs_id)
+        return annotation is not None
 
     def get_ref_seq_difference_annotation(self, rs_id: str, reference_assembly: ReferenceAssembly) -> str:
-        annotation = self.__get_rs_id_info(rs_id).ref_seq_difference_annotation
+        annotation = self.__gene_to_gene_panel[self.get_gene_for_rs_id(rs_id)].get_ref_seq_difference_annotation(rs_id)
         if annotation is None:
             raise ValueError(f"No ref seq difference annotation for rs_id: rs_id={rs_id}")
         return annotation.for_assembly(reference_assembly)
 
     def get_gene_for_rs_id(self, rs_id: str) -> str:
-        matching_genes = []
-        for gene_panel in self.__gene_to_gene_panel.values():
-            for rs_id_info in gene_panel.rs_id_infos:
-                if rs_id_info.rs_id == rs_id:
-                    matching_genes.append(gene_panel.gene)
-        if len(matching_genes) == 1:
-            return matching_genes[0]
-        else:
-            raise ValueError(f"Not exactly one gene for rs_id: rs_id={rs_id}, genes={sorted(matching_genes)}")
+        return self.__rs_id_to_gene[rs_id]
 
     def contains_rs_id(self, rs_id: str) -> bool:
-        return rs_id in self.__get_rs_ids()
+        return rs_id in self.__rs_id_to_gene.keys()
 
     def is_empty(self) -> bool:
         return not self.__gene_to_gene_panel.keys()
@@ -153,36 +148,29 @@ class Panel(object):
     def get_id(self) -> str:
         return f"{self.__name}_v{self.__version}"
 
-    def __get_rs_id_info(self, rs_id: str) -> RsIdInfo:
-        matching_rs_id_infos = [rs_id_info for rs_id_info in self.__get_rs_id_infos() if rs_id_info.rs_id == rs_id]
-        if len(matching_rs_id_infos) == 1:
-            return matching_rs_id_infos[0]
+    def __get_matching_reference_site_to_rs_id(self, reference_assembly: ReferenceAssembly) -> Dict[ReferenceSite, str]:
+        if reference_assembly == ReferenceAssembly.V37:
+            return self.__v37_reference_site_to_rs_id
+        elif reference_assembly == ReferenceAssembly.V38:
+            return self.__v38_reference_site_to_rs_id
         else:
-            raise ValueError(f"Not exactly one matching rs id info in panel: rs_id={rs_id}")
-
-    def __get_rs_ids(self) -> Set[str]:
-        return {info.rs_id for info in self.__get_rs_id_infos()}
-
-    def __get_rs_id_infos(self) -> Set[RsIdInfo]:
-        rs_id_infos = {
-            rs_id_info for gene_panel in self.__gene_to_gene_panel.values() for rs_id_info in gene_panel.rs_id_infos
-        }
-        return rs_id_infos
+            raise ValueError(f"Unrecognized reference assembly: '{reference_assembly}'")
 
     @staticmethod
-    def __assert_all_rs_id_infos_compatible(gene_panels: FrozenSet[GenePanel]) -> None:
-        for left_gene_panel, right_gene_panel in itertools.combinations(gene_panels, 2):
-            for left_info in left_gene_panel.rs_id_infos:
-                for right_info in right_gene_panel.rs_id_infos:
-                    if not left_info.is_compatible(right_info):
-                        error_msg = f"Incompatible rs id infos in panel. left: {left_info}, right: {right_info}"
-                        raise ValueError(error_msg)
-
-    @staticmethod
-    def __assert_rs_ids_all_different(gene_panels: FrozenSet[GenePanel]) -> None:
-        rs_ids = [rs_id for gene_panel in gene_panels for rs_id in gene_panel.get_rs_ids()]
-        if len(rs_ids) != len(set(rs_ids)):
-            error_msg = (
-                f"Not all rs ids are different: rs_ids={sorted(rs_ids)}"
-            )
-            raise ValueError(error_msg)
+    def __get_reference_site_to_rs_id(
+            gene_panels: FrozenSet[GenePanel], reference_assembly: ReferenceAssembly, name: str
+    ) -> Dict[ReferenceSite, str]:
+        seen_covered_coordinates: Set[GeneCoordinate] = set()
+        reference_site_to_rs_id: Dict[ReferenceSite, str] = {}
+        for gene_panel in gene_panels:
+            for rs_id in gene_panel.get_rs_ids():
+                reference_site = gene_panel.get_reference_site(rs_id, reference_assembly)
+                if seen_covered_coordinates.intersection(reference_site.get_covered_coordinates()):
+                    error_msg = (
+                        f"Some rs ids for panel '{name}' have overlapping {reference_assembly.name} coordinates. "
+                        f"One of them is rs id '{rs_id}' for gene '{gene_panel.gene}'."
+                    )
+                    raise ValueError(error_msg)
+                seen_covered_coordinates = seen_covered_coordinates.union(reference_site.get_covered_coordinates())
+                reference_site_to_rs_id[reference_site] = rs_id
+        return reference_site_to_rs_id

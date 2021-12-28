@@ -1,5 +1,8 @@
 from typing import FrozenSet, Optional, Set, Dict
 
+from base.reference_assembly import ReferenceAssembly
+from base.reference_site import ReferenceSite
+from panel.annotation import Annotation
 from panel.drug_summary import DrugSummary
 from panel.gene_transcript_summary import GeneTranscriptSummary
 from panel.haplotype import Haplotype, GeneHaplotypePanel
@@ -57,7 +60,7 @@ class GenePanel(object):
             f"wild_type_haplotype_name={self.__gene_haplotype_panel.wild_type_haplotype_name!r}, "
             f"transcript_id={self.__gene_transcript_summary.transcript_id!r}, "
             f"haplotypes={self.__gene_haplotype_panel.get_haplotypes() !r}, "
-            f"rs_id_infos={self.__gene_transcript_summary.rs_id_infos!r}, "
+            f"rs_id_infos={self.__gene_transcript_summary.get_rs_id_infos()!r}, "
             f"drug_summaries={self.__get_drug_summaries()!r}, "
             f")"
         )
@@ -73,10 +76,6 @@ class GenePanel(object):
     @property
     def transcript_id(self) -> Optional[str]:
         return self.__gene_transcript_summary.transcript_id
-
-    @property
-    def rs_id_infos(self) -> FrozenSet[RsIdInfo]:
-        return self.__gene_transcript_summary.rs_id_infos
 
     def get_non_wild_type_haplotype_names(self) -> Set[str]:
         return self.__gene_haplotype_panel.get_non_wild_type_haplotype_names()
@@ -95,6 +94,12 @@ class GenePanel(object):
 
     def get_rs_ids(self) -> Set[str]:
         return self.__gene_transcript_summary.get_rs_ids()
+
+    def get_ref_seq_difference_annotation(self, rs_id: str) -> Optional[Annotation]:
+        return self.__gene_transcript_summary.get_ref_seq_difference_annotation(rs_id)
+
+    def get_reference_site(self, rs_id: str, reference_assembly: ReferenceAssembly) -> ReferenceSite:
+        return self.__gene_transcript_summary.get_reference_site(rs_id, reference_assembly)
 
     def __get_drug_summaries(self) -> FrozenSet[DrugSummary]:
         return frozenset(self.__drug_name_to_drug_summary.values())

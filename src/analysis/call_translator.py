@@ -288,7 +288,7 @@ class SimpleCallTranslator(object):
     def __get_correct_gene_for_vcf_call(
             self, vcf_call: VcfCall, call_reference_assembly: ReferenceAssembly, panel: Panel
     ) -> str:
-        relevant_rs_ids_for_call = panel.get_relevant_rs_ids(vcf_call, call_reference_assembly)
+        relevant_rs_ids_for_call = panel.get_relevant_panel_rs_ids(vcf_call, call_reference_assembly)
         panel_genes_for_call = {panel.get_gene_for_rs_id(rs_id) for rs_id in relevant_rs_ids_for_call}
         if len(panel_genes_for_call) != 1:
             error_msg = (
