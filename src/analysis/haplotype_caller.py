@@ -3,6 +3,7 @@ import logging
 from copy import deepcopy
 from typing import Dict, Set, DefaultDict, Tuple
 
+from base.gene_coordinate import GeneCoordinate
 from base.reference_assembly import ReferenceAssembly
 from calls.haplotype_call import HaplotypeCall
 from calls.dual_call import DualCall, DualCallData
@@ -22,6 +23,8 @@ class HaplotypeCaller(object):
 
     def __get_haplotypes_call(self, gene: str, dual_call_data: DualCallData, panel: Panel) -> Set[HaplotypeCall]:
         try:
+            self.__assert_call_data_is_handleable(dual_call_data)
+
             variant_to_count = self.__get_variant_to_count_for_gene(dual_call_data, gene)
 
             explaining_haplotype_combinations = self.__get_explaining_haplotype_combinations(
@@ -139,3 +142,47 @@ class HaplotypeCaller(object):
         if call.rs_ids == tuple():
             error_msg = f"Call has unknown rs id: call={call}"
             raise ValueError(error_msg)
+
+    def __assert_call_data_is_handleable(self, dual_call_data: DualCallData) -> None:
+        handled_v37_coordinates: Set[GeneCoordinate] = set()
+        handled_v38_coordinates: Set[GeneCoordinate] = set()
+        handled_rs_ids: Set[str] = set()
+        for dual_call in dual_call_data.calls:
+            for rs_id in dual_call.rs_ids:
+                if rs_id in handled_rs_ids:
+                    error_msg = (
+                        f"Call for rs id that has already been handled:\n"
+                        f"call={dual_call}\n"
+                        f"handled_rs_ids={handled_rs_ids}"
+                    )
+                    raise ValueError(error_msg)
+                handled_rs_ids.add(rs_id)
+
+            if dual_call.reference_site_v37 is not None:
+                relevant_v37_coordinates = dual_call.reference_site_v37.get_covered_coordinates()
+                if relevant_v37_coordinates.intersection(handled_v37_coordinates):
+                    warning_msg = (
+                        f"Call involves at least one v37 position that has already been handled:\n"
+                        f"call={dual_call}\n"
+                        f"handled_coordinates={handled_v37_coordinates}"
+                    )
+                    logging.warning(warning_msg)
+                handled_v37_coordinates.update(relevant_v37_coordinates)
+            else:
+                warning_msg = f"Could not determine relevant v37 coordinates for call:\ncall={dual_call}"
+                logging.warning(warning_msg)
+
+            if dual_call.reference_site_v38 is not None:
+                relevant_v38_coordinates = dual_call.reference_site_v38.get_covered_coordinates()
+                if relevant_v38_coordinates.intersection(handled_v38_coordinates):
+                    warning_msg = (
+                        f"Call involves at least one v38 position that has already been handled:\n"
+                        f"call={dual_call}\n"
+                        f"handled_coordinates={handled_v38_coordinates}"
+                    )
+                    logging.warning(warning_msg)
+                handled_v38_coordinates.update(relevant_v38_coordinates)
+            else:
+                warning_msg = f"Could not determine relevant v38 coordinates for call:\n" f"call={dual_call}"
+                logging.warning(warning_msg)
+

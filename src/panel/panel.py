@@ -1,8 +1,9 @@
-from typing import Set, FrozenSet, Dict
+from typing import Set, FrozenSet, Dict, Optional, Union
 
 from base.gene_coordinate import GeneCoordinate
 from base.reference_assembly import ReferenceAssembly
 from base.reference_site import ReferenceSite
+from calls.single_call import SingleCall
 from calls.vcf_call import VcfCall
 from panel.gene_panel import GenePanel
 from panel.variant import Variant
@@ -116,15 +117,18 @@ class Panel(object):
 
         return relevant_rs_ids
 
-    def contains_rs_id_with_reference_site(
-            self, reference_site: ReferenceSite, reference_assembly: ReferenceAssembly
-    ) -> bool:
-        return reference_site in self.__get_matching_reference_site_to_rs_id(reference_assembly)
-
-    def get_rs_id_with_reference_site(
-            self, reference_site: ReferenceSite, reference_assembly: ReferenceAssembly
-    ) -> str:
-        return self.__get_matching_reference_site_to_rs_id(reference_assembly)[reference_site]
+    def get_perfectly_matching_rs_id(
+            self, call: Union[VcfCall, SingleCall], reference_assembly: ReferenceAssembly
+    ) -> Optional[str]:
+        matching_rs_id: Optional[str]
+        if self.__contains_rs_id_with_reference_site(call.reference_site, reference_assembly):
+            matching_rs_id = self.__get_rs_id_with_reference_site(call.reference_site, reference_assembly)
+        else:
+            if any(self.__contains_rs_id(rs_id) for rs_id in call.rs_ids):
+                error_msg = f"Rs id is in panel, but the call reference site does not match the panel reference site."
+                raise ValueError(error_msg)
+            matching_rs_id = None
+        return matching_rs_id
 
     def has_ref_seq_difference_annotation(self, rs_id: str) -> bool:
         annotation = self.__gene_to_gene_panel[self.get_gene_for_rs_id(rs_id)].get_ref_seq_difference_annotation(rs_id)
@@ -139,14 +143,24 @@ class Panel(object):
     def get_gene_for_rs_id(self, rs_id: str) -> str:
         return self.__rs_id_to_gene[rs_id]
 
-    def contains_rs_id(self, rs_id: str) -> bool:
-        return rs_id in self.__rs_id_to_gene.keys()
-
     def is_empty(self) -> bool:
         return not self.__gene_to_gene_panel.keys()
 
     def get_id(self) -> str:
         return f"{self.__name}_v{self.__version}"
+
+    def __contains_rs_id_with_reference_site(
+            self, reference_site: ReferenceSite, reference_assembly: ReferenceAssembly
+    ) -> bool:
+        return reference_site in self.__get_matching_reference_site_to_rs_id(reference_assembly)
+
+    def __get_rs_id_with_reference_site(
+            self, reference_site: ReferenceSite, reference_assembly: ReferenceAssembly
+    ) -> str:
+        return self.__get_matching_reference_site_to_rs_id(reference_assembly)[reference_site]
+
+    def __contains_rs_id(self, rs_id: str) -> bool:
+        return rs_id in self.__rs_id_to_gene.keys()
 
     def __get_matching_reference_site_to_rs_id(self, reference_assembly: ReferenceAssembly) -> Dict[ReferenceSite, str]:
         if reference_assembly == ReferenceAssembly.V37:

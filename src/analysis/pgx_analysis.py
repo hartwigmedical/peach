@@ -7,7 +7,7 @@ from base.filter import VcfCallFilter
 from calls.haplotype_call import HaplotypeCall
 from calls.dual_call import DualCall, DualCallData
 from calls.vcf_call import VcfCallData, VcfCall
-from analysis.call_translator import DualCallTranslator
+from analysis.dual_call_constructor import DualCallConstructor
 from panel.panel import Panel
 from analysis.haplotype_caller import HaplotypeCaller
 
@@ -45,7 +45,7 @@ class PgxAnalyser(object):
         complete_vcf_call_data = self.__add_calls_for_uncalled_variants_in_panel(vcf_call_data, panel)
 
         logging.info(f"Annotating call data for reference assembly {vcf_call_data.reference_assembly.opposite().name}")
-        dual_call_data = DualCallTranslator().get_dual_call_data(complete_vcf_call_data, panel)
+        dual_call_data = DualCallConstructor().get_dual_call_data(complete_vcf_call_data, panel)
 
         logging.info(f"Calling haplotypes")
         gene_to_haplotype_calls = HaplotypeCaller().get_gene_to_haplotypes_call(dual_call_data, panel)
