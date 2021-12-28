@@ -57,7 +57,7 @@ class Haplotype(object):
 
 class GeneHaplotypePanel(object):
     def __init__(self, gene: str, wild_type_haplotype_name: str, other_haplotypes: FrozenSet[Haplotype]) -> None:
-        self.assert_no_overlap_haplotype_variant_combinations(other_haplotypes, gene)
+        self.__assert_no_overlap_haplotype_variant_combinations(other_haplotypes, gene)
 
         if not other_haplotypes:
             logging.warning(f"No alternate haplotypes configured for gene {gene}\n")
@@ -125,11 +125,11 @@ class GeneHaplotypePanel(object):
         else:
             return self.__haplotype_name_to_haplotype[haplotype_name].function
 
-    def __get_haplotypes(self) -> FrozenSet[Haplotype]:
+    def get_haplotypes(self) -> FrozenSet[Haplotype]:
         return frozenset(self.__haplotype_name_to_haplotype.values())
 
     @classmethod
-    def assert_no_overlap_haplotype_variant_combinations(
+    def __assert_no_overlap_haplotype_variant_combinations(
             cls, haplotypes: Collection[Haplotype], gene: str
     ) -> None:
         if cls.__variant_combinations_of_haplotypes_overlap(haplotypes):

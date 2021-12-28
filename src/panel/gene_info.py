@@ -1,8 +1,6 @@
 import itertools
-import logging
 from typing import FrozenSet, Optional, Set, Dict
 
-from base.constants import NORMAL_FUNCTION_STRING
 from panel.drug_info import DrugInfo
 from panel.haplotype import Haplotype, GeneHaplotypePanel
 from panel.rs_id_info import RsIdInfo
@@ -17,19 +15,15 @@ class GeneInfo(object):
         gene: str,
         wild_type_haplotype_name: str,
         transcript_id: Optional[str],
-        haplotypes: FrozenSet[Haplotype],
+        other_haplotypes: FrozenSet[Haplotype],
         rs_id_infos: FrozenSet[RsIdInfo],
         drugs: FrozenSet[DrugInfo],
     ) -> None:
-        GeneHaplotypePanel.assert_no_overlap_haplotype_variant_combinations(haplotypes, f"gene info for {gene}")
         self.__assert_rs_ids_all_different(rs_id_infos)
         self.__assert_rs_id_infos_compatible(rs_id_infos)
         self.__assert_rs_id_infos_match_chromosome(rs_id_infos, gene)
-        self.__assert_info_exists_for_all_rs_ids_in_haplotypes(haplotypes, rs_id_infos)
-        self.__assert_variants_in_haplotypes_compatible_with_rs_id_infos(haplotypes, rs_id_infos)
-
-        if not haplotypes:
-            logging.warning(f"No alternate haplotypes configured for gene {gene}\n")
+        self.__assert_info_exists_for_all_rs_ids_in_haplotypes(other_haplotypes, rs_id_infos)
+        self.__assert_variants_in_haplotypes_compatible_with_rs_id_infos(other_haplotypes, rs_id_infos)
 
         drug_name_to_drug_info: Dict[str, DrugInfo] = {}
         for drug_info in drugs:
@@ -38,43 +32,33 @@ class GeneInfo(object):
                 raise ValueError(error_msg)
             drug_name_to_drug_info[drug_info.name] = drug_info
 
-        haplotype_name_to_haplotype: Dict[str, Haplotype] = {}
-        for haplotype in haplotypes:
-            if haplotype.name in haplotype_name_to_haplotype.keys():
-                error_msg = f"The gene '{gene}' has multiple haplotypes with the name '{haplotype.name}'."
-                raise ValueError(error_msg)
-            haplotype_name_to_haplotype[haplotype.name] = haplotype
-
         # public through @property decorator
         self.__gene = gene
-        self.__wild_type_haplotype_name = wild_type_haplotype_name
         self.__transcript_id = transcript_id
         self.__rs_id_infos = rs_id_infos
 
         # truly private
         self.__drug_name_to_drug_info = drug_name_to_drug_info
-        self.__haplotype_name_to_haplotype = haplotype_name_to_haplotype
+        self.__gene_haplotype_panel = GeneHaplotypePanel(gene, wild_type_haplotype_name, other_haplotypes)
 
     def __eq__(self, other: object) -> bool:
         return (
             isinstance(other, GeneInfo)
             and self.__gene == other.__gene
-            and self.__wild_type_haplotype_name == other.__wild_type_haplotype_name
             and self.__transcript_id == other.__transcript_id
-            and self.__haplotype_name_to_haplotype == other.__haplotype_name_to_haplotype
             and self.__rs_id_infos == other.__rs_id_infos
             and self.__drug_name_to_drug_info == other.__drug_name_to_drug_info
+            and self.__gene_haplotype_panel == other.__gene_haplotype_panel
         )
 
     def __hash__(self) -> int:
         return hash(
             (
                 self.__gene,
-                self.__wild_type_haplotype_name,
                 self.__transcript_id,
-                self.__get_haplotypes(),
                 self.__rs_id_infos,
                 self.__get_drug_infos(),
+                self.__gene_haplotype_panel,
             )
         )
 
@@ -82,9 +66,9 @@ class GeneInfo(object):
         return (
             f"GeneInfo("
             f"gene={self.__gene!r}, "
-            f"wild_type_haplotype_name={self.__wild_type_haplotype_name!r}, "
+            f"wild_type_haplotype_name={self.__gene_haplotype_panel.wild_type_haplotype_name!r}, "
             f"transcript_id={self.__transcript_id!r}, "
-            f"haplotypes={self.__get_haplotypes()!r}, "
+            f"haplotypes={self.__gene_haplotype_panel.get_haplotypes() !r}, "
             f"rs_id_infos={self.__rs_id_infos!r}, "
             f"drugs={self.__get_drug_infos()!r}, "
             f")"
@@ -96,7 +80,7 @@ class GeneInfo(object):
 
     @property
     def wild_type_haplotype_name(self) -> str:
-        return self.__wild_type_haplotype_name
+        return self.__gene_haplotype_panel.wild_type_haplotype_name
 
     @property
     def transcript_id(self) -> Optional[str]:
@@ -107,19 +91,13 @@ class GeneInfo(object):
         return self.__rs_id_infos
 
     def get_non_wild_type_haplotype_names(self) -> Set[str]:
-        return set(self.__haplotype_name_to_haplotype.keys())
+        return self.__gene_haplotype_panel.get_non_wild_type_haplotype_names()
 
     def get_variants(self, haplotype_name: str) -> Set[Variant]:
-        if haplotype_name == self.__wild_type_haplotype_name:
-            return set()
-        else:
-            return set(self.__haplotype_name_to_haplotype[haplotype_name].variants)
+        return self.__gene_haplotype_panel.get_variants(haplotype_name)
 
     def get_haplotype_function(self, haplotype_name: str) -> str:
-        if haplotype_name == self.__wild_type_haplotype_name:
-            return NORMAL_FUNCTION_STRING
-        else:
-            return self.__haplotype_name_to_haplotype[haplotype_name].function
+        return self.__gene_haplotype_panel.get_haplotype_function(haplotype_name)
 
     def get_drug_names(self) -> Set[str]:
         return set(self.__drug_name_to_drug_info.keys())
@@ -130,17 +108,14 @@ class GeneInfo(object):
     def get_rs_ids(self) -> Set[str]:
         return {rs_id_info.rs_id for rs_id_info in self.__rs_id_infos}
 
-    def __get_haplotypes(self) -> FrozenSet[Haplotype]:
-        return frozenset(self.__haplotype_name_to_haplotype.values())
-
     def __get_drug_infos(self) -> FrozenSet[DrugInfo]:
         return frozenset(self.__drug_name_to_drug_info.values())
 
     @staticmethod
     def __assert_info_exists_for_all_rs_ids_in_haplotypes(
-        haplotypes: FrozenSet[Haplotype], rs_id_infos: FrozenSet[RsIdInfo]
+        non_wild_type_haplotypes: FrozenSet[Haplotype], rs_id_infos: FrozenSet[RsIdInfo]
     ) -> None:
-        rs_ids_in_haplotypes = {variant.rs_id for haplotype in haplotypes for variant in haplotype.variants}
+        rs_ids_in_haplotypes = {variant.rs_id for haplotype in non_wild_type_haplotypes for variant in haplotype.variants}
         rs_ids_with_info = {info.rs_id for info in rs_id_infos}
         if not rs_ids_in_haplotypes.issubset(rs_ids_with_info):
             rs_ids_without_info = rs_ids_in_haplotypes.difference(rs_ids_with_info)
@@ -168,9 +143,9 @@ class GeneInfo(object):
 
     @staticmethod
     def __assert_variants_in_haplotypes_compatible_with_rs_id_infos(
-        haplotypes: FrozenSet[Haplotype], rs_id_infos: FrozenSet[RsIdInfo]
+            non_wild_type_haplotypes: FrozenSet[Haplotype], rs_id_infos: FrozenSet[RsIdInfo]
     ) -> None:
-        variants = {variant for haplotype in haplotypes for variant in haplotype.variants}
+        variants = {variant for haplotype in non_wild_type_haplotypes for variant in haplotype.variants}
         for variant in variants:
             matching_rs_id_infos = [rs_id_info for rs_id_info in rs_id_infos if rs_id_info.rs_id == variant.rs_id]
             assert len(matching_rs_id_infos) == 1, (
