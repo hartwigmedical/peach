@@ -89,7 +89,7 @@ class GeneHaplotypePanel(object):
             (
                 self.__gene,
                 self.__wild_type_haplotype_name,
-                self.__get_haplotypes(),
+                self.get_haplotypes(),
             )
         )
 
@@ -98,7 +98,7 @@ class GeneHaplotypePanel(object):
             f"GeneHaplotypePanel("
             f"gene={self.__gene!r}, "
             f"wild_type_haplotype_name={self.__wild_type_haplotype_name!r}, "
-            f"haplotypes={self.__get_haplotypes()!r}, "
+            f"haplotypes={self.get_haplotypes()!r}, "
             f")"
         )
 
