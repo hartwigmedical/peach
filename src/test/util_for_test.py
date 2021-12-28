@@ -3,7 +3,7 @@ from typing import Set
 from base.gene_coordinate import GeneCoordinate
 from base.reference_site import ReferenceSite
 from panel.annotation import Annotation
-from panel.drug_info import DrugInfo
+from panel.drug_summary import DrugSummary
 from panel.gene_panel import GenePanel
 from panel.haplotype import Haplotype
 from panel.panel import Panel
@@ -38,8 +38,8 @@ def get_wide_example_panel(include_transcript_ids: bool) -> Panel:
             ReferenceSite(GeneCoordinate("chr1", 97450065), "TC"), Annotation("6744CA>GA", "6744GA>CA")),
     })
     dpyd_drugs = frozenset({
-        DrugInfo("5-Fluorouracil", "https://www.pharmgkb.org/chemical/PA128406956/guidelineAnnotation/PA166104939"),
-        DrugInfo("Capecitabine", "https://www.pharmgkb.org/chemical/PA448771/guidelineAnnotation/PA166104963"),
+        DrugSummary("5-Fluorouracil", "https://www.pharmgkb.org/chemical/PA128406956/guidelineAnnotation/PA166104939"),
+        DrugSummary("Capecitabine", "https://www.pharmgkb.org/chemical/PA448771/guidelineAnnotation/PA166104963"),
     })
 
     fake_haplotypes = frozenset({
@@ -51,7 +51,7 @@ def get_wide_example_panel(include_transcript_ids: bool) -> Panel:
             ReferenceSite(GeneCoordinate("chr5", 97450060), "T"), None),
     })
     fake_drugs = frozenset({
-        DrugInfo("Aspirin", "https://www.pharmgkb.org/some_other_url"),
+        DrugSummary("Aspirin", "https://www.pharmgkb.org/some_other_url"),
     })
 
     fake2_haplotypes = frozenset({
@@ -63,7 +63,7 @@ def get_wide_example_panel(include_transcript_ids: bool) -> Panel:
             ReferenceSite(GeneCoordinate("chr16", 97450060), "T"), Annotation("1324C>T", "1324T>C")),
     })
     fake2_drugs = frozenset({
-        DrugInfo("Aspirin", "https://www.pharmgkb.org/some_other_url"),
+        DrugSummary("Aspirin", "https://www.pharmgkb.org/some_other_url"),
     })
 
     dpyd_gene_panel = GenePanel(
@@ -133,8 +133,8 @@ def get_narrow_example_panel(included_haplotypes: Set[str]) -> Panel:
         {rs_id_info for rs_id_info in possible_rs_id_infos if rs_id_info.rs_id in included_dpyd_rs_ids}
     )
     dpyd_drugs = frozenset({
-        DrugInfo("5-Fluorouracil", "https://www.pharmgkb.org/chemical/PA128406956/guidelineAnnotation/PA166104939"),
-        DrugInfo("Capecitabine", "https://www.pharmgkb.org/chemical/PA448771/guidelineAnnotation/PA166104963"),
+        DrugSummary("5-Fluorouracil", "https://www.pharmgkb.org/chemical/PA128406956/guidelineAnnotation/PA166104939"),
+        DrugSummary("Capecitabine", "https://www.pharmgkb.org/chemical/PA448771/guidelineAnnotation/PA166104963"),
     })
 
     gene_panels = frozenset({

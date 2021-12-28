@@ -3,7 +3,7 @@ from typing import Optional, Any, Dict, FrozenSet
 from base.gene_coordinate import GeneCoordinate
 from base.reference_site import ReferenceSite
 from panel.annotation import Annotation
-from panel.drug_info import DrugInfo
+from panel.drug_summary import DrugSummary
 from panel.gene_panel import GenePanel
 from panel.haplotype import Haplotype
 from panel.panel import Panel
@@ -27,7 +27,7 @@ class JsonParser(object):
     TRANSCRIPT_ID = "canonicalTranscript"
     RSID_INFOS_KEY = "variants"
     HAPLOTYPES_KEY = "haplotypes"
-    DRUG_INFOS_KEY = "drugs"
+    DRUG_SUMMARIES_KEY = "drugs"
     REF_SEQ_DIFF_KEY = "refSeqDifferenceAnnotations"
 
     # per annotation
@@ -77,7 +77,7 @@ class JsonParser(object):
             chromosome_v38,
         )
         haplotypes = frozenset({self.get_haplotype(haplotype_json) for haplotype_json in data[self.HAPLOTYPES_KEY]})
-        drugs = frozenset({self.get_drug_info(drug_json) for drug_json in data[self.DRUG_INFOS_KEY]})
+        drugs = frozenset({self.get_drug_summary(drug_json) for drug_json in data[self.DRUG_SUMMARIES_KEY]})
         gene_panel = GenePanel(
             gene,
             wild_type_haplotype,
@@ -144,10 +144,10 @@ class JsonParser(object):
         variants = frozenset({self.get_variant(variant_json) for variant_json in data[self.HAPLOTYPE_VARIANTS_KEY]})
         return Haplotype(name, function, variants)
 
-    def get_drug_info(self, data: Json) -> DrugInfo:
+    def get_drug_summary(self, data: Json) -> DrugSummary:
         name = str(data[self.DRUG_NAME])
         url_prescription_info = str(data[self.PRESCRIPTION_URL])
-        return DrugInfo(name, url_prescription_info)
+        return DrugSummary(name, url_prescription_info)
 
     def get_annotation(self, data: Json) -> Annotation:
         annotation_v37 = str(data[self.ANNOTATION_V37])

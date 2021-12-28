@@ -1,7 +1,7 @@
 import itertools
 from typing import FrozenSet, Optional, Set, Dict
 
-from panel.drug_info import DrugInfo
+from panel.drug_summary import DrugSummary
 from panel.haplotype import Haplotype, GeneHaplotypePanel
 from panel.rs_id_info import RsIdInfo
 from panel.variant import Variant
@@ -17,7 +17,7 @@ class GenePanel(object):
         transcript_id: Optional[str],
         other_haplotypes: FrozenSet[Haplotype],
         rs_id_infos: FrozenSet[RsIdInfo],
-        drugs: FrozenSet[DrugInfo],
+        drug_summaries: FrozenSet[DrugSummary],
     ) -> None:
         self.__assert_rs_ids_all_different(rs_id_infos)
         self.__assert_rs_id_infos_compatible(rs_id_infos)
@@ -25,12 +25,12 @@ class GenePanel(object):
         self.__assert_info_exists_for_all_rs_ids_in_haplotypes(other_haplotypes, rs_id_infos)
         self.__assert_variants_in_haplotypes_compatible_with_rs_id_infos(other_haplotypes, rs_id_infos)
 
-        drug_name_to_drug_info: Dict[str, DrugInfo] = {}
-        for drug_info in drugs:
-            if drug_info.name in drug_name_to_drug_info.keys():
-                error_msg = f"The gene '{gene}' has multiple drugs with the name '{drug_info.name}'."
+        drug_name_to_drug_summary: Dict[str, DrugSummary] = {}
+        for drug_summary in drug_summaries:
+            if drug_summary.name in drug_name_to_drug_summary.keys():
+                error_msg = f"The gene '{gene}' has multiple drugs with the name '{drug_summary.name}'."
                 raise ValueError(error_msg)
-            drug_name_to_drug_info[drug_info.name] = drug_info
+            drug_name_to_drug_summary[drug_summary.name] = drug_summary
 
         # public through @property decorator
         self.__gene = gene
@@ -38,17 +38,17 @@ class GenePanel(object):
         self.__rs_id_infos = rs_id_infos
 
         # truly private
-        self.__drug_name_to_drug_info = drug_name_to_drug_info
+        self.__drug_name_to_drug_summary = drug_name_to_drug_summary
         self.__gene_haplotype_panel = GeneHaplotypePanel(gene, wild_type_haplotype_name, other_haplotypes)
 
     def __eq__(self, other: object) -> bool:
         return (
-            isinstance(other, GenePanel)
-            and self.__gene == other.__gene
-            and self.__transcript_id == other.__transcript_id
-            and self.__rs_id_infos == other.__rs_id_infos
-            and self.__drug_name_to_drug_info == other.__drug_name_to_drug_info
-            and self.__gene_haplotype_panel == other.__gene_haplotype_panel
+                isinstance(other, GenePanel)
+                and self.__gene == other.__gene
+                and self.__transcript_id == other.__transcript_id
+                and self.__rs_id_infos == other.__rs_id_infos
+                and self.__drug_name_to_drug_summary == other.__drug_name_to_drug_summary
+                and self.__gene_haplotype_panel == other.__gene_haplotype_panel
         )
 
     def __hash__(self) -> int:
@@ -57,7 +57,7 @@ class GenePanel(object):
                 self.__gene,
                 self.__transcript_id,
                 self.__rs_id_infos,
-                self.__get_drug_infos(),
+                self.__get_drug_summaries(),
                 self.__gene_haplotype_panel,
             )
         )
@@ -70,7 +70,7 @@ class GenePanel(object):
             f"transcript_id={self.__transcript_id!r}, "
             f"haplotypes={self.__gene_haplotype_panel.get_haplotypes() !r}, "
             f"rs_id_infos={self.__rs_id_infos!r}, "
-            f"drugs={self.__get_drug_infos()!r}, "
+            f"drug_summaries={self.__get_drug_summaries()!r}, "
             f")"
         )
 
@@ -100,16 +100,16 @@ class GenePanel(object):
         return self.__gene_haplotype_panel.get_haplotype_function(haplotype_name)
 
     def get_drug_names(self) -> Set[str]:
-        return set(self.__drug_name_to_drug_info.keys())
+        return set(self.__drug_name_to_drug_summary.keys())
 
     def get_prescription_url(self, drug_name: str) -> str:
-        return self.__drug_name_to_drug_info[drug_name].url_prescription_info
+        return self.__drug_name_to_drug_summary[drug_name].url_prescription_info
 
     def get_rs_ids(self) -> Set[str]:
         return {rs_id_info.rs_id for rs_id_info in self.__rs_id_infos}
 
-    def __get_drug_infos(self) -> FrozenSet[DrugInfo]:
-        return frozenset(self.__drug_name_to_drug_info.values())
+    def __get_drug_summaries(self) -> FrozenSet[DrugSummary]:
+        return frozenset(self.__drug_name_to_drug_summary.values())
 
     @staticmethod
     def __assert_info_exists_for_all_rs_ids_in_haplotypes(

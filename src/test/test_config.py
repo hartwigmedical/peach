@@ -4,7 +4,7 @@ from typing import FrozenSet
 from base.gene_coordinate import GeneCoordinate
 from base.reference_site import ReferenceSite
 from panel.annotation import Annotation
-from panel.drug_info import DrugInfo
+from panel.drug_summary import DrugSummary
 from panel.gene_panel import GenePanel
 from panel.haplotype import Haplotype
 from panel.panel import Panel
@@ -59,7 +59,7 @@ class TestConfig(unittest.TestCase):
         chromosome_v37 = "X"
         chromosome_v38 = "chrX"
         reference_haplotype_name = "*1"
-        drugs: FrozenSet[DrugInfo] = frozenset()
+        drugs: FrozenSet[DrugSummary] = frozenset()
 
         variant1 = Variant("rs94982", "A")
         variant2 = Variant("rs394934", "T")
@@ -120,7 +120,7 @@ class TestConfig(unittest.TestCase):
         chromosome_v37 = "X"
         chromosome_v38 = "chrX"
         reference_haplotype_name = "*1"
-        drugs: FrozenSet[DrugInfo] = frozenset()
+        drugs: FrozenSet[DrugSummary] = frozenset()
 
         variant1 = Variant("rs94982", "A")
         variant2 = Variant("rs394934", "T")
@@ -190,10 +190,10 @@ class TestConfig(unittest.TestCase):
         haplotypes: FrozenSet[Haplotype] = frozenset()
         rs_id_infos: FrozenSet[RsIdInfo] = frozenset()
 
-        drug_info1 = DrugInfo("Paracetamol", "google.com")
-        drug_info2 = DrugInfo("Paracetamol", "wikipedia.com")
-        drugs = frozenset([drug_info1])
-        overlapping_drugs = frozenset([drug_info1, drug_info2])
+        drug_summary1 = DrugSummary("Paracetamol", "google.com")
+        drug_summary2 = DrugSummary("Paracetamol", "wikipedia.com")
+        drugs = frozenset([drug_summary1])
+        overlapping_drugs = frozenset([drug_summary1, drug_summary2])
 
         GenePanel(gene, reference_haplotype_name, None, haplotypes, rs_id_infos, drugs)
         with self.assertRaises(ValueError):
@@ -213,7 +213,7 @@ class TestConfig(unittest.TestCase):
         chromosome_v38 = "chrX"
         reference_haplotype_name = "*1"
         haplotypes: FrozenSet[Haplotype] = frozenset()
-        drugs: FrozenSet[DrugInfo] = frozenset()
+        drugs: FrozenSet[DrugSummary] = frozenset()
 
         rs_id_info1 = RsIdInfo(
             "rs294924",
@@ -255,7 +255,7 @@ class TestConfig(unittest.TestCase):
         chromosome_v38 = "chrX"
         reference_haplotype_name = "*1"
         haplotypes: FrozenSet[Haplotype] = frozenset()
-        drugs: FrozenSet[DrugInfo] = frozenset()
+        drugs: FrozenSet[DrugSummary] = frozenset()
 
         other_chromosome_v37 = "1"
         other_chromosome_v38 = "1"
@@ -350,7 +350,7 @@ class TestConfig(unittest.TestCase):
         gene = "FAKE"
         reference_haplotype_name = "*1"
         rs_id_infos: FrozenSet[RsIdInfo] = frozenset()
-        drugs: FrozenSet[DrugInfo] = frozenset()
+        drugs: FrozenSet[DrugSummary] = frozenset()
 
         empty_haplotypes: FrozenSet[Haplotype] = frozenset()
         non_empty_haplotypes = frozenset([Haplotype("*2", "No Function", frozenset([Variant("rs238423", "A")]))])
@@ -379,7 +379,7 @@ class TestConfig(unittest.TestCase):
         chromosome_v37 = "X"
         chromosome_v38 = "chrX"
         reference_haplotype_name = "*1"
-        drugs: FrozenSet[DrugInfo] = frozenset()
+        drugs: FrozenSet[DrugSummary] = frozenset()
 
         rs_id = "rs294924"
 
@@ -429,7 +429,7 @@ class TestConfig(unittest.TestCase):
         gene = "FAKE"
         reference_haplotype_name = "*1"
         haplotypes: FrozenSet[Haplotype] = frozenset()
-        drugs: FrozenSet[DrugInfo] = frozenset()
+        drugs: FrozenSet[DrugSummary] = frozenset()
 
         chromosome_v37 = "X"
         chromosome_v38 = "chrX"
@@ -503,7 +503,7 @@ class TestConfig(unittest.TestCase):
         other_reference_haplotype_name = "*1_something else"
         haplotypes: FrozenSet[Haplotype] = frozenset()
         rs_id_infos: FrozenSet[RsIdInfo] = frozenset()
-        drugs: FrozenSet[DrugInfo] = frozenset()
+        drugs: FrozenSet[DrugSummary] = frozenset()
 
         gene_panel1 = GenePanel(
             gene1,
@@ -548,7 +548,7 @@ class TestConfig(unittest.TestCase):
         chromosome_v38 = "chrX"
         reference_haplotype_name = "*1"
         haplotypes: FrozenSet[Haplotype] = frozenset()
-        drugs: FrozenSet[DrugInfo] = frozenset()
+        drugs: FrozenSet[DrugSummary] = frozenset()
 
         rs_id_info1 = RsIdInfo(
             "rs294924",
@@ -613,7 +613,7 @@ class TestConfig(unittest.TestCase):
         chromosome_v38 = "chrX"
         reference_haplotype_name = "*1"
         haplotypes: FrozenSet[Haplotype] = frozenset()
-        drugs: FrozenSet[DrugInfo] = frozenset()
+        drugs: FrozenSet[DrugSummary] = frozenset()
 
         rs_id_info1 = RsIdInfo(
             "rs294924",
