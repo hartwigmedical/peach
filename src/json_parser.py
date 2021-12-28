@@ -4,7 +4,7 @@ from base.gene_coordinate import GeneCoordinate
 from base.reference_site import ReferenceSite
 from panel.annotation import Annotation
 from panel.drug_info import DrugInfo
-from panel.gene_info import GeneInfo
+from panel.gene_panel import GenePanel
 from panel.haplotype import Haplotype
 from panel.panel import Panel
 from panel.rs_id_info import RsIdInfo
@@ -57,10 +57,10 @@ class JsonParser(object):
     def get_panel(self, data: Json) -> Panel:
         name = str(data[self.PANEL_NAME])
         version = str(data[self.PANEL_VERSION])
-        gene_infos = frozenset({self.get_gene_info(gene_info_json) for gene_info_json in data[self.GENES_KEY]})
-        return Panel(name, version, gene_infos)
+        gene_panels = frozenset({self.get_gene_panel(gene_panel_json) for gene_panel_json in data[self.GENES_KEY]})
+        return Panel(name, version, gene_panels)
 
-    def get_gene_info(self, data: Json) -> GeneInfo:
+    def get_gene_panel(self, data: Json) -> GenePanel:
         gene = str(data[self.GENE_NAME])
         chromosome_v37 = str(data[self.CHROMOSOME_V37])
         chromosome_v38 = str(data[self.CHROMOSOME_V38])
@@ -78,7 +78,7 @@ class JsonParser(object):
         )
         haplotypes = frozenset({self.get_haplotype(haplotype_json) for haplotype_json in data[self.HAPLOTYPES_KEY]})
         drugs = frozenset({self.get_drug_info(drug_json) for drug_json in data[self.DRUG_INFOS_KEY]})
-        gene_info = GeneInfo(
+        gene_panel = GenePanel(
             gene,
             wild_type_haplotype,
             transcript_id,
@@ -86,7 +86,7 @@ class JsonParser(object):
             rs_id_infos,
             drugs,
         )
-        return gene_info
+        return gene_panel
 
     def get_rs_id_infos(
             self,

@@ -5,7 +5,7 @@ from base.gene_coordinate import GeneCoordinate
 from base.reference_site import ReferenceSite
 from panel.annotation import Annotation
 from panel.drug_info import DrugInfo
-from panel.gene_info import GeneInfo
+from panel.gene_panel import GenePanel
 from panel.haplotype import Haplotype
 from panel.panel import Panel
 from panel.rs_id_info import RsIdInfo
@@ -53,7 +53,7 @@ class TestConfig(unittest.TestCase):
                 None,
             )
 
-    def test_gene_info_with_overlapping_haplotype_names(self) -> None:
+    def test_gene_panel_with_overlapping_haplotype_names(self) -> None:
         """Error when haplotype name used multiple times for gene"""
         gene = "FAKE"
         chromosome_v37 = "X"
@@ -96,7 +96,7 @@ class TestConfig(unittest.TestCase):
             ]
         )
 
-        GeneInfo(
+        GenePanel(
             gene,
             reference_haplotype_name,
             None,
@@ -105,7 +105,7 @@ class TestConfig(unittest.TestCase):
             drugs,
         )
         with self.assertRaises(ValueError):
-            GeneInfo(
+            GenePanel(
                 gene,
                 reference_haplotype_name,
                 None,
@@ -114,7 +114,7 @@ class TestConfig(unittest.TestCase):
                 drugs,
             )
 
-    def test_gene_info_with_overlapping_haplotype_variants(self) -> None:
+    def test_gene_panel_with_overlapping_haplotype_variants(self) -> None:
         """Error when different haplotypes have the exact same variant combination"""
         gene = "FAKE"
         chromosome_v37 = "X"
@@ -165,7 +165,7 @@ class TestConfig(unittest.TestCase):
             ]
         )
 
-        GeneInfo(
+        GenePanel(
             gene,
             reference_haplotype_name,
             None,
@@ -174,7 +174,7 @@ class TestConfig(unittest.TestCase):
             drugs,
         )
         with self.assertRaises(ValueError):
-            GeneInfo(
+            GenePanel(
                 gene,
                 reference_haplotype_name,
                 None,
@@ -183,7 +183,7 @@ class TestConfig(unittest.TestCase):
                 drugs,
             )
 
-    def test_gene_info_with_overlapping_drug_names(self) -> None:
+    def test_gene_panel_with_overlapping_drug_names(self) -> None:
         """Error when drug name used multiple times for gene"""
         gene = "FAKE"
         reference_haplotype_name = "*1"
@@ -195,9 +195,9 @@ class TestConfig(unittest.TestCase):
         drugs = frozenset([drug_info1])
         overlapping_drugs = frozenset([drug_info1, drug_info2])
 
-        GeneInfo(gene, reference_haplotype_name, None, haplotypes, rs_id_infos, drugs)
+        GenePanel(gene, reference_haplotype_name, None, haplotypes, rs_id_infos, drugs)
         with self.assertRaises(ValueError):
-            GeneInfo(
+            GenePanel(
                 gene,
                 reference_haplotype_name,
                 None,
@@ -206,7 +206,7 @@ class TestConfig(unittest.TestCase):
                 overlapping_drugs,
             )
 
-    def test_gene_info_with_overlapping_rs_id_infos(self) -> None:
+    def test_gene_panel_with_overlapping_rs_id_infos(self) -> None:
         """Error when gene info has rs id infos for which the relevant coordinates overlap"""
         gene = "FAKE"
         chromosome_v37 = "X"
@@ -230,7 +230,7 @@ class TestConfig(unittest.TestCase):
         single_rs_id_info = frozenset([rs_id_info1])
         overlapping_rs_id_infos = frozenset([rs_id_info1, rs_id_info2])
 
-        GeneInfo(
+        GenePanel(
             gene,
             reference_haplotype_name,
             None,
@@ -239,7 +239,7 @@ class TestConfig(unittest.TestCase):
             drugs,
         )
         with self.assertRaises(ValueError):
-            GeneInfo(
+            GenePanel(
                 gene,
                 reference_haplotype_name,
                 None,
@@ -248,7 +248,7 @@ class TestConfig(unittest.TestCase):
                 drugs,
             )
 
-    def test_gene_info_with_rs_id_infos_for_different_chromosome(self) -> None:
+    def test_gene_panel_with_rs_id_infos_for_different_chromosome(self) -> None:
         """Error when gene info has rs id infos for which the relevant coordinates have a different chromosome"""
         gene = "FAKE"
         chromosome_v37 = "X"
@@ -285,7 +285,7 @@ class TestConfig(unittest.TestCase):
             None,
         )
 
-        GeneInfo(
+        GenePanel(
             gene,
             reference_haplotype_name,
             None,
@@ -293,7 +293,7 @@ class TestConfig(unittest.TestCase):
             frozenset([rs_id_info1]),
             drugs,
         )
-        GeneInfo(
+        GenePanel(
             gene,
             reference_haplotype_name,
             None,
@@ -301,7 +301,7 @@ class TestConfig(unittest.TestCase):
             frozenset([rs_id_info2]),
             drugs,
         )
-        GeneInfo(
+        GenePanel(
             gene,
             reference_haplotype_name,
             None,
@@ -309,7 +309,7 @@ class TestConfig(unittest.TestCase):
             frozenset([rs_id_info3]),
             drugs,
         )
-        GeneInfo(
+        GenePanel(
             gene,
             reference_haplotype_name,
             None,
@@ -318,7 +318,7 @@ class TestConfig(unittest.TestCase):
             drugs,
         )
         with self.assertRaises(ValueError):
-            GeneInfo(
+            GenePanel(
                 gene,
                 reference_haplotype_name,
                 None,
@@ -327,7 +327,7 @@ class TestConfig(unittest.TestCase):
                 drugs,
             )
         with self.assertRaises(ValueError):
-            GeneInfo(
+            GenePanel(
                 gene,
                 reference_haplotype_name,
                 None,
@@ -336,7 +336,7 @@ class TestConfig(unittest.TestCase):
                 drugs,
             )
         with self.assertRaises(ValueError):
-            GeneInfo(
+            GenePanel(
                 gene,
                 reference_haplotype_name,
                 None,
@@ -345,7 +345,7 @@ class TestConfig(unittest.TestCase):
                 drugs,
             )
 
-    def test_gene_info_with_rs_id_in_haplotype_without_info(self) -> None:
+    def test_gene_panel_with_rs_id_in_haplotype_without_info(self) -> None:
         """Error when haplotype uses rs id for which there is no RsIdInfo object"""
         gene = "FAKE"
         reference_haplotype_name = "*1"
@@ -355,7 +355,7 @@ class TestConfig(unittest.TestCase):
         empty_haplotypes: FrozenSet[Haplotype] = frozenset()
         non_empty_haplotypes = frozenset([Haplotype("*2", "No Function", frozenset([Variant("rs238423", "A")]))])
 
-        GeneInfo(
+        GenePanel(
             gene,
             reference_haplotype_name,
             None,
@@ -364,7 +364,7 @@ class TestConfig(unittest.TestCase):
             drugs,
         )
         with self.assertRaises(ValueError):
-            GeneInfo(
+            GenePanel(
                 gene,
                 reference_haplotype_name,
                 None,
@@ -373,7 +373,7 @@ class TestConfig(unittest.TestCase):
                 drugs,
             )
 
-    def test_gene_info_with_variant_that_is_ref_v38(self) -> None:
+    def test_gene_panel_with_variant_that_is_ref_v38(self) -> None:
         """Error when gene info has variant where variant allele is the ref allele"""
         gene = "FAKE"
         chromosome_v37 = "X"
@@ -406,7 +406,7 @@ class TestConfig(unittest.TestCase):
             ]
         )
 
-        GeneInfo(
+        GenePanel(
             gene,
             reference_haplotype_name,
             None,
@@ -415,7 +415,7 @@ class TestConfig(unittest.TestCase):
             drugs,
         )
         with self.assertRaises(ValueError):
-            GeneInfo(
+            GenePanel(
                 gene,
                 reference_haplotype_name,
                 None,
@@ -424,7 +424,7 @@ class TestConfig(unittest.TestCase):
                 drugs,
             )
 
-    def test_gene_info_with_repeated_rs_ids(self) -> None:
+    def test_gene_panel_with_repeated_rs_ids(self) -> None:
         """Error when a gene info contains an rs id multiple times"""
         gene = "FAKE"
         reference_haplotype_name = "*1"
@@ -449,7 +449,7 @@ class TestConfig(unittest.TestCase):
         rs_id_infos1 = frozenset([rs_id_info1])
         rs_id_infos2 = frozenset([rs_id_info1, rs_id_info2])
 
-        GeneInfo(
+        GenePanel(
             gene,
             reference_haplotype_name,
             "ENST000000384893",
@@ -458,7 +458,7 @@ class TestConfig(unittest.TestCase):
             drugs,
         )
         with self.assertRaises(ValueError):
-            GeneInfo(
+            GenePanel(
                 gene,
                 reference_haplotype_name,
                 "ENST000000384893",
@@ -505,7 +505,7 @@ class TestConfig(unittest.TestCase):
         rs_id_infos: FrozenSet[RsIdInfo] = frozenset()
         drugs: FrozenSet[DrugInfo] = frozenset()
 
-        gene_info1 = GeneInfo(
+        gene_panel1 = GenePanel(
             gene1,
             reference_haplotype_name,
             None,
@@ -513,7 +513,7 @@ class TestConfig(unittest.TestCase):
             rs_id_infos,
             drugs,
         )
-        gene_info2 = GeneInfo(
+        gene_panel2 = GenePanel(
             gene2,
             reference_haplotype_name,
             None,
@@ -521,7 +521,7 @@ class TestConfig(unittest.TestCase):
             rs_id_infos,
             drugs,
         )
-        gene_info3 = GeneInfo(
+        gene_panel3 = GenePanel(
             gene1,
             other_reference_haplotype_name,
             None,
@@ -529,12 +529,12 @@ class TestConfig(unittest.TestCase):
             rs_id_infos,
             drugs,
         )
-        gene_infos_without_repeat = frozenset([gene_info1, gene_info2])
-        gene_infos_with_repeat = frozenset([gene_info1, gene_info3])
+        gene_panels_without_repeat = frozenset([gene_panel1, gene_panel2])
+        gene_panels_with_repeat = frozenset([gene_panel1, gene_panel3])
 
-        Panel(name, version, gene_infos_without_repeat)
+        Panel(name, version, gene_panels_without_repeat)
         with self.assertRaises(ValueError):
-            Panel(name, version, gene_infos_with_repeat)
+            Panel(name, version, gene_panels_with_repeat)
 
     def test_panel_with_overlapping_rs_id_infos_for_different_genes(self) -> None:
         """Error when panel has overlapping rs id infos for different genes"""
@@ -572,7 +572,7 @@ class TestConfig(unittest.TestCase):
         rs_id_infos1 = frozenset([rs_id_info1])
         rs_id_infos2 = frozenset([rs_id_info2])
         rs_id_infos3 = frozenset([rs_id_info3])
-        gene_info1 = GeneInfo(
+        gene_panel1 = GenePanel(
             gene1,
             reference_haplotype_name,
             None,
@@ -580,7 +580,7 @@ class TestConfig(unittest.TestCase):
             rs_id_infos1,
             drugs,
         )
-        gene_info2 = GeneInfo(
+        gene_panel2 = GenePanel(
             gene2,
             reference_haplotype_name,
             None,
@@ -588,7 +588,7 @@ class TestConfig(unittest.TestCase):
             rs_id_infos2,
             drugs,
         )
-        gene_info3 = GeneInfo(
+        gene_panel3 = GenePanel(
             gene2,
             reference_haplotype_name,
             None,
@@ -597,9 +597,9 @@ class TestConfig(unittest.TestCase):
             drugs,
         )
 
-        Panel(name, version, frozenset([gene_info1, gene_info2]))
+        Panel(name, version, frozenset([gene_panel1, gene_panel2]))
         with self.assertRaises(ValueError):
-            Panel(name, version, frozenset([gene_info1, gene_info3]))
+            Panel(name, version, frozenset([gene_panel1, gene_panel3]))
 
     def test_panel_with_repeated_rs_ids(self) -> None:
         """Error when panel has repeated rs ids for different genes"""
@@ -637,7 +637,7 @@ class TestConfig(unittest.TestCase):
         rs_id_infos1 = frozenset([rs_id_info1])
         rs_id_infos2 = frozenset([rs_id_info2])
         rs_id_infos3 = frozenset([rs_id_info3])
-        gene_info1 = GeneInfo(
+        gene_panel1 = GenePanel(
             gene1,
             reference_haplotype_name,
             None,
@@ -645,7 +645,7 @@ class TestConfig(unittest.TestCase):
             rs_id_infos1,
             drugs,
         )
-        gene_info2 = GeneInfo(
+        gene_panel2 = GenePanel(
             gene2,
             reference_haplotype_name,
             None,
@@ -653,7 +653,7 @@ class TestConfig(unittest.TestCase):
             rs_id_infos2,
             drugs,
         )
-        gene_info3 = GeneInfo(
+        gene_panel3 = GenePanel(
             gene2,
             reference_haplotype_name,
             None,
@@ -662,9 +662,9 @@ class TestConfig(unittest.TestCase):
             drugs,
         )
 
-        Panel(name, version, frozenset([gene_info1, gene_info2]))
+        Panel(name, version, frozenset([gene_panel1, gene_panel2]))
         with self.assertRaises(ValueError):
-            Panel(name, version, frozenset([gene_info1, gene_info3]))
+            Panel(name, version, frozenset([gene_panel1, gene_panel3]))
 
 
 if __name__ == "__main__":  # pragma: no cover

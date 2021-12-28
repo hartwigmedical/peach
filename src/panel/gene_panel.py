@@ -7,7 +7,7 @@ from panel.rs_id_info import RsIdInfo
 from panel.variant import Variant
 
 
-class GeneInfo(object):
+class GenePanel(object):
     """This object is meant to be immutable"""
 
     def __init__(
@@ -43,7 +43,7 @@ class GeneInfo(object):
 
     def __eq__(self, other: object) -> bool:
         return (
-            isinstance(other, GeneInfo)
+            isinstance(other, GenePanel)
             and self.__gene == other.__gene
             and self.__transcript_id == other.__transcript_id
             and self.__rs_id_infos == other.__rs_id_infos
@@ -115,7 +115,9 @@ class GeneInfo(object):
     def __assert_info_exists_for_all_rs_ids_in_haplotypes(
         non_wild_type_haplotypes: FrozenSet[Haplotype], rs_id_infos: FrozenSet[RsIdInfo]
     ) -> None:
-        rs_ids_in_haplotypes = {variant.rs_id for haplotype in non_wild_type_haplotypes for variant in haplotype.variants}
+        rs_ids_in_haplotypes = {
+            variant.rs_id for haplotype in non_wild_type_haplotypes for variant in haplotype.variants
+        }
         rs_ids_with_info = {info.rs_id for info in rs_id_infos}
         if not rs_ids_in_haplotypes.issubset(rs_ids_with_info):
             rs_ids_without_info = rs_ids_in_haplotypes.difference(rs_ids_with_info)

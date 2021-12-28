@@ -4,7 +4,7 @@ from base.gene_coordinate import GeneCoordinate
 from base.reference_site import ReferenceSite
 from panel.annotation import Annotation
 from panel.drug_info import DrugInfo
-from panel.gene_info import GeneInfo
+from panel.gene_panel import GenePanel
 from panel.haplotype import Haplotype
 from panel.panel import Panel
 from panel.rs_id_info import RsIdInfo
@@ -66,23 +66,23 @@ def get_wide_example_panel(include_transcript_ids: bool) -> Panel:
         DrugInfo("Aspirin", "https://www.pharmgkb.org/some_other_url"),
     })
 
-    dpyd_gene_info = GeneInfo(
+    dpyd_gene_panel = GenePanel(
         "DPYD", "*1", "ENST00000370192" if include_transcript_ids else None,
         dpyd_haplotypes, dpyd_rs_id_infos, dpyd_drugs,
     )
-    fake_gene_info = GeneInfo(
+    fake_gene_panel = GenePanel(
         "FAKE", "*1", "ENST00000192883" if include_transcript_ids else None,
         fake_haplotypes, fake_rs_id_infos, fake_drugs,
     )
-    fake2_gene_info = GeneInfo(
+    fake2_gene_panel = GenePanel(
         "FAKE2", "*1", "ENST0000021918" if include_transcript_ids else None,
         fake2_haplotypes, fake2_rs_id_infos, fake2_drugs,
     )
-    gene_infos = frozenset({dpyd_gene_info, fake_gene_info, fake2_gene_info})
+    gene_panels = frozenset({dpyd_gene_panel, fake_gene_panel, fake2_gene_panel})
 
     name = "WideTestPanel"
     version = "1.0"
-    return Panel(name, version, gene_infos)
+    return Panel(name, version, gene_panels)
 
 
 def get_narrow_example_panel(included_haplotypes: Set[str]) -> Panel:
@@ -137,15 +137,15 @@ def get_narrow_example_panel(included_haplotypes: Set[str]) -> Panel:
         DrugInfo("Capecitabine", "https://www.pharmgkb.org/chemical/PA448771/guidelineAnnotation/PA166104963"),
     })
 
-    gene_infos = frozenset({
-        GeneInfo(
+    gene_panels = frozenset({
+        GenePanel(
             "DPYD", "*1", None, included_dpyd_haplotypes, included_dpyd_rs_id_infos,
             dpyd_drugs,
         ),
     })
     name = "NarrowTestPanel"
     version = "1.0"
-    return Panel(name, version, gene_infos)
+    return Panel(name, version, gene_panels)
 
 
 def get_empty_panel() -> Panel:

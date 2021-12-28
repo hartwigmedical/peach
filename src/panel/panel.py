@@ -4,33 +4,33 @@ from typing import Set, FrozenSet, Dict
 from base.reference_assembly import ReferenceAssembly
 from base.reference_site import ReferenceSite
 from calls.vcf_call import VcfCall
-from panel.gene_info import GeneInfo
+from panel.gene_panel import GenePanel
 from panel.rs_id_info import RsIdInfo
 from panel.variant import Variant
 
 
 class Panel(object):
-    def __init__(self, name: str, version: str, gene_infos: FrozenSet[GeneInfo]) -> None:
-        self.__assert_rs_ids_all_different(gene_infos)
-        self.__assert_all_rs_id_infos_compatible(gene_infos)
+    def __init__(self, name: str, version: str, gene_panels: FrozenSet[GenePanel]) -> None:
+        self.__assert_rs_ids_all_different(gene_panels)
+        self.__assert_all_rs_id_infos_compatible(gene_panels)
 
-        gene_to_gene_info: Dict[str, GeneInfo] = {}
-        for gene_info in gene_infos:
-            if gene_info.gene in gene_to_gene_info.keys():
-                error_msg = f"The panel '{name}' contains the gene '{gene_info.gene}' more than once."
+        gene_to_gene_panel: Dict[str, GenePanel] = {}
+        for gene_panel in gene_panels:
+            if gene_panel.gene in gene_to_gene_panel.keys():
+                error_msg = f"The panel '{name}' contains the gene '{gene_panel.gene}' more than once."
                 raise ValueError(error_msg)
-            gene_to_gene_info[gene_info.gene] = gene_info
+            gene_to_gene_panel[gene_panel.gene] = gene_panel
 
         self.__name = name
         self.__version = version
-        self.__gene_to_gene_info = gene_to_gene_info
+        self.__gene_to_gene_panel = gene_to_gene_panel
 
     def __eq__(self, other: object) -> bool:
         return (
-            isinstance(other, Panel)
-            and self.__name == other.__name
-            and self.__version == other.__version
-            and self.__gene_to_gene_info == other.__gene_to_gene_info
+                isinstance(other, Panel)
+                and self.__name == other.__name
+                and self.__version == other.__version
+                and self.__gene_to_gene_panel == other.__gene_to_gene_panel
         )
 
     def __repr__(self) -> str:  # pragma: no cover
@@ -38,7 +38,7 @@ class Panel(object):
             f"Panel("
             f"name={self.__name!r}, "
             f"version={self.__version!r}, "
-            f"gene_infos={frozenset(self.__gene_to_gene_info.values())!r}, "
+            f"gene_panels={frozenset(self.__gene_to_gene_panel.values())!r}, "
             f")"
         )
 
@@ -51,36 +51,36 @@ class Panel(object):
         return self.__version
 
     def get_drugs(self, gene: str) -> Set[str]:
-        return self.__gene_to_gene_info[gene].get_drug_names()
+        return self.__gene_to_gene_panel[gene].get_drug_names()
 
     def get_drug_prescription_url(self, gene: str, drug_name: str) -> str:
-        return self.__gene_to_gene_info[gene].get_prescription_url(drug_name)
+        return self.__gene_to_gene_panel[gene].get_prescription_url(drug_name)
 
     def get_reference_site(self, rs_id: str, reference_assembly: ReferenceAssembly) -> ReferenceSite:
         return self.__get_rs_id_info(rs_id).get_reference_site(reference_assembly)
 
     def get_genes(self) -> Set[str]:
-        return set(self.__gene_to_gene_info.keys())
+        return set(self.__gene_to_gene_panel.keys())
 
     def get_rs_ids_for_gene(self, gene: str) -> Set[str]:
-        return self.__gene_to_gene_info[gene].get_rs_ids()
+        return self.__gene_to_gene_panel[gene].get_rs_ids()
 
     def get_wild_type_haplotype_name(self, gene: str) -> str:
-        return self.__gene_to_gene_info[gene].wild_type_haplotype_name
+        return self.__gene_to_gene_panel[gene].wild_type_haplotype_name
 
     def get_non_wild_type_haplotype_names(self, gene: str) -> Set[str]:
-        return self.__gene_to_gene_info[gene].get_non_wild_type_haplotype_names()
+        return self.__gene_to_gene_panel[gene].get_non_wild_type_haplotype_names()
 
     def get_variants_for_haplotype(self, gene: str, haplotype_name: str) -> Set[Variant]:
-        return self.__gene_to_gene_info[gene].get_variants(haplotype_name)
+        return self.__gene_to_gene_panel[gene].get_variants(haplotype_name)
 
     def get_haplotype_function(self, gene: str, haplotype_name: str) -> str:
-        return self.__gene_to_gene_info[gene].get_haplotype_function(haplotype_name)
+        return self.__gene_to_gene_panel[gene].get_haplotype_function(haplotype_name)
 
     def get_transcript_ids(self) -> Set[str]:
         transcript_ids = {
-            gene_info.transcript_id for gene_info in self.__gene_to_gene_info.values()
-            if gene_info.transcript_id is not None
+            gene_panel.transcript_id for gene_panel in self.__gene_to_gene_panel.values()
+            if gene_panel.transcript_id is not None
         }
         return transcript_ids
 
@@ -135,10 +135,10 @@ class Panel(object):
 
     def get_gene_for_rs_id(self, rs_id: str) -> str:
         matching_genes = []
-        for gene_info in self.__gene_to_gene_info.values():
-            for rs_id_info in gene_info.rs_id_infos:
+        for gene_panel in self.__gene_to_gene_panel.values():
+            for rs_id_info in gene_panel.rs_id_infos:
                 if rs_id_info.rs_id == rs_id:
-                    matching_genes.append(gene_info.gene)
+                    matching_genes.append(gene_panel.gene)
         if len(matching_genes) == 1:
             return matching_genes[0]
         else:
@@ -148,7 +148,7 @@ class Panel(object):
         return rs_id in self.__get_rs_ids()
 
     def is_empty(self) -> bool:
-        return not self.__gene_to_gene_info.keys()
+        return not self.__gene_to_gene_panel.keys()
 
     def get_id(self) -> str:
         return f"{self.__name}_v{self.__version}"
@@ -164,20 +164,23 @@ class Panel(object):
         return {info.rs_id for info in self.__get_rs_id_infos()}
 
     def __get_rs_id_infos(self) -> Set[RsIdInfo]:
-        return {rs_id_info for gene_info in self.__gene_to_gene_info.values() for rs_id_info in gene_info.rs_id_infos}
+        rs_id_infos = {
+            rs_id_info for gene_panel in self.__gene_to_gene_panel.values() for rs_id_info in gene_panel.rs_id_infos
+        }
+        return rs_id_infos
 
     @staticmethod
-    def __assert_all_rs_id_infos_compatible(gene_infos: FrozenSet[GeneInfo]) -> None:
-        for left_gene_info, right_gene_info in itertools.combinations(gene_infos, 2):
-            for left_info in left_gene_info.rs_id_infos:
-                for right_info in right_gene_info.rs_id_infos:
+    def __assert_all_rs_id_infos_compatible(gene_panels: FrozenSet[GenePanel]) -> None:
+        for left_gene_panel, right_gene_panel in itertools.combinations(gene_panels, 2):
+            for left_info in left_gene_panel.rs_id_infos:
+                for right_info in right_gene_panel.rs_id_infos:
                     if not left_info.is_compatible(right_info):
                         error_msg = f"Incompatible rs id infos in panel. left: {left_info}, right: {right_info}"
                         raise ValueError(error_msg)
 
     @staticmethod
-    def __assert_rs_ids_all_different(gene_infos: FrozenSet[GeneInfo]) -> None:
-        rs_ids = [rs_id for gene_info in gene_infos for rs_id in gene_info.get_rs_ids()]
+    def __assert_rs_ids_all_different(gene_panels: FrozenSet[GenePanel]) -> None:
+        rs_ids = [rs_id for gene_panel in gene_panels for rs_id in gene_panel.get_rs_ids()]
         if len(rs_ids) != len(set(rs_ids)):
             error_msg = (
                 f"Not all rs ids are different: rs_ids={sorted(rs_ids)}"
