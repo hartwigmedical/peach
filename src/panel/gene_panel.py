@@ -1,7 +1,7 @@
-import itertools
 from typing import FrozenSet, Optional, Set, Dict
 
 from panel.drug_summary import DrugSummary
+from panel.gene_transcript_summary import GeneTranscriptSummary
 from panel.haplotype import Haplotype, GeneHaplotypePanel
 from panel.rs_id_info import RsIdInfo
 from panel.variant import Variant
@@ -19,9 +19,6 @@ class GenePanel(object):
         rs_id_infos: FrozenSet[RsIdInfo],
         drug_summaries: FrozenSet[DrugSummary],
     ) -> None:
-        self.__assert_rs_ids_all_different(rs_id_infos)
-        self.__assert_rs_id_infos_compatible(rs_id_infos)
-        self.__assert_rs_id_infos_match_chromosome(rs_id_infos, gene)
         self.__assert_info_exists_for_all_rs_ids_in_haplotypes(other_haplotypes, rs_id_infos)
         self.__assert_variants_in_haplotypes_compatible_with_rs_id_infos(other_haplotypes, rs_id_infos)
 
@@ -32,51 +29,42 @@ class GenePanel(object):
                 raise ValueError(error_msg)
             drug_name_to_drug_summary[drug_summary.name] = drug_summary
 
-        # public through @property decorator
-        self.__gene = gene
-        self.__transcript_id = transcript_id
-        self.__rs_id_infos = rs_id_infos
-
-        # truly private
         self.__drug_name_to_drug_summary = drug_name_to_drug_summary
         self.__gene_haplotype_panel = GeneHaplotypePanel(gene, wild_type_haplotype_name, other_haplotypes)
+        self.__gene_transcript_summary = GeneTranscriptSummary(gene, transcript_id, rs_id_infos)
 
     def __eq__(self, other: object) -> bool:
         return (
                 isinstance(other, GenePanel)
-                and self.__gene == other.__gene
-                and self.__transcript_id == other.__transcript_id
-                and self.__rs_id_infos == other.__rs_id_infos
                 and self.__drug_name_to_drug_summary == other.__drug_name_to_drug_summary
                 and self.__gene_haplotype_panel == other.__gene_haplotype_panel
+                and self.__gene_transcript_summary == other.__gene_transcript_summary
         )
 
     def __hash__(self) -> int:
         return hash(
             (
-                self.__gene,
-                self.__transcript_id,
-                self.__rs_id_infos,
                 self.__get_drug_summaries(),
                 self.__gene_haplotype_panel,
+                self.__gene_transcript_summary,
             )
         )
 
     def __repr__(self) -> str:  # pragma: no cover
         return (
             f"GeneInfo("
-            f"gene={self.__gene!r}, "
+            f"gene={self.__gene_transcript_summary.gene!r}, "
             f"wild_type_haplotype_name={self.__gene_haplotype_panel.wild_type_haplotype_name!r}, "
-            f"transcript_id={self.__transcript_id!r}, "
+            f"transcript_id={self.__gene_transcript_summary.transcript_id!r}, "
             f"haplotypes={self.__gene_haplotype_panel.get_haplotypes() !r}, "
-            f"rs_id_infos={self.__rs_id_infos!r}, "
+            f"rs_id_infos={self.__gene_transcript_summary.rs_id_infos!r}, "
             f"drug_summaries={self.__get_drug_summaries()!r}, "
             f")"
         )
 
     @property
     def gene(self) -> str:
-        return self.__gene
+        return self.__gene_transcript_summary.gene
 
     @property
     def wild_type_haplotype_name(self) -> str:
@@ -84,11 +72,11 @@ class GenePanel(object):
 
     @property
     def transcript_id(self) -> Optional[str]:
-        return self.__transcript_id
+        return self.__gene_transcript_summary.transcript_id
 
     @property
     def rs_id_infos(self) -> FrozenSet[RsIdInfo]:
-        return self.__rs_id_infos
+        return self.__gene_transcript_summary.rs_id_infos
 
     def get_non_wild_type_haplotype_names(self) -> Set[str]:
         return self.__gene_haplotype_panel.get_non_wild_type_haplotype_names()
@@ -106,7 +94,7 @@ class GenePanel(object):
         return self.__drug_name_to_drug_summary[drug_name].url_prescription_info
 
     def get_rs_ids(self) -> Set[str]:
-        return {rs_id_info.rs_id for rs_id_info in self.__rs_id_infos}
+        return self.__gene_transcript_summary.get_rs_ids()
 
     def __get_drug_summaries(self) -> FrozenSet[DrugSummary]:
         return frozenset(self.__drug_name_to_drug_summary.values())
@@ -122,25 +110,6 @@ class GenePanel(object):
         if not rs_ids_in_haplotypes.issubset(rs_ids_with_info):
             rs_ids_without_info = rs_ids_in_haplotypes.difference(rs_ids_with_info)
             error_msg = f"No info available for some of the rs ids in the haplotypes. Rs ids: {rs_ids_without_info}"
-            raise ValueError(error_msg)
-
-    @staticmethod
-    def __assert_rs_id_infos_compatible(rs_id_infos: FrozenSet[RsIdInfo]) -> None:
-        for left, right in itertools.combinations(rs_id_infos, 2):
-            if not left.is_compatible(right):
-                error_msg = f"Incompatible rs id infos in gene info. left: {left}, right: {right}"
-                raise ValueError(error_msg)
-
-    @staticmethod
-    def __assert_rs_id_infos_match_chromosome(rs_id_infos: FrozenSet[RsIdInfo], gene: str) -> None:
-        v37_chromosomes = {info.reference_site_v37.start_coordinate.chromosome for info in rs_id_infos}
-        v38_chromosomes = {info.reference_site_v38.start_coordinate.chromosome for info in rs_id_infos}
-        if len(v37_chromosomes) > 1 or len(v38_chromosomes) > 1:
-            error_msg = (
-                f"Rs id infos for gene {gene} disagree on chromosome:\n"
-                f"v37 chromosomes: {v37_chromosomes}\n"
-                f"v38 chromosomes: {v38_chromosomes}"
-            )
             raise ValueError(error_msg)
 
     @staticmethod
@@ -160,12 +129,3 @@ class GenePanel(object):
                     f"variant={variant}, rs_id_info={matching_rs_id_infos[0]}"
                 )
                 raise ValueError(error_msg)
-
-    @staticmethod
-    def __assert_rs_ids_all_different(rs_id_infos: FrozenSet[RsIdInfo]) -> None:
-        rs_ids = [info.rs_id for info in rs_id_infos]
-        if len(rs_ids) != len(set(rs_ids)):
-            error_msg = (
-                f"Not all rs ids are different: rs_ids={sorted(rs_ids)}"
-            )
-            raise ValueError(error_msg)
