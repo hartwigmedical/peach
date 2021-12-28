@@ -7,8 +7,8 @@ class VcfCallFilter(Enum):
     NO_CALL = auto()
 
 
-class FullCallFilter(Enum):
-    # For full calls
+class DualCallFilter(Enum):
+    # For dual calls
     PASS = auto()
     NO_CALL = auto()
     UNKNOWN = auto()

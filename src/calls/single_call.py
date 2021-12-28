@@ -4,7 +4,7 @@ from base.filter import VcfCallFilter
 from base.reference_site import ReferenceSite
 
 
-class SimpleCall(NamedTuple):
+class SingleCall(NamedTuple):
     """
     Call with data and annotation for only a single reference assembly version. So only v37 or v38.
     Annotation fixes etc. with data from the panel has already been done at this point.

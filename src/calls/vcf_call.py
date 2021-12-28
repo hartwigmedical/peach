@@ -24,4 +24,4 @@ class VcfCallData(NamedTuple):
 
     def __repr__(self) -> str:  # pragma: no cover
         calls_string = "frozenset(" + ", ".join(sorted([repr(call) for call in self.calls])) + ")"
-        return f"SimpleCallData({calls_string}, {self.reference_assembly!r})"
+        return f"VcfCallData({calls_string}, {self.reference_assembly!r})"

@@ -5,35 +5,35 @@ from typing import Dict, Set, FrozenSet
 from base.constants import REF_CALL_ANNOTATION_STRING
 from base.filter import VcfCallFilter
 from calls.haplotype_call import HaplotypeCall
-from calls.full_call import FullCall, FullCallData
+from calls.dual_call import DualCall, DualCallData
 from calls.vcf_call import VcfCallData, VcfCall
-from analysis.call_translator import SimpleCallTranslator
+from analysis.call_translator import DualCallTranslator
 from panel.panel import Panel
 from analysis.haplotype_caller import HaplotypeCaller
 
 
 class PgxAnalysis(object):
-    def __init__(self, full_call_data: FullCallData, gene_to_haplotype_calls: Dict[str, Set[HaplotypeCall]]) -> None:
-        self.__full_call_data = full_call_data
+    def __init__(self, dual_call_data: DualCallData, gene_to_haplotype_calls: Dict[str, Set[HaplotypeCall]]) -> None:
+        self.__dual_call_data = dual_call_data
         self.__gene_to_haplotype_calls = gene_to_haplotype_calls
 
     def __eq__(self, other: object) -> bool:
         return (
             isinstance(other, PgxAnalysis)
-            and self.__full_call_data == other.__full_call_data
+            and self.__dual_call_data == other.__dual_call_data
             and self.__gene_to_haplotype_calls == other.__gene_to_haplotype_calls
         )
 
     def __repr__(self) -> str:  # pragma: no cover
         return (
             f"PgxAnalysis("
-            f"full_call_data={self.__full_call_data!r}, "
+            f"dual_call_data={self.__dual_call_data!r}, "
             f"gene_to_haplotype_calls={self.__gene_to_haplotype_calls!r}, "
             f")"
         )
 
-    def get_all_full_calls(self) -> FrozenSet[FullCall]:
-        return self.__full_call_data.calls
+    def get_all_dual_calls(self) -> FrozenSet[DualCall]:
+        return self.__dual_call_data.calls
 
     def get_gene_to_haplotype_calls(self) -> Dict[str, Set[HaplotypeCall]]:
         return deepcopy(self.__gene_to_haplotype_calls)
@@ -45,22 +45,22 @@ class PgxAnalyser(object):
         complete_vcf_call_data = self.__add_calls_for_uncalled_variants_in_panel(vcf_call_data, panel)
 
         logging.info(f"Annotating call data for reference assembly {vcf_call_data.reference_assembly.opposite().name}")
-        full_call_data = SimpleCallTranslator().get_all_full_call_data(complete_vcf_call_data, panel)
+        dual_call_data = DualCallTranslator().get_dual_call_data(complete_vcf_call_data, panel)
 
         logging.info(f"Calling haplotypes")
-        gene_to_haplotype_calls = HaplotypeCaller().get_gene_to_haplotypes_call(full_call_data, panel)
+        gene_to_haplotype_calls = HaplotypeCaller().get_gene_to_haplotypes_call(dual_call_data, panel)
 
-        return PgxAnalysis(full_call_data, gene_to_haplotype_calls)
+        return PgxAnalysis(dual_call_data, gene_to_haplotype_calls)
 
     def __add_calls_for_uncalled_variants_in_panel(
             self, vcf_call_data: VcfCallData, panel: Panel
     ) -> VcfCallData:
         missing_calls = self.__get_calls_for_panel_variants_without_calls(vcf_call_data, panel)
-        complete_simple_call_data = VcfCallData(
+        complete_vcf_call_data = VcfCallData(
             vcf_call_data.calls.union(missing_calls),
             vcf_call_data.reference_assembly,
         )
-        return complete_simple_call_data
+        return complete_vcf_call_data
 
     def __get_calls_for_panel_variants_without_calls(
             self, vcf_call_data: VcfCallData, panel: Panel

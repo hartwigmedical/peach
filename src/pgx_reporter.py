@@ -66,45 +66,45 @@ class GenotypeReporter(object):
         self, pgx_analysis: PgxAnalysis, panel_id: str, version: str, input_reference_assembly: ReferenceAssembly
     ) -> pd.DataFrame:
         data_frame = pd.DataFrame(columns=self.CALLS_TSV_COLUMNS)
-        for full_call in pgx_analysis.get_all_full_calls():
-            sorted_alleles = sorted(full_call.alleles)
+        for dual_call in pgx_analysis.get_all_dual_calls():
+            sorted_alleles = sorted(dual_call.alleles)
 
             position_v37: Union[str, int]
             position_v38: Union[str, int]
-            if full_call.reference_site_v37 is not None:
-                chromosome_v37 = full_call.reference_site_v37.start_coordinate.chromosome
-                position_v37 = full_call.reference_site_v37.start_coordinate.position
-                reference_allele_v37 = full_call.reference_site_v37.allele
+            if dual_call.reference_site_v37 is not None:
+                chromosome_v37 = dual_call.reference_site_v37.start_coordinate.chromosome
+                position_v37 = dual_call.reference_site_v37.start_coordinate.position
+                reference_allele_v37 = dual_call.reference_site_v37.allele
             else:
                 chromosome_v37 = self.UNKNOWN_CHROMOSOME_STRING
                 position_v37 = self.UNKNOWN_POSITION_STRING
                 reference_allele_v37 = self.UNKNOWN_REF_ALLELE_STRING
-            if full_call.reference_site_v38 is not None:
-                chromosome_v38 = full_call.reference_site_v38.start_coordinate.chromosome
-                position_v38 = full_call.reference_site_v38.start_coordinate.position
-                reference_allele_v38 = full_call.reference_site_v38.allele
+            if dual_call.reference_site_v38 is not None:
+                chromosome_v38 = dual_call.reference_site_v38.start_coordinate.chromosome
+                position_v38 = dual_call.reference_site_v38.start_coordinate.position
+                reference_allele_v38 = dual_call.reference_site_v38.allele
             else:
                 chromosome_v38 = self.UNKNOWN_CHROMOSOME_STRING
                 position_v38 = self.UNKNOWN_POSITION_STRING
                 reference_allele_v38 = self.UNKNOWN_REF_ALLELE_STRING
 
-            if full_call.rs_ids:
-                rs_id_string = self.RS_ID_SEPARATOR.join(full_call.rs_ids)
+            if dual_call.rs_ids:
+                rs_id_string = self.RS_ID_SEPARATOR.join(dual_call.rs_ids)
             else:
                 rs_id_string = self.RS_ID_EMPTY_INDICATOR
 
-            if full_call.variant_annotation_v37 is None:
+            if dual_call.variant_annotation_v37 is None:
                 variant_annotation_v37 = self.UNKNOWN_VARIANT_ANNOTATION_STRING
             else:
-                variant_annotation_v37 = full_call.variant_annotation_v37
+                variant_annotation_v37 = dual_call.variant_annotation_v37
 
-            if full_call.variant_annotation_v38 is None:
+            if dual_call.variant_annotation_v38 is None:
                 variant_annotation_v38 = self.UNKNOWN_VARIANT_ANNOTATION_STRING
             else:
-                variant_annotation_v38 = full_call.variant_annotation_v38
+                variant_annotation_v38 = dual_call.variant_annotation_v38
 
             line_data: Dict[str, Union[str, int]] = {
-                self.GENE_COLUMN_NAME: full_call.gene,
+                self.GENE_COLUMN_NAME: dual_call.gene,
                 self.CHROMOSOME_V37_COLUMN_NAME: chromosome_v37,
                 self.POSITION_V37_COLUMN_NAME: position_v37,
                 self.CHROMOSOME_V38_COLUMN_NAME: chromosome_v38,
@@ -115,9 +115,9 @@ class GenotypeReporter(object):
                 self.SECOND_ALLELE_COLUMN_NAME: sorted_alleles[1],
                 self.RS_IDS_COLUMN_NAME: rs_id_string,
                 self.ANNOTATION_V37_COLUMN_NAME: variant_annotation_v37,
-                self.FILTER_V37_COLUMN_NAME: full_call.filter_v37.name,
+                self.FILTER_V37_COLUMN_NAME: dual_call.filter_v37.name,
                 self.ANNOTATION_V38_COLUMN_NAME: variant_annotation_v38,
-                self.FILTER_V38_COLUMN_NAME: full_call.filter_v38.name,
+                self.FILTER_V38_COLUMN_NAME: dual_call.filter_v38.name,
                 self.PANEL_VERSION_COLUMN_NAME: panel_id,
                 self.TOOL_VERSION_COLUMN_NAME: version,
             }

@@ -162,15 +162,15 @@ If the calls in the input VCF are wrt v37, then this requires a translation of v
 PEACH extracts the required knowledge of the differences between these reference genomes from the information in the panel JSON.
 No matter wrt what reference genome version the calls in the input VCF have been defined, 
 PEACH always tries to translate these calls to the other reference genome by using the information in the panel JSON, 
-resulting in *full calls* with information for both versions. 
-For haplotype calling we use the v38 information from the full calls. 
+resulting in *dual calls* with information for both versions. 
+For haplotype calling we use the v38 information from the dual calls. 
 
 Define the *VCF RG version* as the reference genome version wrt which the calls in the VCF are defined. 
 Define the *non-VCF RG version* as the reference genome version that is not the VCF RG version.
 
 In broad strokes, PEACH does the following:
 * Extract relevant calls from VCF, where relevance is determined by the panel JSON.
-* Use information from the panel JSON to translate these calls to the other reference genome, where possible, and construct full calls.
+* Use information from the panel JSON to translate these calls to the other reference genome, where possible, and construct dual calls.
 * For each gene:
   + Determine for each variant how often each alt allele occurs (alt wrt v38).
   + Determine the unique simplest combination of haplotypes that completely explains that combination of alt alleles and counts.
@@ -242,10 +242,10 @@ For instance, calls that do not match any variants from the panel JSON can only 
 Furthermore, if there is no matching variant in the panel JSON, then PEACH does not know what the correct non-VCF RG version reference allele is, 
 so it would be unknown whether the reference alleles wrt v37 and v38 are identical. 
 
-Let's call these calls with both v37 and v38 details *full calls*.
+Let's call these calls with both v37 and v38 details *dual calls*.
 
 ### Infer Haplotypes
-For the haplotype calling PEACH only uses the v38 and general information from the full calls, not the v37 information.
+For the haplotype calling PEACH only uses the v38 and general information from the dual calls, not the v37 information.
 
 The goal is to find the simplest combination of haplotypes that explains the called variants. 
 
@@ -273,8 +273,8 @@ one of the variants in the panel JSON, then the haplotype combination "Unresolve
 because this variant will be an observed VCF call that is not part of any haplotypes in the panel JSON.
 
 #### Haplotype Calling Algorithm 
-Haplotypes are called for each gene separately. First, collect the full calls that correspond to that gene. 
-Then, extract the alt alleles wrt v38 from these full calls, 
+Haplotypes are called for each gene separately. First, collect the dual calls that correspond to that gene. 
+Then, extract the alt alleles wrt v38 from these dual calls, 
 and count the number of times each combination of position (v38) and alt allele (v38) occurs.
 Use recursive descent to determine all haplotype combinations that perfectly explain all of these variants.
 If there are no such combinations, then no haplotype combination can be called for this gene. 
@@ -307,7 +307,7 @@ and that FAKE is the only gene in the panel JSON.
 | *5             | rs1: T, rs3: G                           |
 
 #### No Calls
-If there are no calls wrt v37 in the VCF, then the full calls are:
+If there are no calls wrt v37 in the VCF, then the dual calls are:
 
 | Rs Id | Allele1 | Allele2 | Variant Annotation V37 | Filter V37 | Variant Annotation V38 | Filter V38    |
 |-------|---------|---------|------------------------|------------|------------------------|---------------|
@@ -327,7 +327,7 @@ Suppose that the v37 calls are the following:
 | rs2   | GC      | GC      | c.6543TA>GC            | PASS       |
 | rs3   | GG      | GG      | c.4838GG>G             | PASS       |
 
-In this case, the full calls are:
+In this case, the dual calls are:
 
 | Rs Id | Allele1 | Allele2 | Variant Annotation V37 | Filter V37 | Variant Annotation V38 | Filter V38 |
 |-------|---------|---------|------------------------|------------|------------------------|------------|
@@ -346,7 +346,7 @@ Suppose that the v37 calls are the following:
 | rs2   | TA      | GC      | c.6543TA>GC            | PASS       |
 | rs3   | GG      | GG      | c.4838GG>G             | PASS       |
 
-The full calls are:
+The dual calls are:
 
 | Rs Id | Allele1 | Allele2 | Variant Annotation V37 | Filter V37 | Variant Annotation V38 | Filter V38 |
 |-------|---------|---------|------------------------|------------|------------------------|------------|
@@ -365,7 +365,7 @@ Suppose that the v37 calls are the following:
 | rs2   | GC      | GC      | c.6543TA>GC            | PASS       |
 | rs3   | G       | G       | c.4838GG>G             | PASS       |
 
-The resulting full calls are:
+The resulting dual calls are:
 
 | Rs Id | Allele1 | Allele2 | Variant Annotation V37 | Filter V37 | Variant Annotation V38 | Filter V38 |
 |-------|---------|---------|------------------------|------------|------------------------|------------|
