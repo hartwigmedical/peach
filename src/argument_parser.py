@@ -59,9 +59,19 @@ class ArgumentParser(object):
         required.add_argument(
             "--outputdir", "-o", type=str, required=True, help="Directory to store output of pharmacogenomic analysis."
         )
-        required.add_argument("--sample_t_id", "-t", type=str, required=True, help="The sample ID of the tumor.")
         required.add_argument("--sample_r_id", "-r", type=str, required=True, help="The sample ID of the normal.")
         required.add_argument("--tool_version", "-v", type=str, required=True, help="The version of the tool.")
+        optional = parser.add_argument_group("optional arguments")
+        optional.add_argument(
+            "--sample_t_id",
+            "-t",
+            type=str,
+            default=None,
+            help=(
+                "The sample ID of the tumor. Only used for output file names. "
+                "If not provided, --sample_r_id value is used for this insetad."
+            ),
+        )
         experimental_optional = parser.add_argument_group("experimental optional arguments")
         experimental_optional.add_argument(
             "--vcf_reference_assembly_version",

@@ -16,7 +16,7 @@ def main(tool_config: ToolConfig) -> None:
     """Run pharmacogenomics analysis on sample"""
     set_up_logging()
 
-    logging.info(f"PEACH STARTING FOR {tool_config.sample_t_id}")
+    logging.info(f"PEACH STARTING FOR {tool_config.get_sample_name()}")
 
     # Check if output dir exists, create if it does not
     if not os.path.exists(tool_config.output_dir):
@@ -47,7 +47,7 @@ def main(tool_config: ToolConfig) -> None:
 
     # TODO: add genes CYP2D6, CYP3A4, CYP3A5
 
-    logging.info(f"PEACH FINISHED FOR {tool_config.sample_t_id}")
+    logging.info(f"PEACH FINISHED FOR {tool_config.get_sample_name()}")
 
 
 def set_up_logging() -> None:

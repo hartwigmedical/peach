@@ -78,7 +78,6 @@ class TestArgumentParser(unittest.TestCase):
     def test_defaults(self) -> None:
         arguments = []
         arguments.extend(["--vcf", "vcf_file"])
-        arguments.extend(["-t", "tumor_sample_id"])
         arguments.extend(["-r", "ref_sample_id"])
         arguments.extend(["-v", "script_version"])
         arguments.extend(["-o", "output_directory"])
@@ -89,7 +88,7 @@ class TestArgumentParser(unittest.TestCase):
             "vcf_file",
             "panel_location",
             "output_directory",
-            "tumor_sample_id",
+            None,
             "ref_sample_id",
             "script_version",
             ReferenceAssembly.V37,
@@ -99,7 +98,6 @@ class TestArgumentParser(unittest.TestCase):
     def test_missing_required_arguments(self) -> None:
         minimum_arguments = [
             "-i vcf_file",
-            "-t tumor_sample_id",
             "-r ref_sample_id",
             "-v script_version",
             "-o output_directory",
