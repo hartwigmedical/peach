@@ -71,16 +71,15 @@ If you have installed PEACH's requirements into a venv, then remember to source 
 | --vcf              | -i             | Path to germline VCF file of sample. For instance the germline VCF output from PURPLE. Calls should be wrt v37. Support for v38 calls is experimental. |
 | --panel            | -p             | Path to a JSON file that contains the variants and haplotypes to test on.                                                                              |
 | --outputdir        | -o             | Directory to write the output to.                                                                                                                      |
-| --sample_t_id      | -t             | The tumor sample ID of the run. Only used for the names of the output files.                                                                           |
 | --sample_r_id      | -r             | The ref sample ID of the run.                                                                                                                          |
 | --tool_version     | -v             | The version of PEACH. It is included in the output files.                                                                                              |
 
 ### Optional Arguments
-Currently, the only optional argument enables an experimental feature.
 
-| Long&nbsp;Argument               | Short Argument | Options  | Default | Description                                                                                                                    |
-|----------------------------------|----------------|----------|---------|--------------------------------------------------------------------------------------------------------------------------------|
-| --vcf_reference_assembly_version | -a             | V37, V38 | V37     | The version of the reference assembly wrt which the vcf has been constructed. Support for V38 is experimental. Default is V37. |
+| Long&nbsp;Argument               | Short Argument | Options  | Default | Description                                                                                                                                                               |
+|----------------------------------|----------------|----------|---------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| --sample_t_id                    | -t             | N/A      | None    | The tumor sample ID of the run. Only used for the names of the output files and in the log. When not provided, use the --sample_r_id argument for these purposes instead. |
+| --vcf_reference_assembly_version | -a             | V37, V38 | V37     | Experimental: The version of the reference assembly wrt which the vcf has been constructed. Support for V38 is experimental. Default is V37.                              |
 
 ## Input
 ### VCF
@@ -389,6 +388,9 @@ To run PEACH's test suite, including mypy, run the script `test_peach`.
 If you have installed PEACH's requirements into a venv, then remember to source the venv before running `test_peach`.
 
 ## Version History and Download Links
+* [1.6](https://github.com/hartwigmedical/peach/releases/tag/v1.6)
+  * Make --sample_t_id argument optional.
+  * Fix crash when PAVE_TI has "Number=." in VCF header.
 * [1.5](https://github.com/hartwigmedical/peach/releases/tag/v1.5)
   * Add support for [PAVE](https://github.com/hartwigmedical/hmftools/tree/master/pave) annotations.
   * Add optional "canonicalTranscript" entry in panel JSON. 
