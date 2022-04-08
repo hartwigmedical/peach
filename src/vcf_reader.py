@@ -55,7 +55,7 @@ class VcfReader(object):
     def __get_variants_from_vcf(self, vcf: str) -> Optional[Dict[str, Any]]:
         # variants is None precisely when the VCF file has no variants
         try:
-            variants = allel.read_vcf(vcf, fields="*")
+            variants = allel.read_vcf(vcf, fields="*", numbers={self.PAVE_ANNOTATION_FIELD_NAME: 1000})
         except IOError:
             raise FileNotFoundError(f"File {vcf} not found or cannot be opened.")
         return variants
