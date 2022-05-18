@@ -104,9 +104,12 @@ then an error is raised.
 
 ### JSON
 For an example of a valid panel JSON (with fake data), see 
-[example](https://github.com/hartwigmedical/scripts/blob/master/peach/src/test_resources/test_panel.json).
+[example](https://github.com/hartwigmedical/peach/blob/master/src/test_resources/test_panel.json).
 Almost all fields in the example JSON are required. The only exception is "canonicalTranscript", 
 which is required for handling PAVE annotations, but ignored for SNPEFF annotations. Additional fields are ignored. 
+
+See [example](https://nextcloud.hartwigmedicalfoundation.nl/s/3d3K8oTizDoPKQA) for the panel JSON that is currently 
+being used in [Hartwig Medical Foundation pipeline](https://github.com/hartwigmedical/pipeline5).
 
 Relevant differences between the v37 and v38 reference sequences for a gene should be included as an entry in the "variants" field
 of that gene where the "referenceAlleleV37" and "referenceAlleleV38" fields are different. The set of rs id's with such entries 
