@@ -3,8 +3,8 @@ from typing import Dict, Union
 
 import pandas as pd
 
-from base.constants import UNKNOWN_FUNCTION_STRING
-from base.reference_assembly import ReferenceAssembly
+from util.constants import UNKNOWN_FUNCTION_STRING
+from util.reference_assembly import ReferenceAssembly
 from calls.haplotype_call import HaplotypeCall
 from panel.panel import Panel
 from analysis.pgx_analysis import PgxAnalysis

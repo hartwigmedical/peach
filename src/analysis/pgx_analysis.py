@@ -2,8 +2,8 @@ import logging
 from copy import deepcopy
 from typing import Dict, Set, FrozenSet
 
-from base.constants import REF_CALL_ANNOTATION_STRING
-from base.filter import VcfCallFilter
+from util.constants import REF_CALL_ANNOTATION_STRING
+from util.filter import VcfCallFilter
 from calls.haplotype_call import HaplotypeCall
 from calls.dual_call import DualCall, DualCallData
 from calls.vcf_call import VcfCallData, VcfCall

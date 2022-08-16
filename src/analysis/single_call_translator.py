@@ -1,10 +1,10 @@
 import logging
 from typing import NamedTuple, Optional, Tuple
 
-from base.constants import REF_CALL_ANNOTATION_STRING
-from base.filter import DualCallFilter
-from base.reference_assembly import ReferenceAssembly
-from base.reference_site import ReferenceSite
+from util.constants import REF_CALL_ANNOTATION_STRING
+from util.filter import DualCallFilter
+from util.reference_assembly import ReferenceAssembly
+from util.reference_site import ReferenceSite
 from calls.single_call import SingleCall
 from panel.panel import Panel
 

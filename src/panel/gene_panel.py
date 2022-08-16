@@ -1,7 +1,7 @@
 from typing import FrozenSet, Optional, Set, Dict
 
-from base.reference_assembly import ReferenceAssembly
-from base.reference_site import ReferenceSite
+from util.reference_assembly import ReferenceAssembly
+from util.reference_site import ReferenceSite
 from panel.annotation import Annotation
 from panel.drug_summary import DrugSummary
 from panel.gene_transcript_summary import GeneTranscriptSummary

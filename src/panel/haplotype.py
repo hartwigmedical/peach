@@ -1,7 +1,7 @@
 import logging
 from typing import Collection, Dict, FrozenSet, Set
 
-from base.constants import NORMAL_FUNCTION_STRING
+from util.constants import NORMAL_FUNCTION_STRING
 from panel.variant import Variant
 
 

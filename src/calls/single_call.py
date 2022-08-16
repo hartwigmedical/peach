@@ -1,7 +1,7 @@
 from typing import NamedTuple, Tuple, Optional
 
-from base.filter import VcfCallFilter
-from base.reference_site import ReferenceSite
+from util.filter import VcfCallFilter
+from util.reference_site import ReferenceSite
 
 
 class SingleCall(NamedTuple):

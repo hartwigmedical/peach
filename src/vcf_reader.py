@@ -4,12 +4,12 @@ from typing import Dict, Any, Tuple, Optional
 
 import allel
 
-from base.reference_site import ReferenceSite
+from util.reference_site import ReferenceSite
 from tool_config import ToolConfig
-from base.constants import REF_CALL_ANNOTATION_STRING
-from base.filter import VcfCallFilter
-from base.gene_coordinate import GeneCoordinate
-from base.reference_assembly import ReferenceAssembly
+from util.constants import REF_CALL_ANNOTATION_STRING
+from util.filter import VcfCallFilter
+from util.gene_coordinate import GeneCoordinate
+from util.reference_assembly import ReferenceAssembly
 from calls.vcf_call import VcfCall, VcfCallData
 from panel.panel import Panel
 

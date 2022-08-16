@@ -2,7 +2,7 @@ import argparse
 from enum import Enum
 from typing import List, Optional, Any
 
-from base.reference_assembly import ReferenceAssembly
+from util.reference_assembly import ReferenceAssembly
 from tool_config import ToolConfig
 
 

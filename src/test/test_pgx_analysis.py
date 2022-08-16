@@ -1,10 +1,10 @@
 import unittest
 from typing import Dict, Set
 
-from base.filter import DualCallFilter, VcfCallFilter
-from base.gene_coordinate import GeneCoordinate
-from base.reference_assembly import ReferenceAssembly
-from base.reference_site import ReferenceSite
+from util.filter import DualCallFilter, VcfCallFilter
+from util.gene_coordinate import GeneCoordinate
+from util.reference_assembly import ReferenceAssembly
+from util.reference_site import ReferenceSite
 from calls.haplotype_call import HaplotypeCall
 from calls.dual_call import DualCall, DualCallData
 from calls.vcf_call import VcfCall, VcfCallData

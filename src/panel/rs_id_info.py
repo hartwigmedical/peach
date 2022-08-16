@@ -1,7 +1,7 @@
 from typing import Optional
 
-from base.reference_site import ReferenceSite
-from base.reference_assembly import ReferenceAssembly
+from util.reference_site import ReferenceSite
+from util.reference_assembly import ReferenceAssembly
 from panel.annotation import Annotation
 
 

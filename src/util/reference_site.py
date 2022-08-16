@@ -1,6 +1,6 @@
 from typing import NamedTuple, Set
 
-from base.gene_coordinate import GeneCoordinate
+from util.gene_coordinate import GeneCoordinate
 
 
 class ReferenceSite(NamedTuple):

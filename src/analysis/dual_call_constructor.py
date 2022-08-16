@@ -1,7 +1,7 @@
 from analysis.single_call_constructor import SingleCallConstructor
 from analysis.single_call_translator import SingleCallTranslator
-from base.filter import DualCallFilter, VcfCallFilter
-from base.reference_assembly import ReferenceAssembly
+from util.filter import DualCallFilter, VcfCallFilter
+from util.reference_assembly import ReferenceAssembly
 from calls.dual_call import DualCall, DualCallData
 from calls.vcf_call import VcfCall, VcfCallData
 from panel.panel import Panel

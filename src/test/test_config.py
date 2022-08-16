@@ -1,8 +1,8 @@
 import unittest
 from typing import FrozenSet
 
-from base.gene_coordinate import GeneCoordinate
-from base.reference_site import ReferenceSite
+from util.gene_coordinate import GeneCoordinate
+from util.reference_site import ReferenceSite
 from panel.annotation import Annotation
 from panel.drug_summary import DrugSummary
 from panel.gene_panel import GenePanel

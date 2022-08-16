@@ -1,11 +1,11 @@
 import unittest
 from typing import Set
 
-from base.gene_coordinate import GeneCoordinate
-from base.reference_site import ReferenceSite
+from util.gene_coordinate import GeneCoordinate
+from util.reference_site import ReferenceSite
 
 
-class TestBaseUtil(unittest.TestCase):
+class TestUtil(unittest.TestCase):
     def test_get_covered_coordinates_empty(self) -> None:
         reference = ReferenceSite(GeneCoordinate("X", 17), "")
         result = reference.get_covered_coordinates()

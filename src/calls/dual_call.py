@@ -1,8 +1,8 @@
 from typing import Optional, NamedTuple, Tuple, FrozenSet
 
-from base.filter import DualCallFilter
-from base.reference_assembly import ReferenceAssembly
-from base.reference_site import ReferenceSite
+from util.filter import DualCallFilter
+from util.reference_assembly import ReferenceAssembly
+from util.reference_site import ReferenceSite
 
 
 class DualCall(NamedTuple):

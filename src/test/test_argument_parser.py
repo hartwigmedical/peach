@@ -4,7 +4,7 @@ from io import StringIO
 from unittest.mock import patch
 
 from argument_parser import ArgumentParser
-from base.reference_assembly import ReferenceAssembly
+from util.reference_assembly import ReferenceAssembly
 from tool_config import ToolConfig
 
 

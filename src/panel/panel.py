@@ -1,8 +1,8 @@
 from typing import Set, FrozenSet, Dict, Optional, Union
 
-from base.gene_coordinate import GeneCoordinate
-from base.reference_assembly import ReferenceAssembly
-from base.reference_site import ReferenceSite
+from util.gene_coordinate import GeneCoordinate
+from util.reference_assembly import ReferenceAssembly
+from util.reference_site import ReferenceSite
 from calls.single_call import SingleCall
 from calls.vcf_call import VcfCall
 from panel.gene_panel import GenePanel

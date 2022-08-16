@@ -1,6 +1,6 @@
 from typing import NamedTuple
 
-from base.reference_assembly import ReferenceAssembly
+from util.reference_assembly import ReferenceAssembly
 
 
 class Annotation(NamedTuple):

@@ -1,6 +1,6 @@
 from typing import Optional, Tuple
 
-from base.reference_assembly import ReferenceAssembly
+from util.reference_assembly import ReferenceAssembly
 from calls.single_call import SingleCall
 from calls.vcf_call import VcfCall
 from panel.panel import Panel

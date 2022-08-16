@@ -1,8 +1,8 @@
 from typing import Optional, FrozenSet, Set, Dict
 
-from base.gene_coordinate import GeneCoordinate
-from base.reference_assembly import ReferenceAssembly
-from base.reference_site import ReferenceSite
+from util.gene_coordinate import GeneCoordinate
+from util.reference_assembly import ReferenceAssembly
+from util.reference_site import ReferenceSite
 from panel.annotation import Annotation
 from panel.rs_id_info import RsIdInfo
 

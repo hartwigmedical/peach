@@ -1,8 +1,8 @@
 from typing import NamedTuple, Tuple, Optional, FrozenSet
 
-from base.filter import VcfCallFilter
-from base.reference_assembly import ReferenceAssembly
-from base.reference_site import ReferenceSite
+from util.filter import VcfCallFilter
+from util.reference_assembly import ReferenceAssembly
+from util.reference_site import ReferenceSite
 
 
 class VcfCall(NamedTuple):

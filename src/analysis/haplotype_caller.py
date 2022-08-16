@@ -3,8 +3,8 @@ import logging
 from copy import deepcopy
 from typing import Dict, Set, DefaultDict, Tuple
 
-from base.gene_coordinate import GeneCoordinate
-from base.reference_assembly import ReferenceAssembly
+from util.gene_coordinate import GeneCoordinate
+from util.reference_assembly import ReferenceAssembly
 from calls.haplotype_call import HaplotypeCall
 from calls.dual_call import DualCall, DualCallData
 from panel.panel import Panel
