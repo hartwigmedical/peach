@@ -87,7 +87,6 @@ class PgxAnalyser(object):
                     uncalled_ref_call = VcfCall(
                         reference_site,
                         (reference_site.allele, reference_site.allele),
-                        gene,
                         (rs_id,),
                         REF_CALL_ANNOTATION_STRING,
                         VcfCallFilter.NO_CALL,

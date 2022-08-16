@@ -12,7 +12,6 @@ class VcfCall(NamedTuple):
     """
     reference_site: ReferenceSite
     alleles: Tuple[str, str]  # The order is (ref, alt) when there is one of each
-    gene: Optional[str]  # Is None if unknown
     rs_ids: Tuple[str, ...]
     variant_annotation: Optional[str]  # Is None if unknown
     filter: VcfCallFilter

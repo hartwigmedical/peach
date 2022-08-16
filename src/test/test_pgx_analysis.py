@@ -109,13 +109,13 @@ class TestPgxAnalysis(unittest.TestCase):
         vcf_call_data = VcfCallData(frozenset({
             VcfCall(
                 ReferenceSite(GeneCoordinate("16", 97915617), "C"), ("T", "T"),
-                "FAKE2", ("rs1212127",), "1324C>T", VcfCallFilter.PASS),
+                ("rs1212127",), "1324C>T", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("1", 97915621), "TG"), ("TC", "TC"),
-                "DPYD", tuple(), "6744CA>GA", VcfCallFilter.PASS),
+                tuple(), "6744CA>GA", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("1", 97915614), "C"), ("C", "C"),
-                "DPYD", ("rs3918290",), "REF_CALL", VcfCallFilter.PASS),
+                ("rs3918290",), "REF_CALL", VcfCallFilter.PASS),
         }), ReferenceAssembly.V37)
         pgx_analysis = PgxAnalyser().create_pgx_analysis(vcf_call_data, panel)
 
@@ -163,19 +163,19 @@ class TestPgxAnalysis(unittest.TestCase):
         vcf_call_data = VcfCallData(frozenset({
             VcfCall(
                 ReferenceSite(GeneCoordinate("16", 97915617), "C"), ("C", "T"),
-                "FAKE2", ("rs1212127",), "1324C>T", VcfCallFilter.PASS),
+                ("rs1212127",), "1324C>T", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("5", 97915617), "T"), ("T", "C"),
-                "FAKE", ("rs1212125",), "1005T>C", VcfCallFilter.PASS),
+                ("rs1212125",), "1005T>C", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("1", 97915621), "TG"), ("TG", "TC"),
-                "DPYD", ("rs72549303",), "6744CA>GA", VcfCallFilter.PASS),
+                ("rs72549303",), "6744CA>GA", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("1", 97915614), "C"), ("C", "T"),
-                "DPYD", ("rs3918290",), "35G>A", VcfCallFilter.PASS),
+                ("rs3918290",), "35G>A", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("1", 97981395), "T"), ("T", "C"),
-                "DPYD", ("rs1801159",), "674A>G", VcfCallFilter.PASS),
+                ("rs1801159",), "674A>G", VcfCallFilter.PASS),
         }), ReferenceAssembly.V37)
         pgx_analysis = PgxAnalyser().create_pgx_analysis(vcf_call_data, panel)
 
@@ -225,19 +225,19 @@ class TestPgxAnalysis(unittest.TestCase):
         vcf_call_data = VcfCallData(frozenset({
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr16", 97450060), "T"), ("C", "T"),
-                "FAKE2", ("rs1212127",), "1324T>C", VcfCallFilter.PASS),
+                ("rs1212127",), "1324T>C", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr5", 97450060), "T"), ("T", "C"),
-                "FAKE", ("rs1212125",), "1005T>C", VcfCallFilter.PASS),
+                ("rs1212125",), "1005T>C", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr1", 97450065), "TC"), ("TG", "TC"),
-                "DPYD", ("rs72549303",), "6744GA>CA", VcfCallFilter.PASS),
+                ("rs72549303",), "6744GA>CA", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr1", 97450058), "C"), ("C", "T"),
-                "DPYD", ("rs3918290",), "35G>A", VcfCallFilter.PASS),
+                ("rs3918290",), "35G>A", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr1", 97515839), "T"), ("T", "C"),
-                "DPYD", ("rs1801159",), "674A>G", VcfCallFilter.PASS),
+                ("rs1801159",), "674A>G", VcfCallFilter.PASS),
         }), ReferenceAssembly.V38)
         pgx_analysis = PgxAnalyser().create_pgx_analysis(vcf_call_data, panel)
 
@@ -287,10 +287,10 @@ class TestPgxAnalysis(unittest.TestCase):
         vcf_call_data = VcfCallData(frozenset({
             VcfCall(
                 ReferenceSite(GeneCoordinate("1", 97915614), "C"), ("C", "T"),
-                "DPYD", ("rs3918290",), "9213C>T", VcfCallFilter.PASS),
+                ("rs3918290",), "9213C>T", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("1", 97912838), "A"), ("AGT", "AGT"),
-                "DPYD", ("rs2938101",), "293A>AGT", VcfCallFilter.PASS),
+                ("rs2938101",), "293A>AGT", VcfCallFilter.PASS),
         }), ReferenceAssembly.V37)
         pgx_analysis = PgxAnalyser().create_pgx_analysis(vcf_call_data, panel)
 
@@ -323,13 +323,13 @@ class TestPgxAnalysis(unittest.TestCase):
         vcf_call_data = VcfCallData(frozenset({
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr1", 97450058), "C"), ("T", "T"),
-                "DPYD", ("rs3918290",), "9213C>T", VcfCallFilter.PASS),
+                ("rs3918290",), "9213C>T", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr1", 97515839), "T"), ("C", "C"),
-                "DPYD", ("rs1801159",), "293T>C", VcfCallFilter.PASS),
+                ("rs1801159",), "293T>C", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr1", 97450065), "TC"), ("TC", "TC"),
-                "DPYD", ("rs72549303",), "REF_CALL", VcfCallFilter.PASS),
+                ("rs72549303",), "REF_CALL", VcfCallFilter.PASS),
         }), ReferenceAssembly.V38)
         pgx_analysis = PgxAnalyser().create_pgx_analysis(vcf_call_data, panel)
 
@@ -360,13 +360,13 @@ class TestPgxAnalysis(unittest.TestCase):
         vcf_call_data = VcfCallData(frozenset({
             VcfCall(
                 ReferenceSite(GeneCoordinate("1", 97915614), "C"), ("C", "T"),
-                "DPYD", ("rs3918290",), "9213C>T", VcfCallFilter.PASS),
+                ("rs3918290",), "9213C>T", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("1", 97981395), "T"), ("T", "C"),
-                "DPYD", ("rs1801159",), "293T>C", VcfCallFilter.PASS),
+                ("rs1801159",), "293T>C", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("1", 97915621), "TG"), ("TC", "TC"),
-                "DPYD", ("rs72549303",), "6744CA>GA", VcfCallFilter.PASS),
+                ("rs72549303",), "6744CA>GA", VcfCallFilter.PASS),
         }), ReferenceAssembly.V37)
         pgx_analysis = PgxAnalyser().create_pgx_analysis(vcf_call_data, panel)
 
@@ -400,13 +400,13 @@ class TestPgxAnalysis(unittest.TestCase):
         vcf_call_data = VcfCallData(frozenset({
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr1", 97450058), "C"), ("T", "T"),
-                "DPYD", ("rs3918290",), "9213C>T", VcfCallFilter.PASS),
+                ("rs3918290",), "9213C>T", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr1", 97515839), "T"), ("T", "C"),
-                "DPYD", ("rs1801159",), "293T>C", VcfCallFilter.PASS),
+                ("rs1801159",), "293T>C", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr1", 97450065), "TC"), ("TC", "TC"),
-                "DPYD", ("rs72549303",), "REF_CALL", VcfCallFilter.PASS),
+                ("rs72549303",), "REF_CALL", VcfCallFilter.PASS),
         }), ReferenceAssembly.V38)
         pgx_analysis = PgxAnalyser().create_pgx_analysis(vcf_call_data, panel)
 
@@ -437,16 +437,16 @@ class TestPgxAnalysis(unittest.TestCase):
         vcf_call_data = VcfCallData(frozenset({
             VcfCall(
                 ReferenceSite(GeneCoordinate("1", 97915614), "C"), ("T", "T"),
-                "DPYD", ("rs3918290",), "9213C>T", VcfCallFilter.PASS),
+                ("rs3918290",), "9213C>T", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("1", 97981395), "T"), ("T", "C"),
-                "DPYD", ("rs1801159",), "293T>C", VcfCallFilter.PASS),
+                ("rs1801159",), "293T>C", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("1", 97915621), "TG"), ("TG", "TC"),
-                "DPYD", ("rs72549303",), "6744CA>GA", VcfCallFilter.PASS),
+                ("rs72549303",), "6744CA>GA", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("1", 97912838), "A"), ("AGT", "AGT"),
-                "DPYD", ("rs2938101",), "301A>AGT", VcfCallFilter.PASS),
+                ("rs2938101",), "301A>AGT", VcfCallFilter.PASS),
         }), ReferenceAssembly.V37)
         pgx_analysis = PgxAnalyser().create_pgx_analysis(vcf_call_data, panel)
 
@@ -484,13 +484,13 @@ class TestPgxAnalysis(unittest.TestCase):
         vcf_call_data = VcfCallData(frozenset({
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr1", 97450058), "C"), ("T", "T"),
-                "DPYD", ("rs3918290",), "9213C>T", VcfCallFilter.PASS),
+                ("rs3918290",), "9213C>T", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr1", 97515839), "T"), ("C", "C"),
-                "DPYD", ("rs1801159",), "293T>C", VcfCallFilter.PASS),
+                ("rs1801159",), "293T>C", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr1", 97450065), "TC"), ("TG", "TG"),
-                "DPYD", ("rs72549303",), "6744GA>CA", VcfCallFilter.PASS),
+                ("rs72549303",), "6744GA>CA", VcfCallFilter.PASS),
         }), ReferenceAssembly.V38)
         pgx_analysis = PgxAnalyser().create_pgx_analysis(vcf_call_data, panel)
 
@@ -527,13 +527,13 @@ class TestPgxAnalysis(unittest.TestCase):
         vcf_call_data = VcfCallData(frozenset({
             VcfCall(
                 ReferenceSite(GeneCoordinate("1", 97915614), "C"), ("C", "T"),
-                "DPYD", ("rs3918290",), "9213C>T", VcfCallFilter.PASS),
+                ("rs3918290",), "9213C>T", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("1", 97981395), "T"), ("T", "C"),
-                "DPYD", ("rs1801159",), "293T>C", VcfCallFilter.PASS),
+                ("rs1801159",), "293T>C", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("1", 97915621), "TG"), ("TG", "TC"),
-                "DPYD", ("rs72549303",), "6744CA>GA", VcfCallFilter.PASS),
+                ("rs72549303",), "6744CA>GA", VcfCallFilter.PASS),
         }), ReferenceAssembly.V37)
         pgx_analysis = PgxAnalyser().create_pgx_analysis(vcf_call_data, panel)
 
@@ -568,13 +568,13 @@ class TestPgxAnalysis(unittest.TestCase):
         vcf_call_data = VcfCallData(frozenset({
             VcfCall(
                 ReferenceSite(GeneCoordinate("16", 39593405), "A"), ("A", "G"),
-                "FAKE2", ("rs1949223",), "384C>T", VcfCallFilter.PASS),  # unknown
+                ("rs1949223",), "384C>T", VcfCallFilter.PASS),  # unknown
             VcfCall(
                 ReferenceSite(GeneCoordinate("5", 97915617), "T"), ("T", "C"),
-                "FAKE", ("rs1212125",), "1005T>C", VcfCallFilter.PASS),
+                ("rs1212125",), "1005T>C", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("1", 2488242), "AC"), ("AC", "AG"),
-                "DPYD", tuple(), "9213CT>GT", VcfCallFilter.PASS),  # unknown
+                tuple(), "9213CT>GT", VcfCallFilter.PASS),  # unknown
         }), ReferenceAssembly.V37)
 
         with self.assertRaises(ValueError):
@@ -590,60 +590,16 @@ class TestPgxAnalysis(unittest.TestCase):
         vcf_call_data = VcfCallData(frozenset({
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr16", 39593405), "A"), ("A", "G"),
-                "FAKE2", ("rs1949223",), "384C>T", VcfCallFilter.PASS),  # unknown
+                ("rs1949223",), "384C>T", VcfCallFilter.PASS),  # unknown
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr5", 97450060), "T"), ("T", "C"),
-                "FAKE", ("rs1212125",), "1005T>C", VcfCallFilter.PASS),
+                ("rs1212125",), "1005T>C", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr1", 2488242), "AC"), ("AC", "AG"),
-                "DPYD", tuple(), "9213CT>GT", VcfCallFilter.PASS),  # unknown
+                tuple(), "9213CT>GT", VcfCallFilter.PASS),  # unknown
         }), ReferenceAssembly.V38)
         with self.assertRaises(ValueError):
             PgxAnalyser().create_pgx_analysis(vcf_call_data, panel)
-
-    def test_unknown_gene(self) -> None:
-        """Variants that are of an unknown gene. Uses v37 input"""
-        panel = get_wide_example_panel(include_transcript_ids=True)
-        reference_assembly = ReferenceAssembly.V37
-
-        good_calls = {
-            VcfCall(
-                ReferenceSite(GeneCoordinate("5", 97915617), "T"), ("T", "C"), "FAKE",
-                ("rs1212125",), "1005T>C", VcfCallFilter.PASS),
-        }
-        bad_call = VcfCall(
-            ReferenceSite(GeneCoordinate("3", 18473423), "T"), ("T", "C"), ".",
-            ("rs2492932",), "12T>C", VcfCallFilter.PASS,
-        )
-
-        good_vcf_call_data = VcfCallData(frozenset(good_calls), reference_assembly)
-        all_vcf_call_data = VcfCallData(frozenset(good_calls.union({bad_call})), reference_assembly)
-
-        PgxAnalyser().create_pgx_analysis(good_vcf_call_data, panel)  # no error
-        with self.assertRaises(ValueError):
-            PgxAnalyser().create_pgx_analysis(all_vcf_call_data, panel)
-
-    def test_incorrect_gene(self) -> None:
-        """Variants that are assigned to an incorrect gene. Uses v37 input"""
-        panel = get_wide_example_panel(include_transcript_ids=True)
-        reference_assembly = ReferenceAssembly.V37
-
-        good_calls = {
-            VcfCall(
-                ReferenceSite(GeneCoordinate("5", 97915617), "T"), ("T", "C"), "FAKE",
-                ("rs1212125",), "1005T>C", VcfCallFilter.PASS),
-        }
-        bad_call = VcfCall(
-            ReferenceSite(GeneCoordinate("3", 18473423), "T"), ("T", "C"), "DPYD",
-            ("rs2492932",), "12T>C", VcfCallFilter.PASS,
-        )
-
-        good_vcf_call_data = VcfCallData(frozenset(good_calls), reference_assembly)
-        all_vcf_call_data = VcfCallData(frozenset(good_calls.union({bad_call})), reference_assembly)
-
-        PgxAnalyser().create_pgx_analysis(good_vcf_call_data, panel)  # no error
-        with self.assertRaises(ValueError):
-            PgxAnalyser().create_pgx_analysis(all_vcf_call_data, panel)
 
     def test_known_variants_with_incorrect_rs_id(self) -> None:
         """Known variant with one incorrect rs id. Uses v38 input"""
@@ -653,18 +609,18 @@ class TestPgxAnalysis(unittest.TestCase):
         good_calls = {
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr16", 97450060), "T"), ("C", "T"),
-                "FAKE2", ("rs1212127",), "1324T>C", VcfCallFilter.PASS),
+                ("rs1212127",), "1324T>C", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr1", 97450065), "TC"), ("TG", "TC"),
-                "DPYD", ("rs72549303",), "6744CA>GA", VcfCallFilter.PASS),
+                ("rs72549303",), "6744CA>GA", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr1", 97515839), "T"), ("T", "C"),
-                "DPYD", ("rs1801159",), "674A>G", VcfCallFilter.PASS),
+                ("rs1801159",), "674A>G", VcfCallFilter.PASS),
         }
 
         bad_call = VcfCall(
             ReferenceSite(GeneCoordinate("chr5", 97450060), "T"), ("T", "C"),
-            "FAKE", ("rs27384",), "1005T>C", VcfCallFilter.PASS
+            ("rs27384",), "1005T>C", VcfCallFilter.PASS
         )
 
         good_call_data = VcfCallData(frozenset(good_calls), reference_assembly)
@@ -682,20 +638,20 @@ class TestPgxAnalysis(unittest.TestCase):
         good_calls = {
             VcfCall(
                 ReferenceSite(GeneCoordinate("16", 97915617), "C"), ("C", "T"),
-                "FAKE2", ("rs1212127",), "1324C>T", VcfCallFilter.PASS),
+                ("rs1212127",), "1324C>T", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("5", 97915617), "T"), ("T", "C"),
-                "FAKE", ("rs1212125",), "1005T>C", VcfCallFilter.PASS),
+                ("rs1212125",), "1005T>C", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("1", 97915621), "TG"), ("TG", "TC"),
-                "DPYD", ("rs72549303",), "6744CA>GA", VcfCallFilter.PASS),
+                ("rs72549303",), "6744CA>GA", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("1", 97981395), "T"), ("T", "C"),
-                "DPYD", ("rs1801159",), "674A>G", VcfCallFilter.PASS),
+                ("rs1801159",), "674A>G", VcfCallFilter.PASS),
         }
         bad_call = VcfCall(
             ReferenceSite(GeneCoordinate("1", 6778543), "C"), ("C", "T"),
-            "DPYD", ("rs3918290",), "35G>A", VcfCallFilter.PASS
+            ("rs3918290",), "35G>A", VcfCallFilter.PASS
         )
 
         good_call_data = VcfCallData(frozenset(good_calls), reference_assembly)
@@ -713,20 +669,20 @@ class TestPgxAnalysis(unittest.TestCase):
         good_calls = {
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr16", 97450060), "T"), ("C", "T"),
-                "FAKE2", ("rs1212127",), "1324T>C", VcfCallFilter.PASS),
+                ("rs1212127",), "1324T>C", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr5", 97450060), "T"), ("T", "C"),
-                "FAKE", ("rs1212125",), "1005T>C", VcfCallFilter.PASS),
+                ("rs1212125",), "1005T>C", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr1", 97450065), "TC"), ("TG", "TC"),
-                "DPYD", ("rs72549303",), "6744GA>CA", VcfCallFilter.PASS),
+                ("rs72549303",), "6744GA>CA", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr1", 97515839), "T"), ("T", "C"),
-                "DPYD", ("rs1801159",), "674A>G", VcfCallFilter.PASS),
+                ("rs1801159",), "674A>G", VcfCallFilter.PASS),
         }
         bad_call = VcfCall(
             ReferenceSite(GeneCoordinate("3", 97915614), "C"), ("C", "T"),
-            "DPYD", ("rs3918290",), "35G>A", VcfCallFilter.PASS
+            ("rs3918290",), "35G>A", VcfCallFilter.PASS
         )
 
         good_call_data = VcfCallData(frozenset(good_calls), reference_assembly)
@@ -743,17 +699,17 @@ class TestPgxAnalysis(unittest.TestCase):
         good_calls = {
             VcfCall(
                 ReferenceSite(GeneCoordinate("5", 97915617), "T"), ("T", "C"),
-                "FAKE", ("rs1212125",), "1005T>C", VcfCallFilter.PASS),
+                ("rs1212125",), "1005T>C", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("1", 97915621), "TG"), ("TG", "TC"),
-                "DPYD", ("rs72549303",), "6744CA>GA", VcfCallFilter.PASS),
+                ("rs72549303",), "6744CA>GA", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("1", 97981395), "T"), ("T", "C"),
-                "DPYD", ("rs1801159",), "674A>G", VcfCallFilter.PASS),
+                ("rs1801159",), "674A>G", VcfCallFilter.PASS),
         }
         bad_call = VcfCall(
             ReferenceSite(GeneCoordinate("16", 97915617), "C"), ("C", "T"),
-            "FAKE2", ("rs1212127", "rs394832"), "1324C>T", VcfCallFilter.PASS
+            ("rs1212127", "rs394832"), "1324C>T", VcfCallFilter.PASS
         )
 
         good_call_data = VcfCallData(frozenset(good_calls), reference_assembly)
@@ -770,15 +726,15 @@ class TestPgxAnalysis(unittest.TestCase):
 
         call_that_ref_seq_diff_is_ref_v38 = VcfCall(
             ReferenceSite(GeneCoordinate("1", 97915621), "TG"), ("TC", "TC"),
-            "DPYD", ("rs72549303",), "6744CA>GA", VcfCallFilter.PASS,
+            ("rs72549303",), "6744CA>GA", VcfCallFilter.PASS,
         )
         normal_call = VcfCall(
             ReferenceSite(GeneCoordinate("1", 97915614), "C"), ("T", "C"),
-            "DPYD", ("rs3918290",), "9213C>T", VcfCallFilter.PASS,
+            ("rs3918290",), "9213C>T", VcfCallFilter.PASS,
         )
         unexpected_base_call = VcfCall(
             ReferenceSite(GeneCoordinate("1", 97915614), "C"), ("T", "A"),
-            "DPYD", ("rs3918290",), "9213C>T", VcfCallFilter.PASS,
+            ("rs3918290",), "9213C>T", VcfCallFilter.PASS,
         )
         good_call_data = VcfCallData(
             frozenset({normal_call, call_that_ref_seq_diff_is_ref_v38}),
@@ -825,15 +781,15 @@ class TestPgxAnalysis(unittest.TestCase):
 
         normal_call = VcfCall(
             ReferenceSite(GeneCoordinate("chr1", 97450058), "C"), ("T", "C"),
-            "DPYD", ("rs3918290",), "9213C>T", VcfCallFilter.PASS,
+            ("rs3918290",), "9213C>T", VcfCallFilter.PASS,
         )
         unexpected_base_call = VcfCall(
             ReferenceSite(GeneCoordinate("chr1", 97450058), "C"), ("T", "A"),
-            "DPYD", ("rs3918290",), "9213C>T", VcfCallFilter.PASS,
+            ("rs3918290",), "9213C>T", VcfCallFilter.PASS,
         )
         other_call = VcfCall(
             ReferenceSite(GeneCoordinate("chr1", 97515839), "T"), ("C", "C"),
-            "DPYD", ("rs1801159",), "674A>G", VcfCallFilter.PASS,
+            ("rs1801159",), "674A>G", VcfCallFilter.PASS,
         )
         good_call_data = VcfCallData(
             frozenset({normal_call, other_call}),
@@ -882,13 +838,13 @@ class TestPgxAnalysis(unittest.TestCase):
         vcf_call_data = VcfCallData(frozenset({
             VcfCall(
                 ReferenceSite(GeneCoordinate("1", 97915614), "C"), ("T", "T"),
-                "DPYD", ("rs3918290",), "9213C>T", VcfCallFilter.PASS),
+                ("rs3918290",), "9213C>T", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("1", 97981395), "T"), ("T", "C"),
-                "DPYD", ("rs1801159",), "293T>C", VcfCallFilter.PASS),
+                ("rs1801159",), "293T>C", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("1", 97915621), "TG"), ("TC", "TC"),
-                "DPYD", ("rs72549303",), "6744CA>GA", VcfCallFilter.PASS),
+                ("rs72549303",), "6744CA>GA", VcfCallFilter.PASS),
         }), ReferenceAssembly.V37)
         pgx_analysis = PgxAnalyser().create_pgx_analysis(vcf_call_data, panel)
 
@@ -922,13 +878,13 @@ class TestPgxAnalysis(unittest.TestCase):
         vcf_call_data = VcfCallData(frozenset({
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr1", 97450057), "GC"), ("CT", "CT"),
-                "DPYD", tuple(), "9212GC>CT", VcfCallFilter.PASS),  # unknown
+                tuple(), "9212GC>CT", VcfCallFilter.PASS),  # unknown
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr1", 97515839), "T"), ("C", "C"),
-                "DPYD", ("rs1801159",), "293T>C", VcfCallFilter.PASS),
+                ("rs1801159",), "293T>C", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr1", 97450065), "TC"), ("TC", "TC"),
-                "DPYD", ("rs72549303",), "REF_CALL", VcfCallFilter.PASS),
+                ("rs72549303",), "REF_CALL", VcfCallFilter.PASS),
         }), ReferenceAssembly.V38)
         pgx_analysis = PgxAnalyser().create_pgx_analysis(vcf_call_data, panel)
 
@@ -962,13 +918,13 @@ class TestPgxAnalysis(unittest.TestCase):
         vcf_call_data = VcfCallData(frozenset({
             VcfCall(
                 ReferenceSite(GeneCoordinate("1", 97915614), "CG"), ("TC", "TC"),
-                "DPYD", tuple(), "9212CG>TC", VcfCallFilter.PASS),  # unknown
+                tuple(), "9212CG>TC", VcfCallFilter.PASS),  # unknown
             VcfCall(
                 ReferenceSite(GeneCoordinate("1", 97981395), "T"), ("C", "C"),
-                "DPYD", ("rs1801159",), "293T>C", VcfCallFilter.PASS),
+                ("rs1801159",), "293T>C", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("1", 97915621), "TG"), ("TC", "TC"),
-                "DPYD", ("rs72549303",), "6744CA>GA", VcfCallFilter.PASS),
+                ("rs72549303",), "6744CA>GA", VcfCallFilter.PASS),
         }), ReferenceAssembly.V37)
         pgx_analysis = PgxAnalyser().create_pgx_analysis(vcf_call_data, panel)
 
@@ -999,10 +955,10 @@ class TestPgxAnalysis(unittest.TestCase):
         vcf_call_data = VcfCallData(frozenset({
             VcfCall(
                 ReferenceSite(GeneCoordinate("16", 97915617), "C"), ("C", "C"),
-                "FAKE2", ("rs1212127",), "REF_CALL", VcfCallFilter.PASS),
+                ("rs1212127",), "REF_CALL", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("1", 97915621), "TG"), ("TG", "TG"),
-                "DPYD", ("rs72549303",), "REF_CALL", VcfCallFilter.PASS),
+                ("rs72549303",), "REF_CALL", VcfCallFilter.PASS),
         }), ReferenceAssembly.V37)
         pgx_analysis = PgxAnalyser().create_pgx_analysis(vcf_call_data, panel)
 
@@ -1050,10 +1006,10 @@ class TestPgxAnalysis(unittest.TestCase):
         vcf_call_data = VcfCallData(frozenset({
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr16", 97450060), "T"), ("T", "T"),
-                "FAKE2", ("rs1212127",), "REF_CALL", VcfCallFilter.PASS),
+                ("rs1212127",), "REF_CALL", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr1", 97450065), "TC"), ("TC", "TC"),
-                "DPYD", ("rs72549303",), "REF_CALL", VcfCallFilter.PASS),
+                ("rs72549303",), "REF_CALL", VcfCallFilter.PASS),
         }), ReferenceAssembly.V38)
         pgx_analysis = PgxAnalyser().create_pgx_analysis(vcf_call_data, panel)
 
@@ -1101,10 +1057,10 @@ class TestPgxAnalysis(unittest.TestCase):
         vcf_call_data = VcfCallData(frozenset({
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr16", 97450060), "T"), ("C", "C"),
-                "FAKE2", ("rs1212127",), "1324T>C", VcfCallFilter.PASS),
+                ("rs1212127",), "1324T>C", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr1", 97450065), "TC"), ("TG", "TG"),
-                "DPYD", ("rs72549303",), "6744GA>CA", VcfCallFilter.PASS),
+                ("rs72549303",), "6744GA>CA", VcfCallFilter.PASS),
         }), ReferenceAssembly.V38)
         pgx_analysis = PgxAnalyser().create_pgx_analysis(vcf_call_data, panel)
 
@@ -1152,10 +1108,10 @@ class TestPgxAnalysis(unittest.TestCase):
         vcf_call_data = VcfCallData(frozenset({
             VcfCall(
                 ReferenceSite(GeneCoordinate("16", 97915617), "C"), ("C", "T"),
-                "FAKE2", tuple(), "1324C>T", VcfCallFilter.PASS),
+                tuple(), "1324C>T", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("1", 97915621), "TG"), ("TG", "TC"),
-                "DPYD", tuple(), "6744CA>GA", VcfCallFilter.PASS),
+                tuple(), "6744CA>GA", VcfCallFilter.PASS),
         }), ReferenceAssembly.V37)
         pgx_analysis = PgxAnalyser().create_pgx_analysis(vcf_call_data, panel)
 
@@ -1205,10 +1161,10 @@ class TestPgxAnalysis(unittest.TestCase):
         vcf_call_data = VcfCallData(frozenset({
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr16", 97450060), "T"), ("C", "T"),
-                "FAKE2", tuple(), "1324T>C", VcfCallFilter.PASS),
+                tuple(), "1324T>C", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr1", 97450065), "TC"), ("TG", "TC"),
-                "DPYD", tuple(), "6744GA>CA", VcfCallFilter.PASS),
+                tuple(), "6744GA>CA", VcfCallFilter.PASS),
         }), ReferenceAssembly.V38)
         pgx_analysis = PgxAnalyser().create_pgx_analysis(vcf_call_data, panel)
 
@@ -1261,10 +1217,10 @@ class TestPgxAnalysis(unittest.TestCase):
         vcf_call_data = VcfCallData(frozenset({
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr16", 97450060), "T"), ("C", "A"),
-                "FAKE2", ("rs1212127",), "1324T>A", VcfCallFilter.PASS),  # with ref v37
+                ("rs1212127",), "1324T>A", VcfCallFilter.PASS),  # with ref v37
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr1", 97450065), "TC"), ("AC", "TC"),
-                "DPYD", ("rs72549303",), "6744CT>GT;6744CT>GC", VcfCallFilter.PASS),  # with ref v38
+                ("rs72549303",), "6744CT>GT;6744CT>GC", VcfCallFilter.PASS),  # with ref v38
         }), ReferenceAssembly.V38)
         pgx_analysis = PgxAnalyser().create_pgx_analysis(vcf_call_data, panel)
 
@@ -1312,10 +1268,10 @@ class TestPgxAnalysis(unittest.TestCase):
         vcf_call_data = VcfCallData(frozenset({
             VcfCall(
                 ReferenceSite(GeneCoordinate("16", 97915617), "C"), ("A", "G"),
-                "FAKE2", ("rs1212127",), "1324C>A;1324C>G", VcfCallFilter.PASS),
+                ("rs1212127",), "1324C>A;1324C>G", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("1", 97915621), "TG"), ("AC", "AG"),
-                "DPYD", ("rs72549303",), "6744CT>GT;6744CT>GC", VcfCallFilter.PASS),
+                ("rs72549303",), "6744CT>GT;6744CT>GC", VcfCallFilter.PASS),
         }), ReferenceAssembly.V37)
         pgx_analysis = PgxAnalyser().create_pgx_analysis(vcf_call_data, panel)
 
@@ -1363,16 +1319,16 @@ class TestPgxAnalysis(unittest.TestCase):
         vcf_call_data = VcfCallData(frozenset({
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr1", 97450058), "C"), ("T", "T"),
-                "DPYD", ("rs3918290",), "9212C>T", VcfCallFilter.PASS),
+                ("rs3918290",), "9212C>T", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr1", 97450058), "CG"), ("CG", "TC"),
-                "DPYD", tuple(), "9212CG>TC", VcfCallFilter.PASS),  # unknown
+                tuple(), "9212CG>TC", VcfCallFilter.PASS),  # unknown
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr1", 97515839), "T"), ("C", "C"),
-                "DPYD", ("rs1801159",), "293T>C", VcfCallFilter.PASS),
+                ("rs1801159",), "293T>C", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("chr1", 97450065), "TC"), ("TC", "TC"),
-                "DPYD", ("rs72549303",), "REF_CALL", VcfCallFilter.PASS),
+                ("rs72549303",), "REF_CALL", VcfCallFilter.PASS),
         }), ReferenceAssembly.V38)
         pgx_analysis = PgxAnalyser().create_pgx_analysis(vcf_call_data, panel)
 
@@ -1408,16 +1364,16 @@ class TestPgxAnalysis(unittest.TestCase):
         vcf_call_data = VcfCallData(frozenset({
             VcfCall(
                 ReferenceSite(GeneCoordinate("1", 97915614), "C"), ("T", "T"),
-                "DPYD", ("rs3918290",), "9212C>T", VcfCallFilter.PASS),
+                ("rs3918290",), "9212C>T", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("1", 97981395), "T"), ("C", "C"),
-                "DPYD", ("rs1801159",), "293T>C", VcfCallFilter.PASS),
+                ("rs1801159",), "293T>C", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("1", 97915621), "TG"), ("TG", "AC"),
-                "DPYD", ("rs72549303",), "6744CA>GT", VcfCallFilter.PASS),
+                ("rs72549303",), "6744CA>GT", VcfCallFilter.PASS),
             VcfCall(
                 ReferenceSite(GeneCoordinate("1", 97915622), "G"), ("C", "C"),
-                "DPYD", tuple(), "6744C>G", VcfCallFilter.PASS),  # unknown
+                tuple(), "6744C>G", VcfCallFilter.PASS),  # unknown
         }), ReferenceAssembly.V37)
         pgx_analysis = PgxAnalyser().create_pgx_analysis(vcf_call_data, panel)
 

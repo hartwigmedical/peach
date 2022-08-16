@@ -51,11 +51,4 @@ class SingleCallConstructor(object):
                 f"panel_genes={sorted(panel_genes_for_call)}, call={vcf_call}"
             )
             raise ValueError(error_msg)
-        panel_gene = panel_genes_for_call.pop()
-        if vcf_call.gene is not None and panel_gene != vcf_call.gene:
-            error_msg = (
-                f"Gene name from VCF does not match gene name from panel: "
-                f"vcf_gene_name={vcf_call.gene}, panel_gene_name={panel_gene}, call={vcf_call}"
-            )
-            raise ValueError(error_msg)
-        return panel_gene
+        return panel_genes_for_call.pop()
