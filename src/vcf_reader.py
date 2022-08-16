@@ -173,12 +173,13 @@ class VcfReader(object):
             else:
                 full_variant_annotation = None
         elif annotation_type == AnnotationType.PAVE:
-            pave_annotation = self.__get_relevant_pave_annotation(call_index, variants, panel)
-            if pave_annotation is not None:
-                full_variant_annotation = pave_annotation.split(self.PAVE_ANNOTATION_SEPARATOR)[5]
+            complete_annotation = self.__get_relevant_pave_annotation(call_index, variants, panel)
+            if complete_annotation is not None:
+                full_variant_annotation = complete_annotation.split(self.PAVE_ANNOTATION_SEPARATOR)[5]
             else:
                 full_variant_annotation = None
         elif annotation_type == AnnotationType.NONE:
+            complete_annotation = None
             full_variant_annotation = None
         else:
             raise ValueError(f"Unrecognized annotation type: {annotation_type}")
@@ -191,7 +192,12 @@ class VcfReader(object):
         elif full_variant_annotation.startswith(self.NON_CODING_VARIANT_ANNOTATION_PREFIX):
             variant_annotation = self.__strip_prefix(full_variant_annotation, self.NON_CODING_VARIANT_ANNOTATION_PREFIX)
         else:
-            raise ValueError(f"Unexpected annotation prefix: {full_variant_annotation}")
+            error_msg = (
+                f"Unexpected annotation prefix: "
+                f"full_variant_annotation={full_variant_annotation}, "
+                f"complete_annotation={complete_annotation}"
+            )
+            raise ValueError(error_msg)
 
         return variant_annotation
 
