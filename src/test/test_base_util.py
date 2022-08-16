@@ -3,7 +3,7 @@ from typing import Set
 
 from base.gene_coordinate import GeneCoordinate
 from base.reference_site import ReferenceSite
-from base.util import replace_file_extension_of_path, strip_prefix
+from base.util import strip_prefix
 
 
 class TestBaseUtil(unittest.TestCase):
@@ -32,20 +32,6 @@ class TestBaseUtil(unittest.TestCase):
             GeneCoordinate("X", 20),
         }
         self.assertEqual(result_expected, result)
-
-    def test_replace_file_extension_of_path_single_point(self) -> None:
-        result = replace_file_extension_of_path("something.ext", "test")
-        result_expected = "something.test"
-        self.assertEqual(result_expected, result)
-
-    def test_replace_file_extension_of_path_multiple_points(self) -> None:
-        result = replace_file_extension_of_path("this.is.something.ext", "test")
-        result_expected = "this.is.something.test"
-        self.assertEqual(result_expected, result)
-
-    def test_replace_file_extension_of_path_no_point(self) -> None:
-        with self.assertRaises(AssertionError):
-            replace_file_extension_of_path("something", "test")
 
     def test_strip_prefix(self) -> None:
         self.assertEqual("HiHello", strip_prefix("HiHiHello", "Hi"))
