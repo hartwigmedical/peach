@@ -5,7 +5,6 @@ from typing import Dict, Any, Tuple, Optional
 import allel
 
 from base.reference_site import ReferenceSite
-from base.util import strip_prefix
 from tool_config import ToolConfig
 from base.constants import REF_CALL_ANNOTATION_STRING
 from base.filter import VcfCallFilter
@@ -188,9 +187,9 @@ class VcfReader(object):
         if full_variant_annotation is None:
             variant_annotation = None
         elif full_variant_annotation.startswith(self.CODING_VARIANT_ANNOTATION_PREFIX):
-            variant_annotation = strip_prefix(full_variant_annotation, self.CODING_VARIANT_ANNOTATION_PREFIX)
+            variant_annotation = self.__strip_prefix(full_variant_annotation, self.CODING_VARIANT_ANNOTATION_PREFIX)
         elif full_variant_annotation.startswith(self.NON_CODING_VARIANT_ANNOTATION_PREFIX):
-            variant_annotation = strip_prefix(full_variant_annotation, self.NON_CODING_VARIANT_ANNOTATION_PREFIX)
+            variant_annotation = self.__strip_prefix(full_variant_annotation, self.NON_CODING_VARIANT_ANNOTATION_PREFIX)
         else:
             raise ValueError(f"Unexpected annotation prefix: {full_variant_annotation}")
 
@@ -287,3 +286,12 @@ class VcfReader(object):
             raise ValueError(error_msg)
             # logging.warning(f"No annotation detected in the VCF. Annotation with SNPEFF or PAVE is preferred.")
             # return AnnotationType.NONE
+
+    def __strip_prefix(self, string: str, prefix: str) -> str:
+        if string.startswith(prefix):
+            return string[len(prefix):]
+        else:
+            error_msg = (
+                f"String does not start with expected prefix: string={string}, prefix={prefix}"
+            )
+            raise ValueError(error_msg)

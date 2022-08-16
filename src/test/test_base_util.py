@@ -3,7 +3,6 @@ from typing import Set
 
 from base.gene_coordinate import GeneCoordinate
 from base.reference_site import ReferenceSite
-from base.util import strip_prefix
 
 
 class TestBaseUtil(unittest.TestCase):
@@ -32,13 +31,6 @@ class TestBaseUtil(unittest.TestCase):
             GeneCoordinate("X", 20),
         }
         self.assertEqual(result_expected, result)
-
-    def test_strip_prefix(self) -> None:
-        self.assertEqual("HiHello", strip_prefix("HiHiHello", "Hi"))
-
-    def test_strip_prefix_wrong_prefix(self) -> None:
-        with self.assertRaises(ValueError):
-            strip_prefix("HiHiHello", "Hello")
 
 
 if __name__ == "__main__":  # pragma: no cover
