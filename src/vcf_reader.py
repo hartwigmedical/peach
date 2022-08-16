@@ -168,16 +168,16 @@ class VcfReader(object):
         full_variant_annotation: Optional[str]
         if annotation_type == AnnotationType.SNPEFF:
             complete_annotation = self.__get_snpeff_annotation_string(call_index, variants)
-            if complete_annotation is not None:
-                full_variant_annotation = complete_annotation.split(self.SNPEFF_ANNOTATION_SEPARATOR)[9]
-            else:
+            if complete_annotation is None or complete_annotation == "":
                 full_variant_annotation = None
+            else:
+                full_variant_annotation = complete_annotation.split(self.SNPEFF_ANNOTATION_SEPARATOR)[9]
         elif annotation_type == AnnotationType.PAVE:
             complete_annotation = self.__get_relevant_pave_annotation(call_index, variants, panel)
-            if complete_annotation is not None:
-                full_variant_annotation = complete_annotation.split(self.PAVE_ANNOTATION_SEPARATOR)[5]
-            else:
+            if complete_annotation is None or complete_annotation == "":
                 full_variant_annotation = None
+            else:
+                full_variant_annotation = complete_annotation.split(self.PAVE_ANNOTATION_SEPARATOR)[5]
         elif annotation_type == AnnotationType.NONE:
             complete_annotation = None
             full_variant_annotation = None
