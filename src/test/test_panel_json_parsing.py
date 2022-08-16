@@ -1,6 +1,5 @@
 import unittest
 
-from panel.panel import Panel
 from json_parser import JsonParser
 from main import load_panel
 from test.util_for_test import get_wide_example_panel
