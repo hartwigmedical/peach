@@ -15,6 +15,8 @@ class HaplotypeCaller(object):
     HAPLOTYPE_CALLING_REFERENCE_ASSEMBLY = ReferenceAssembly.V38
 
     def get_gene_to_haplotypes_call(self, dual_call_data: DualCallData, panel: Panel) -> Dict[str, Set[HaplotypeCall]]:
+        self.__assert_call_data_is_handleable(dual_call_data)
+
         gene_to_haplotype_calls = {}
         for gene in panel.get_genes():
             logging.info(f"Calling haplotypes for {gene}")
@@ -23,8 +25,6 @@ class HaplotypeCaller(object):
 
     def __get_haplotypes_call(self, gene: str, dual_call_data: DualCallData, panel: Panel) -> Set[HaplotypeCall]:
         try:
-            self.__assert_call_data_is_handleable(dual_call_data)
-
             variant_to_count = self.__get_variant_to_count_for_gene(dual_call_data, gene)
 
             explaining_haplotype_combinations = self.__get_explaining_haplotype_combinations(
