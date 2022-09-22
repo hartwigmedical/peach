@@ -1,6 +1,7 @@
 import unittest
 from copy import deepcopy
 from io import StringIO
+from pathlib import Path
 from unittest.mock import patch
 
 from argument_parser import ArgumentParser
@@ -21,9 +22,9 @@ class TestArgumentParser(unittest.TestCase):
         actual_config = ArgumentParser().get_tool_config(arguments)
 
         expected_config = ToolConfig(
-            "vcf_file",
-            "panel_location",
-            "output_directory",
+            Path("vcf_file"),
+            Path("panel_location"),
+            Path("output_directory"),
             "tumor_sample_id",
             "ref_sample_id",
             "script_version",
@@ -43,9 +44,9 @@ class TestArgumentParser(unittest.TestCase):
         actual_config = ArgumentParser().get_tool_config(arguments)
 
         expected_config = ToolConfig(
-            "vcf_file",
-            "panel_location",
-            "output_directory",
+            Path("vcf_file"),
+            Path("panel_location"),
+            Path("output_directory"),
             "tumor_sample_id",
             "ref_sample_id",
             "script_version",
@@ -65,9 +66,9 @@ class TestArgumentParser(unittest.TestCase):
         actual_config = ArgumentParser().get_tool_config(arguments)
 
         expected_config = ToolConfig(
-            "vcf_file",
-            "panel_location",
-            "output_directory",
+            Path("vcf_file"),
+            Path("panel_location"),
+            Path("output_directory"),
             "tumor_sample_id",
             "ref_sample_id",
             "script_version",
@@ -85,9 +86,9 @@ class TestArgumentParser(unittest.TestCase):
         actual_config = ArgumentParser().get_tool_config(arguments)
 
         expected_config = ToolConfig(
-            "vcf_file",
-            "panel_location",
-            "output_directory",
+            Path("vcf_file"),
+            Path("panel_location"),
+            Path("output_directory"),
             None,
             "ref_sample_id",
             "script_version",

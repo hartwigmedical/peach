@@ -1,7 +1,7 @@
 import json
 import logging
-import os
 import sys
+from pathlib import Path
 
 from argument_parser import ArgumentParser
 from tool_config import ToolConfig
@@ -19,12 +19,7 @@ def main(tool_config: ToolConfig) -> None:
     logging.info(f"PEACH STARTING FOR {tool_config.get_sample_name()}")
 
     # Check if output dir exists, create if it does not
-    if not os.path.exists(tool_config.output_dir):
-        try:
-            os.makedirs(tool_config.output_dir)
-        except FileExistsError:
-            # Directory already exists
-            pass
+    tool_config.output_dir.mkdir(parents=True, exist_ok=True)
 
     # Get configuration
     logging.info("Creating panel config from JSON")
@@ -56,7 +51,7 @@ def set_up_logging() -> None:
     )
 
 
-def load_panel(panel_path: str) -> Panel:
+def load_panel(panel_path: Path) -> Panel:
     """Load manually annotated JSON panel file"""
     try:
         with open(panel_path, "r+", encoding="utf-8") as json_file:
@@ -67,24 +62,24 @@ def load_panel(panel_path: str) -> Panel:
 
 def print_calls_to_file(pgx_analysis: PgxAnalysis, tool_config: ToolConfig, panel_id: str) -> None:
     calls_file = tool_config.get_calls_output_file_path()
-    if os.path.exists(calls_file):
+    if calls_file.exists():
         raise IOError(f"Calls output file {calls_file} already exists. Exiting.")
     with open(calls_file, "w") as f:
         text = GenotypeReporter().get_calls_tsv_text(
             pgx_analysis, panel_id, tool_config.tool_version, tool_config.vcf_reference_assembly
         )
         f.write(text)
-    if not os.path.exists(calls_file):
+    if not calls_file.exists():
         raise FileNotFoundError(f"Failed to write calls output file {calls_file}")
 
 
 def print_genotypes_to_file(pgx_analysis: PgxAnalysis, panel: Panel, tool_config: ToolConfig) -> None:
     genotype_file = tool_config.get_genotype_output_file_path()
-    if os.path.exists(genotype_file):
+    if genotype_file.exists():
         raise IOError(f"Genotype output file {genotype_file} already exists. Exiting.")
     with open(genotype_file, "w") as f:
         f.write(HaplotypeReporter().get_genotype_tsv_text(pgx_analysis, panel, tool_config.tool_version))
-    if not os.path.exists(genotype_file):
+    if not genotype_file.exists():
         raise FileNotFoundError(f"Failed to write calls output file {genotype_file}")
 
 

@@ -1,5 +1,6 @@
 import argparse
 from enum import Enum
+from pathlib import Path
 from typing import List, Optional, Any
 
 from util.reference_assembly import ReferenceAssembly
@@ -53,11 +54,11 @@ class ArgumentParser(object):
         parser._action_groups.pop()
         required = parser.add_argument_group("required arguments")
         required.add_argument(
-            "--vcf", "-i", type=str, required=True, help="VCF file to use for pharmacogenomics analysis."
+            "--vcf", "-i", type=Path, required=True, help="VCF file to use for pharmacogenomics analysis."
         )
-        required.add_argument("--panel", "-p", type=str, required=True, help="Json file with the panel variants.")
+        required.add_argument("--panel", "-p", type=Path, required=True, help="Json file with the panel variants.")
         required.add_argument(
-            "--outputdir", "-o", type=str, required=True, help="Directory to store output of pharmacogenomic analysis."
+            "--outputdir", "-o", type=Path, required=True, help="Directory to store output of pharmacogenomic analysis."
         )
         required.add_argument("--sample_r_id", "-r", type=str, required=True, help="The sample ID of the normal.")
         required.add_argument("--tool_version", "-v", type=str, required=True, help="The version of the tool.")
@@ -69,7 +70,7 @@ class ArgumentParser(object):
             default=None,
             help=(
                 "The sample ID of the tumor. Only used for output file names. "
-                "If not provided, --sample_r_id value is used for this insetad."
+                "If not provided, --sample_r_id value is used for this instead."
             ),
         )
         experimental_optional = parser.add_argument_group("experimental optional arguments")

@@ -1,5 +1,6 @@
 import logging
 from enum import Enum, auto
+from pathlib import Path
 from typing import Dict, Any, Tuple, Optional
 
 import allel
@@ -51,10 +52,10 @@ class VcfReader(object):
             logging.warning("No variants found in vcf")
             return VcfCallData(frozenset(), tool_config.vcf_reference_assembly)
 
-    def __get_variants_from_vcf(self, vcf: str) -> Optional[Dict[str, Any]]:
+    def __get_variants_from_vcf(self, vcf: Path) -> Optional[Dict[str, Any]]:
         # variants is None precisely when the VCF file has no variants
         try:
-            variants = allel.read_vcf(vcf, fields="*", numbers={self.PAVE_ANNOTATION_FIELD_NAME: 1000})
+            variants = allel.read_vcf(str(vcf), fields="*", numbers={self.PAVE_ANNOTATION_FIELD_NAME: 1000})
         except IOError:
             raise FileNotFoundError(f"File {vcf} not found or cannot be opened.")
         return variants
