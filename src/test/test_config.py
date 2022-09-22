@@ -529,12 +529,12 @@ class TestConfig(unittest.TestCase):
             rs_id_infos,
             drugs,
         )
-        gene_panels_without_repeat = frozenset([gene_panel1, gene_panel2])
-        gene_panels_with_repeat = frozenset([gene_panel1, gene_panel3])
+        gene_panels_without_repeat = {gene_panel1, gene_panel2}
+        gene_panels_with_repeat = {gene_panel1, gene_panel3}
 
-        Panel(name, version, gene_panels_without_repeat)
+        Panel(name, version, gene_panels_without_repeat, set())
         with self.assertRaises(ValueError):
-            Panel(name, version, gene_panels_with_repeat)
+            Panel(name, version, gene_panels_with_repeat, set())
 
     def test_panel_with_overlapping_rs_id_infos_for_different_genes(self) -> None:
         """Error when panel has overlapping rs id infos for different genes"""
@@ -597,9 +597,9 @@ class TestConfig(unittest.TestCase):
             drugs,
         )
 
-        Panel(name, version, frozenset([gene_panel1, gene_panel2]))
+        Panel(name, version, {gene_panel1, gene_panel2}, set())
         with self.assertRaises(ValueError):
-            Panel(name, version, frozenset([gene_panel1, gene_panel3]))
+            Panel(name, version, {gene_panel1, gene_panel3}, set())
 
     def test_panel_with_repeated_rs_ids(self) -> None:
         """Error when panel has repeated rs ids for different genes"""
@@ -662,9 +662,9 @@ class TestConfig(unittest.TestCase):
             drugs,
         )
 
-        Panel(name, version, frozenset([gene_panel1, gene_panel2]))
+        Panel(name, version, {gene_panel1, gene_panel2}, set())
         with self.assertRaises(ValueError):
-            Panel(name, version, frozenset([gene_panel1, gene_panel3]))
+            Panel(name, version, {gene_panel1, gene_panel3}, set())
 
 
 if __name__ == "__main__":  # pragma: no cover

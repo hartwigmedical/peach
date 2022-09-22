@@ -1,5 +1,6 @@
-from typing import Set, FrozenSet, Dict, Optional, Union
+from typing import Set, Dict, Optional, Union
 
+from calls.dual_call import DualCall
 from util.gene_coordinate import GeneCoordinate
 from util.reference_assembly import ReferenceAssembly
 from util.reference_site import ReferenceSite
@@ -9,7 +10,13 @@ from panel.variant import Variant
 
 
 class Panel(object):
-    def __init__(self, name: str, version: str, gene_panels: FrozenSet[GenePanel]) -> None:
+    def __init__(
+            self,
+            name: str,
+            version: str,
+            gene_panels: Set[GenePanel],
+            ignored_variants: Set[DualCall],
+    ) -> None:
         gene_to_gene_panel: Dict[str, GenePanel] = {}
         for gene_panel in gene_panels:
             if gene_panel.gene in gene_to_gene_panel.keys():
@@ -28,6 +35,7 @@ class Panel(object):
         self.__name = name
         self.__version = version
         self.__gene_to_gene_panel = gene_to_gene_panel
+        self.__ignored_variants = ignored_variants
 
         self.__rs_id_to_gene = rs_id_to_gene
         self.__v37_reference_site_to_rs_id = self.__get_reference_site_to_rs_id(
@@ -43,6 +51,7 @@ class Panel(object):
                 and self.__name == other.__name
                 and self.__version == other.__version
                 and self.__gene_to_gene_panel == other.__gene_to_gene_panel
+                and self.__ignored_variants == other.__ignored_variants
         )
 
     def __repr__(self) -> str:  # pragma: no cover
@@ -51,6 +60,7 @@ class Panel(object):
             f"name={self.__name!r}, "
             f"version={self.__version!r}, "
             f"gene_panels={frozenset(self.__gene_to_gene_panel.values())!r}, "
+            f"ignored_variants={self.__ignored_variants!r}, "
             f")"
         )
 
@@ -171,7 +181,7 @@ class Panel(object):
 
     @staticmethod
     def __get_reference_site_to_rs_id(
-            gene_panels: FrozenSet[GenePanel], reference_assembly: ReferenceAssembly, name: str
+            gene_panels: Set[GenePanel], reference_assembly: ReferenceAssembly, name: str
     ) -> Dict[ReferenceSite, str]:
         seen_covered_coordinates: Set[GeneCoordinate] = set()
         reference_site_to_rs_id: Dict[ReferenceSite, str] = {}

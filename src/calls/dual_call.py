@@ -5,6 +5,14 @@ from util.reference_assembly import ReferenceAssembly
 from util.reference_site import ReferenceSite
 
 
+class DualCall(NamedTuple):
+    # Call with both v37 and v38 data
+    reference_site_v37: ReferenceSite
+    reference_site_v38: ReferenceSite
+    alt_allele_v37: str
+    alt_allele_v38: str
+
+
 class AnnotatedDualCall(NamedTuple):
     # Call with both v37 and v38 data and annotation
     reference_site_v37: Optional[ReferenceSite]  # Is None if unknown

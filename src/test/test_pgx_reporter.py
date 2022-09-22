@@ -137,12 +137,12 @@ class TestPgxReporter(unittest.TestCase):
 
         result_expected = (
             "gene\thaplotype\tfunction\tlinked_drugs\turl_prescription_info\tpanel_version\trepo_version\thaplotype_only\tzygosity_only\n"
-            "DPYD\t*2A_HET\tNo Function\t5-Fluorouracil;Capecitabine\thttps://www.pharmgkb.org/chemical/PA128406956/guidelineAnnotation/PA166104939;https://www.pharmgkb.org/chemical/PA448771/guidelineAnnotation/PA166104963\tWideTestPanel_v1.0\tV1\t*2A\tHET\n"
-            "DPYD\t*2B_HOM\tNo Function\t5-Fluorouracil;Capecitabine\thttps://www.pharmgkb.org/chemical/PA128406956/guidelineAnnotation/PA166104939;https://www.pharmgkb.org/chemical/PA448771/guidelineAnnotation/PA166104963\tWideTestPanel_v1.0\tV1\t*2B\tHOM\n"
-            "DPYD\t*3_HET\tNormal Function\t5-Fluorouracil;Capecitabine\thttps://www.pharmgkb.org/chemical/PA128406956/guidelineAnnotation/PA166104939;https://www.pharmgkb.org/chemical/PA448771/guidelineAnnotation/PA166104963\tWideTestPanel_v1.0\tV1\t*3\tHET\n"
-            "FAKE\tUnresolved Haplotype\tUnknown Function\tAspirin\thttps://www.pharmgkb.org/some_other_url\tWideTestPanel_v1.0\tV1\tUnresolved Haplotype\tN/A\n"
-            "FAKE2\t*1_HET\tNormal Function\tAspirin\thttps://www.pharmgkb.org/some_other_url\tWideTestPanel_v1.0\tV1\t*1\tHET\n"
-            "FAKE2\t*4A_HET\tReduced Function\tAspirin\thttps://www.pharmgkb.org/some_other_url\tWideTestPanel_v1.0\tV1\t*4A\tHET\n"
+            "DPYD\t*2A_HET\tNo Function\t5-Fluorouracil;Capecitabine\thttps://www.pharmgkb.org/chemical/PA128406956/guidelineAnnotation/PA166104939;https://www.pharmgkb.org/chemical/PA448771/guidelineAnnotation/PA166104963\tWideTestPanel_v1.1\tV1\t*2A\tHET\n"
+            "DPYD\t*2B_HOM\tNo Function\t5-Fluorouracil;Capecitabine\thttps://www.pharmgkb.org/chemical/PA128406956/guidelineAnnotation/PA166104939;https://www.pharmgkb.org/chemical/PA448771/guidelineAnnotation/PA166104963\tWideTestPanel_v1.1\tV1\t*2B\tHOM\n"
+            "DPYD\t*3_HET\tNormal Function\t5-Fluorouracil;Capecitabine\thttps://www.pharmgkb.org/chemical/PA128406956/guidelineAnnotation/PA166104939;https://www.pharmgkb.org/chemical/PA448771/guidelineAnnotation/PA166104963\tWideTestPanel_v1.1\tV1\t*3\tHET\n"
+            "FAKE\tUnresolved Haplotype\tUnknown Function\tAspirin\thttps://www.pharmgkb.org/some_other_url\tWideTestPanel_v1.1\tV1\tUnresolved Haplotype\tN/A\n"
+            "FAKE2\t*1_HET\tNormal Function\tAspirin\thttps://www.pharmgkb.org/some_other_url\tWideTestPanel_v1.1\tV1\t*1\tHET\n"
+            "FAKE2\t*4A_HET\tReduced Function\tAspirin\thttps://www.pharmgkb.org/some_other_url\tWideTestPanel_v1.1\tV1\t*4A\tHET\n"
         )
         self.assertEqual(result_expected, result)
 

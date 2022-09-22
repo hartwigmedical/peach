@@ -7,9 +7,18 @@ from test_resources.test_resource import get_test_resource
 
 
 class TestPanelJsonParsing(unittest.TestCase):
-    def test_load_panel(self) -> None:
+    def test_load_panel_without_ignored_variants(self) -> None:
         """Load panel from json file"""
         panel_path = get_test_resource("test_panel_no_ignored_variants.json")
+        panel = load_panel(panel_path)
+
+        panel_expected = get_wide_example_panel(include_transcript_ids=True, include_ignored_variants=False)
+
+        self.assertEqual(panel_expected, panel)
+
+    def test_load_panel_with_ignored_variants(self) -> None:
+        """Load panel from json file"""
+        panel_path = get_test_resource("test_panel_with_ignored_variants.json")
         panel = load_panel(panel_path)
 
         panel_expected = get_wide_example_panel(include_transcript_ids=True)
@@ -192,7 +201,7 @@ class TestPanelJsonParsing(unittest.TestCase):
             ]
         }
         panel = JsonParser().get_panel(panel_json)
-        panel_expected = get_wide_example_panel(include_transcript_ids=True)
+        panel_expected = get_wide_example_panel(include_transcript_ids=True, include_ignored_variants=False)
 
         self.assertEqual(panel_expected, panel)
 
@@ -369,7 +378,7 @@ class TestPanelJsonParsing(unittest.TestCase):
             ]
         }
         panel = JsonParser().get_panel(panel_json)
-        panel_expected = get_wide_example_panel(include_transcript_ids=False)
+        panel_expected = get_wide_example_panel(include_transcript_ids=False, include_ignored_variants=False)
 
         self.assertEqual(panel_expected, panel)
 

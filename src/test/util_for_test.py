@@ -1,5 +1,6 @@
 from typing import Set
 
+from calls.dual_call import DualCall
 from util.gene_coordinate import GeneCoordinate
 from util.reference_site import ReferenceSite
 from panel.annotation import Annotation
@@ -11,7 +12,7 @@ from panel.rs_id_info import RsIdInfo
 from panel.variant import Variant
 
 
-def get_wide_example_panel(include_transcript_ids: bool) -> Panel:
+def get_wide_example_panel(include_transcript_ids: bool, include_ignored_variants: bool = True) -> Panel:
     dpyd_two_a_variant = Variant("rs3918290", "T")
     dpyd_two_b_variant = Variant("rs1801159", "C")
     dpyd_three_variant = Variant("rs72549303", "TG")
@@ -78,11 +79,29 @@ def get_wide_example_panel(include_transcript_ids: bool) -> Panel:
         "FAKE2", "*1", "ENST0000021918" if include_transcript_ids else None,
         fake2_haplotypes, fake2_rs_id_infos, fake2_drugs,
     )
-    gene_panels = frozenset({dpyd_gene_panel, fake_gene_panel, fake2_gene_panel})
+    gene_panels = {dpyd_gene_panel, fake_gene_panel, fake2_gene_panel}
 
     name = "WideTestPanel"
-    version = "1.0"
-    return Panel(name, version, gene_panels)
+    if include_ignored_variants:
+        version = "1.1"
+        ignored_variants = {
+            DualCall(
+                ReferenceSite(GeneCoordinate("1", 97909382), "AG"),
+                ReferenceSite(GeneCoordinate("chr1", 97458294), "AC"),
+                "TC",
+                "TG",
+            ),
+            DualCall(
+                ReferenceSite(GeneCoordinate("16", 97915617), "A"),
+                ReferenceSite(GeneCoordinate("chr16", 97450060), "A"),
+                "C",
+                "C",
+            ),
+        }
+    else:
+        version = "1.0"
+        ignored_variants = set()
+    return Panel(name, version, gene_panels, ignored_variants)
 
 
 def get_narrow_example_panel(included_haplotypes: Set[str]) -> Panel:
@@ -137,16 +156,16 @@ def get_narrow_example_panel(included_haplotypes: Set[str]) -> Panel:
         DrugSummary("Capecitabine", "https://www.pharmgkb.org/chemical/PA448771/guidelineAnnotation/PA166104963"),
     })
 
-    gene_panels = frozenset({
+    gene_panels = {
         GenePanel(
             "DPYD", "*1", None, included_dpyd_haplotypes, included_dpyd_rs_id_infos,
             dpyd_drugs,
         ),
-    })
+    }
     name = "NarrowTestPanel"
     version = "1.0"
-    return Panel(name, version, gene_panels)
+    return Panel(name, version, gene_panels, set())
 
 
 def get_empty_panel() -> Panel:
-    return Panel("EmptyPanel", "0.3", frozenset())
+    return Panel("EmptyPanel", "0.3", set(), set())
