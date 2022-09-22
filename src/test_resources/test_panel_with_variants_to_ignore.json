@@ -1,7 +1,7 @@
 {
   "panelName": "WideTestPanel",
   "panelVersion": "1.1",
-  "ignoredVariants": [
+  "variantsToIgnore": [
     {
       "chromosomeV37": "1",
       "chromosomeV38": "chr1",

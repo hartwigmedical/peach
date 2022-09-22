@@ -12,7 +12,7 @@ from panel.rs_id_info import RsIdInfo
 from panel.variant import Variant
 
 
-def get_wide_example_panel(include_transcript_ids: bool, include_ignored_variants: bool = True) -> Panel:
+def get_wide_example_panel(include_transcript_ids: bool, include_variants_to_ignore: bool = True) -> Panel:
     dpyd_two_a_variant = Variant("rs3918290", "T")
     dpyd_two_b_variant = Variant("rs1801159", "C")
     dpyd_three_variant = Variant("rs72549303", "TG")
@@ -82,9 +82,9 @@ def get_wide_example_panel(include_transcript_ids: bool, include_ignored_variant
     gene_panels = {dpyd_gene_panel, fake_gene_panel, fake2_gene_panel}
 
     name = "WideTestPanel"
-    if include_ignored_variants:
+    if include_variants_to_ignore:
         version = "1.1"
-        ignored_variants = {
+        variants_to_ignore = {
             DualCall(
                 ReferenceSite(GeneCoordinate("1", 97909382), "AG"),
                 ReferenceSite(GeneCoordinate("chr1", 97458294), "AC"),
@@ -100,8 +100,8 @@ def get_wide_example_panel(include_transcript_ids: bool, include_ignored_variant
         }
     else:
         version = "1.0"
-        ignored_variants = set()
-    return Panel(name, version, gene_panels, ignored_variants)
+        variants_to_ignore = set()
+    return Panel(name, version, gene_panels, variants_to_ignore)
 
 
 def get_narrow_example_panel(included_haplotypes: Set[str]) -> Panel:

@@ -19,7 +19,7 @@ class JsonParser(object):
     PANEL_NAME_KEY = "panelName"
     PANEL_VERSION_KEY = "panelVersion"
     GENES_KEY = "genes"
-    IGNORED_VARIANTS_KEY = "ignoredVariants"
+    VARIANTS_TO_IGNORE_KEY = "variantsToIgnore"
 
     # per gene
     GENE_NAME_KEY = "gene"
@@ -61,15 +61,15 @@ class JsonParser(object):
         name = str(data[self.PANEL_NAME_KEY])
         version = str(data[self.PANEL_VERSION_KEY])
         gene_panels = {self.get_gene_panel(gene_panel_json) for gene_panel_json in data[self.GENES_KEY]}
-        if self.IGNORED_VARIANTS_KEY in data.keys():
-            ignored_variants = {
-                self.get_ignored_variant(variant_json) for variant_json in data[self.IGNORED_VARIANTS_KEY]
+        if self.VARIANTS_TO_IGNORE_KEY in data.keys():
+            variants_to_ignore = {
+                self.get_variant_to_ignore(variant_json) for variant_json in data[self.VARIANTS_TO_IGNORE_KEY]
             }
         else:
-            ignored_variants = set()
-        return Panel(name, version, gene_panels, ignored_variants)
+            variants_to_ignore = set()
+        return Panel(name, version, gene_panels, variants_to_ignore)
 
-    def get_ignored_variant(self, data: Json) -> DualCall:
+    def get_variant_to_ignore(self, data: Json) -> DualCall:
         chromosome_v37 = data[self.CHROMOSOME_V37_KEY]
         chromosome_v38 = data[self.CHROMOSOME_V38_KEY]
         position_v37 = data[self.POSITION_V37_KEY]
@@ -81,8 +81,8 @@ class JsonParser(object):
 
         reference_site_v37 = ReferenceSite(GeneCoordinate(chromosome_v37, int(position_v37)), reference_allele_v37)
         reference_site_v38 = ReferenceSite(GeneCoordinate(chromosome_v38, int(position_v38)), reference_allele_v38)
-        call = DualCall(reference_site_v37, reference_site_v38, alt_allele_v37, alt_allele_v38)
-        return call
+        variant = DualCall(reference_site_v37, reference_site_v38, alt_allele_v37, alt_allele_v38)
+        return variant
 
     def get_gene_panel(self, data: Json) -> GenePanel:
         gene = str(data[self.GENE_NAME_KEY])

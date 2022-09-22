@@ -15,7 +15,7 @@ class Panel(object):
             name: str,
             version: str,
             gene_panels: Set[GenePanel],
-            ignored_variants: Set[DualCall],
+            variants_to_ignore: Set[DualCall],
     ) -> None:
         gene_to_gene_panel: Dict[str, GenePanel] = {}
         for gene_panel in gene_panels:
@@ -35,7 +35,7 @@ class Panel(object):
         self.__name = name
         self.__version = version
         self.__gene_to_gene_panel = gene_to_gene_panel
-        self.__ignored_variants = ignored_variants
+        self.__variants_to_ignore = variants_to_ignore
 
         self.__rs_id_to_gene = rs_id_to_gene
         self.__v37_reference_site_to_rs_id = self.__get_reference_site_to_rs_id(
@@ -51,7 +51,7 @@ class Panel(object):
                 and self.__name == other.__name
                 and self.__version == other.__version
                 and self.__gene_to_gene_panel == other.__gene_to_gene_panel
-                and self.__ignored_variants == other.__ignored_variants
+                and self.__variants_to_ignore == other.__variants_to_ignore
         )
 
     def __repr__(self) -> str:  # pragma: no cover
@@ -60,7 +60,7 @@ class Panel(object):
             f"name={self.__name!r}, "
             f"version={self.__version!r}, "
             f"gene_panels={frozenset(self.__gene_to_gene_panel.values())!r}, "
-            f"ignored_variants={self.__ignored_variants!r}, "
+            f"variants_to_ignore={self.__variants_to_ignore!r}, "
             f")"
         )
 
