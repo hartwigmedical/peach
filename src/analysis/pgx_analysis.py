@@ -5,15 +5,17 @@ from typing import Dict, Set, FrozenSet
 from util.constants import REF_CALL_ANNOTATION_STRING
 from util.filter import VcfCallFilter
 from calls.haplotype_call import HaplotypeCall
-from calls.dual_call import DualCall, DualCallData
-from calls.vcf_call import VcfCallData, VcfCall
+from calls.dual_call import AnnotatedDualCall, AnnotatedDualCallData
+from calls.single_call import VcfCall, VcfCallData
 from analysis.dual_call_constructor import DualCallConstructor
 from panel.panel import Panel
 from analysis.haplotype_caller import HaplotypeCaller
 
 
 class PgxAnalysis(object):
-    def __init__(self, dual_call_data: DualCallData, gene_to_haplotype_calls: Dict[str, Set[HaplotypeCall]]) -> None:
+    def __init__(
+            self, dual_call_data: AnnotatedDualCallData, gene_to_haplotype_calls: Dict[str, Set[HaplotypeCall]]
+    ) -> None:
         self.__dual_call_data = dual_call_data
         self.__gene_to_haplotype_calls = gene_to_haplotype_calls
 
@@ -32,7 +34,7 @@ class PgxAnalysis(object):
             f")"
         )
 
-    def get_all_dual_calls(self) -> FrozenSet[DualCall]:
+    def get_all_dual_calls(self) -> FrozenSet[AnnotatedDualCall]:
         return self.__dual_call_data.calls
 
     def get_gene_to_haplotype_calls(self) -> Dict[str, Set[HaplotypeCall]]:
@@ -45,7 +47,7 @@ class PgxAnalyser(object):
         complete_vcf_call_data = self.__add_calls_for_uncalled_variants_in_panel(vcf_call_data, panel)
 
         logging.info(f"Annotating call data for reference assembly {vcf_call_data.reference_assembly.opposite().name}")
-        dual_call_data = DualCallConstructor().get_dual_call_data(complete_vcf_call_data, panel)
+        dual_call_data = DualCallConstructor().get_annotated_dual_call_data(complete_vcf_call_data, panel)
 
         logging.info(f"Calling haplotypes")
         gene_to_haplotype_calls = HaplotypeCaller().get_gene_to_haplotypes_call(dual_call_data, panel)

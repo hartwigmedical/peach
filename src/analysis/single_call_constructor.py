@@ -1,23 +1,22 @@
 from typing import Optional, Tuple
 
 from util.reference_assembly import ReferenceAssembly
-from calls.single_call import SingleCall
-from calls.vcf_call import VcfCall
+from calls.single_call import AnnotatedSingleCall, VcfCall
 from panel.panel import Panel
 
 
 class SingleCallConstructor(object):
-    def get_single_call(
+    def get_annotated_single_call(
             self,
             vcf_call: VcfCall,
             call_reference_assembly: ReferenceAssembly,
             panel: Panel,
-    ) -> SingleCall:
+    ) -> AnnotatedSingleCall:
         matching_rs_id = panel.get_perfectly_matching_rs_id(vcf_call, call_reference_assembly)
         rs_ids_tuple = self.__get_correct_rs_ids_for_vcf_call(vcf_call, matching_rs_id)
         gene = self.__get_correct_gene_for_vcf_call(vcf_call, call_reference_assembly, panel)
 
-        return SingleCall(
+        return AnnotatedSingleCall(
             vcf_call.reference_site,
             vcf_call.alleles,
             gene,

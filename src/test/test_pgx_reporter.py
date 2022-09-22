@@ -6,7 +6,7 @@ from util.gene_coordinate import GeneCoordinate
 from util.reference_assembly import ReferenceAssembly
 from util.reference_site import ReferenceSite
 from calls.haplotype_call import HaplotypeCall
-from calls.dual_call import DualCall, DualCallData
+from calls.dual_call import AnnotatedDualCall, AnnotatedDualCallData
 from analysis.pgx_analysis import PgxAnalysis
 from pgx_reporter import GenotypeReporter, HaplotypeReporter
 from test.util_for_test import get_wide_example_panel, get_empty_panel
@@ -14,7 +14,7 @@ from test.util_for_test import get_wide_example_panel, get_empty_panel
 
 class TestPgxReporter(unittest.TestCase):
     def test_genotype_reporter_empty(self) -> None:
-        pgx_analysis = PgxAnalysis(DualCallData(frozenset()), {})
+        pgx_analysis = PgxAnalysis(AnnotatedDualCallData(frozenset()), {})
         panel_id = "Panel_v0.2"
         version = "V1"
         result = GenotypeReporter().get_calls_tsv_text(pgx_analysis, panel_id, version, ReferenceAssembly.V37)
@@ -27,32 +27,32 @@ class TestPgxReporter(unittest.TestCase):
 
     def test_genotype_reporter_non_empty_input_v37(self) -> None:
         all_dual_calls = frozenset({
-            DualCall(
+            AnnotatedDualCall(
                 ReferenceSite(GeneCoordinate("1", 1), "C"), None, ("C", "CAG"),
                 "DPYD", ("rs664",), "1A>C;1A>G", DualCallFilter.PASS, "1A>C;1A>G?", DualCallFilter.UNKNOWN,
             ),
-            DualCall(
+            AnnotatedDualCall(
                 ReferenceSite(GeneCoordinate("1", 5), "A"), ReferenceSite(GeneCoordinate("chr1", 25), "A"), ("G", "C"),
                 "DPYD", tuple(), None, DualCallFilter.PASS, None, DualCallFilter.PASS,
             ),
-            DualCall(
+            AnnotatedDualCall(
                 ReferenceSite(GeneCoordinate("1", 15), "C"), None, ("C", "CAG"),
                 "DPYD", ("rs536",), "35A>C;35A>G", DualCallFilter.PASS, "35A>C;35A>G?", DualCallFilter.UNKNOWN,
             ),
-            DualCall(
+            AnnotatedDualCall(
                 ReferenceSite(GeneCoordinate("X", 15), "TT"), ReferenceSite(GeneCoordinate("chrX", 40), "AA"), ("TT", "TT"),
                 "GENE", ("rs23",), "REF_CALL", DualCallFilter.NO_CALL, "627AA>TT", DualCallFilter.INFERRED_PASS,
             ),
-            DualCall(
+            AnnotatedDualCall(
                 ReferenceSite(GeneCoordinate("2", 154663), "T"), ReferenceSite(GeneCoordinate("chr2", 40565464), "T"), ("T", "T"),
                 "BRAF", ("rs154", "rs8839"), "REF_CALL", DualCallFilter.NO_CALL, "REF_CALL", DualCallFilter.NO_CALL,
             ),
-            DualCall(
+            AnnotatedDualCall(
                 ReferenceSite(GeneCoordinate("15", 24113), "A"), ReferenceSite(GeneCoordinate("chr15", 684633), "T"), ("T", "T"),
                 ".", ("rs462", "rs9820", "rs536"), "29482A>T", DualCallFilter.PASS, "REF_CALL", DualCallFilter.PASS,
             ),
         })
-        pgx_analysis = PgxAnalysis(DualCallData(all_dual_calls), {})
+        pgx_analysis = PgxAnalysis(AnnotatedDualCallData(all_dual_calls), {})
         panel_id = "Panel_v0.2"
         version = "V1"
         result = GenotypeReporter().get_calls_tsv_text(pgx_analysis, panel_id, version, ReferenceAssembly.V37)
@@ -71,32 +71,32 @@ class TestPgxReporter(unittest.TestCase):
 
     def test_genotype_reporter_non_empty_input_v38(self) -> None:
         all_dual_calls = frozenset({
-            DualCall(
+            AnnotatedDualCall(
                 None, ReferenceSite(GeneCoordinate("chr1", 15), "C"), ("C", "CAG"),
                 "DPYD", ("rs353",), "3A>C;3A>G?", DualCallFilter.UNKNOWN, "3A>C;3A>G", DualCallFilter.PASS,
             ),
-            DualCall(
+            AnnotatedDualCall(
                 ReferenceSite(GeneCoordinate("1", 5), "A"), ReferenceSite(GeneCoordinate("chr1", 25), "A"), ("G", "C"),
                 "DPYD", tuple(), None, DualCallFilter.PASS, None, DualCallFilter.PASS,
             ),
-            DualCall(
+            AnnotatedDualCall(
                 None, ReferenceSite(GeneCoordinate("chr1", 35), "C"), ("C", "CAG"),
                 "DPYD", ("rs536",), "35A>C;35A>G?", DualCallFilter.UNKNOWN, "35A>C;35A>G", DualCallFilter.PASS,
             ),
-            DualCall(
+            AnnotatedDualCall(
                 ReferenceSite(GeneCoordinate("X", 15), "AA"), ReferenceSite(GeneCoordinate("chrX", 40), "TT"), ("TT", "TT"),
                 "GENE", ("rs23",), "627AA>TT", DualCallFilter.INFERRED_PASS, "REF_CALL", DualCallFilter.NO_CALL,
             ),
-            DualCall(
+            AnnotatedDualCall(
                 ReferenceSite(GeneCoordinate("2", 154663), "T"), ReferenceSite(GeneCoordinate("chr2", 40565464), "T"), ("T", "T"),
                 "BRAF", ("rs154", "rs8839"), "REF_CALL", DualCallFilter.NO_CALL, "REF_CALL", DualCallFilter.NO_CALL,
             ),
-            DualCall(
+            AnnotatedDualCall(
                 ReferenceSite(GeneCoordinate("15", 24113), "T"), ReferenceSite(GeneCoordinate("chr15", 684633), "A"), ("T", "T"),
                 ".", ("rs462", "rs9820", "rs536"), "REF_CALL", DualCallFilter.PASS, "29482A>T", DualCallFilter.PASS,
             ),
         })
-        pgx_analysis = PgxAnalysis(DualCallData(all_dual_calls), {})
+        pgx_analysis = PgxAnalysis(AnnotatedDualCallData(all_dual_calls), {})
         panel_id = "Panel_v0.2"
         version = "V1"
         result = GenotypeReporter().get_calls_tsv_text(pgx_analysis, panel_id, version, ReferenceAssembly.V38)
@@ -114,7 +114,7 @@ class TestPgxReporter(unittest.TestCase):
         self.assertEqual(result_expected, result)
 
     def test_haplotype_reporter_empty(self) -> None:
-        pgx_analysis = PgxAnalysis(DualCallData(frozenset()), {})
+        pgx_analysis = PgxAnalysis(AnnotatedDualCallData(frozenset()), {})
         panel = get_empty_panel()
         version = "V1"
         result = HaplotypeReporter().get_genotype_tsv_text(pgx_analysis, panel, version)
@@ -130,7 +130,7 @@ class TestPgxReporter(unittest.TestCase):
             "FAKE": set(),
             "FAKE2": {HaplotypeCall("*1", 1), HaplotypeCall("*4A", 1)},
         }
-        pgx_analysis = PgxAnalysis(DualCallData(frozenset()), gene_to_haplotype_calls)
+        pgx_analysis = PgxAnalysis(AnnotatedDualCallData(frozenset()), gene_to_haplotype_calls)
         panel = get_wide_example_panel(include_transcript_ids=True)
         version = "V1"
         result = HaplotypeReporter().get_genotype_tsv_text(pgx_analysis, panel, version)

@@ -5,7 +5,7 @@ from util.reference_assembly import ReferenceAssembly
 from util.reference_site import ReferenceSite
 
 
-class DualCall(NamedTuple):
+class AnnotatedDualCall(NamedTuple):
     # Call with both v37 and v38 data and annotation
     reference_site_v37: Optional[ReferenceSite]  # Is None if unknown
     reference_site_v38: Optional[ReferenceSite]  # Is None if unknown
@@ -26,8 +26,8 @@ class DualCall(NamedTuple):
             raise NotImplementedError(f"Unrecognized reference assembly: {reference_assembly}")
 
 
-class DualCallData(NamedTuple):
-    calls: FrozenSet[DualCall]
+class AnnotatedDualCallData(NamedTuple):
+    calls: FrozenSet[AnnotatedDualCall]
 
     def __repr__(self) -> str:  # pragma: no cover
         calls_string = ", ".join(sorted([repr(call) for call in self.calls]))

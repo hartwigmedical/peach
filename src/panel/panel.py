@@ -3,8 +3,7 @@ from typing import Set, FrozenSet, Dict, Optional, Union
 from util.gene_coordinate import GeneCoordinate
 from util.reference_assembly import ReferenceAssembly
 from util.reference_site import ReferenceSite
-from calls.single_call import SingleCall
-from calls.vcf_call import VcfCall
+from calls.single_call import AnnotatedSingleCall, VcfCall
 from panel.gene_panel import GenePanel
 from panel.variant import Variant
 
@@ -118,7 +117,7 @@ class Panel(object):
         return relevant_rs_ids
 
     def get_perfectly_matching_rs_id(
-            self, call: Union[VcfCall, SingleCall], reference_assembly: ReferenceAssembly
+            self, call: Union[VcfCall, AnnotatedSingleCall], reference_assembly: ReferenceAssembly
     ) -> Optional[str]:
         matching_rs_id: Optional[str]
         if self.__contains_rs_id_with_reference_site(call.reference_site, reference_assembly):

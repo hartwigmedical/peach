@@ -5,7 +5,7 @@ from util.constants import REF_CALL_ANNOTATION_STRING
 from util.filter import DualCallFilter
 from util.reference_assembly import ReferenceAssembly
 from util.reference_site import ReferenceSite
-from calls.single_call import SingleCall
+from calls.single_call import AnnotatedSingleCall
 from panel.panel import Panel
 
 
@@ -18,7 +18,7 @@ class Translation(NamedTuple):
 class SingleCallTranslator(object):
     def get_translation(
             self,
-            single_call: SingleCall,
+            single_call: AnnotatedSingleCall,
             call_reference_assembly: ReferenceAssembly,
             panel: Panel,
     ) -> Translation:
@@ -65,7 +65,7 @@ class SingleCallTranslator(object):
 
     def __get_translated_filter_and_variant_annotation_for_ref_seq_difference(
             self,
-            single_call: SingleCall,
+            single_call: AnnotatedSingleCall,
             call_reference_assembly: ReferenceAssembly,
             matching_rs_id: str,
             panel: Panel,

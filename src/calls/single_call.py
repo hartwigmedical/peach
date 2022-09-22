@@ -1,10 +1,11 @@
-from typing import NamedTuple, Tuple, Optional
+from typing import NamedTuple, Tuple, Optional, FrozenSet
 
 from util.filter import VcfCallFilter
+from util.reference_assembly import ReferenceAssembly
 from util.reference_site import ReferenceSite
 
 
-class SingleCall(NamedTuple):
+class AnnotatedSingleCall(NamedTuple):
     """
     Call with data and annotation for only a single reference assembly version. So only v37 or v38.
     Annotation fixes etc. with data from the panel has already been done at this point.
@@ -23,3 +24,24 @@ class SingleCall(NamedTuple):
             return False
         else:
             raise NotImplementedError("Unrecognized filter value")
+
+
+class VcfCall(NamedTuple):
+    """
+    Call as it was extracted from the input VCF.
+    Has data and annotation for only a single reference assembly version. So only v37 or v38.
+    """
+    reference_site: ReferenceSite
+    alleles: Tuple[str, str]  # The order is (ref, alt) when there is one of each
+    rs_ids: Tuple[str, ...]
+    variant_annotation: Optional[str]  # Is None if unknown
+    filter: VcfCallFilter
+
+
+class VcfCallData(NamedTuple):
+    calls: FrozenSet[VcfCall]
+    reference_assembly: ReferenceAssembly
+
+    def __repr__(self) -> str:  # pragma: no cover
+        calls_string = "frozenset(" + ", ".join(sorted([repr(call) for call in self.calls])) + ")"
+        return f"VcfCallData({calls_string}, {self.reference_assembly!r})"

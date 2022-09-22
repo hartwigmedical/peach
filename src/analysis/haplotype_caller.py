@@ -6,7 +6,7 @@ from typing import Dict, Set, DefaultDict, Tuple
 from util.gene_coordinate import GeneCoordinate
 from util.reference_assembly import ReferenceAssembly
 from calls.haplotype_call import HaplotypeCall
-from calls.dual_call import DualCall, DualCallData
+from calls.dual_call import AnnotatedDualCall, AnnotatedDualCallData
 from panel.panel import Panel
 from panel.variant import Variant
 
@@ -14,7 +14,9 @@ from panel.variant import Variant
 class HaplotypeCaller(object):
     HAPLOTYPE_CALLING_REFERENCE_ASSEMBLY = ReferenceAssembly.V38
 
-    def get_gene_to_haplotypes_call(self, dual_call_data: DualCallData, panel: Panel) -> Dict[str, Set[HaplotypeCall]]:
+    def get_gene_to_haplotypes_call(
+            self, dual_call_data: AnnotatedDualCallData, panel: Panel
+    ) -> Dict[str, Set[HaplotypeCall]]:
         self.__assert_call_data_is_handleable(dual_call_data)
 
         gene_to_haplotype_calls = {}
@@ -23,7 +25,9 @@ class HaplotypeCaller(object):
             gene_to_haplotype_calls[gene] = self.__get_haplotypes_call(gene, dual_call_data, panel)
         return gene_to_haplotype_calls
 
-    def __get_haplotypes_call(self, gene: str, dual_call_data: DualCallData, panel: Panel) -> Set[HaplotypeCall]:
+    def __get_haplotypes_call(
+            self, gene: str, dual_call_data: AnnotatedDualCallData, panel: Panel
+    ) -> Set[HaplotypeCall]:
         try:
             variant_to_count = self.__get_variant_to_count_for_gene(dual_call_data, gene)
 
@@ -49,7 +53,9 @@ class HaplotypeCaller(object):
             logging.error(f"Cannot resolve haplotype for gene {gene}. Error: {e}")
             return set()
 
-    def __get_variant_to_count_for_gene(self, dual_call_data: DualCallData, gene: str) -> DefaultDict[Variant, int]:
+    def __get_variant_to_count_for_gene(
+            self, dual_call_data: AnnotatedDualCallData, gene: str
+    ) -> DefaultDict[Variant, int]:
         dual_calls_for_gene = {call for call in dual_call_data.calls if call.gene == gene}
         variant_to_count: DefaultDict[Variant, int] = collections.defaultdict(int)
         for call in dual_calls_for_gene:
@@ -132,7 +138,7 @@ class HaplotypeCaller(object):
 
         return haplotype_calls
 
-    def __assert_handleable_call(self, call: DualCall) -> None:
+    def __assert_handleable_call(self, call: AnnotatedDualCall) -> None:
         if len(call.rs_ids) > 1:
             error_msg = f"Call has more than one rs id: rs ids={call.rs_ids}, call={call}"
             raise ValueError(error_msg)
@@ -143,7 +149,7 @@ class HaplotypeCaller(object):
             error_msg = f"Call has unknown rs id: call={call}"
             raise ValueError(error_msg)
 
-    def __assert_call_data_is_handleable(self, dual_call_data: DualCallData) -> None:
+    def __assert_call_data_is_handleable(self, dual_call_data: AnnotatedDualCallData) -> None:
         handled_v37_coordinates: Set[GeneCoordinate] = set()
         handled_v38_coordinates: Set[GeneCoordinate] = set()
         handled_rs_ids: Set[str] = set()
@@ -185,4 +191,3 @@ class HaplotypeCaller(object):
             else:
                 warning_msg = f"Could not determine relevant v38 coordinates for call:\n" f"call={dual_call}"
                 logging.warning(warning_msg)
-

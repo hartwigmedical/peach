@@ -10,7 +10,7 @@ from util.constants import REF_CALL_ANNOTATION_STRING
 from util.filter import VcfCallFilter
 from util.gene_coordinate import GeneCoordinate
 from util.reference_assembly import ReferenceAssembly
-from calls.vcf_call import VcfCall, VcfCallData
+from calls.single_call import VcfCall, VcfCallData
 from panel.panel import Panel
 
 
