@@ -9,7 +9,7 @@ from test_resources.test_resource import get_test_resource
 class TestPanelJsonParsing(unittest.TestCase):
     def test_load_panel(self) -> None:
         """Load panel from json file"""
-        panel_path = get_test_resource("test_panel.json")
+        panel_path = get_test_resource("test_panel_no_ignored_variants.json")
         panel = load_panel(str(panel_path))
 
         panel_expected = get_wide_example_panel(include_transcript_ids=True)
@@ -197,7 +197,7 @@ class TestPanelJsonParsing(unittest.TestCase):
         self.assertEqual(panel_expected, panel)
 
     def test_json_parser_without_transcript_ids(self) -> None:
-        """Load panel from json dictionary with transcript_ids"""
+        """Load panel from json dictionary without transcript_ids"""
         panel_json = {
             "panelName": "WideTestPanel",
             "panelVersion": "1.0",
@@ -375,7 +375,7 @@ class TestPanelJsonParsing(unittest.TestCase):
 
     def test_panel_name_from_json(self) -> None:
         """Test extraction and formatting of panel name with version"""
-        panel_path = get_test_resource("test_panel.json")
+        panel_path = get_test_resource("test_panel_no_ignored_variants.json")
         panel = load_panel(str(panel_path))
         expected_panel_id = "WideTestPanel_v1.0"
         self.assertEqual(expected_panel_id, panel.get_id())
