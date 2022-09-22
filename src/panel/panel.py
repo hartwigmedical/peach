@@ -110,6 +110,10 @@ class Panel(object):
         reference_site_to_rs_id = self.__get_matching_reference_site_to_rs_id(reference_assembly)
         covered_coordinates_call = call.reference_site.get_covered_coordinates()
 
+        for variant in self.__variants_to_ignore:
+            if call.matches(variant, reference_assembly):
+                return False
+
         for reference_site, rs_id in reference_site_to_rs_id.items():
             if reference_site.get_covered_coordinates().intersection(covered_coordinates_call) or rs_id in call.rs_ids:
                 return True

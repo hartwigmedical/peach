@@ -1,5 +1,6 @@
 from typing import NamedTuple, Tuple, Optional, FrozenSet
 
+from calls.dual_call import DualCall
 from util.filter import VcfCallFilter
 from util.reference_assembly import ReferenceAssembly
 from util.reference_site import ReferenceSite
@@ -37,6 +38,20 @@ class VcfCall(NamedTuple):
     variant_annotation: Optional[str]  # Is None if unknown
     filter: VcfCallFilter
 
+    def matches(self, call: DualCall, reference_assembly: ReferenceAssembly) -> bool:
+        if reference_assembly == ReferenceAssembly.V37:
+            result = (
+                    self.reference_site == call.reference_site_v37
+                    and set(self.alleles).issubset({call.reference_site_v37.allele, call.alt_allele_v37})
+            )
+        elif reference_assembly == ReferenceAssembly.V38:
+            result = (
+                    self.reference_site == call.reference_site_v38
+                    and set(self.alleles).issubset({call.reference_site_v38.allele, call.alt_allele_v38})
+            )
+        else:
+            raise ValueError(f"Unexpected reference assembly: {reference_assembly}")
+        return result
 
 class VcfCallData(NamedTuple):
     calls: FrozenSet[VcfCall]
