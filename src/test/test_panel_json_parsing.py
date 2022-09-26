@@ -137,6 +137,16 @@ class TestPanelJsonParsing(unittest.TestCase):
                                     "altAlleleV38": "C"
                                 }
                             ]
+                        },
+                        {
+                            "haplotypeName": "*5",
+                            "function": "Reduced Function",
+                            "haplotypeVariants": [
+                                {
+                                    "rsid": "rs1212125",
+                                    "altAlleleV38": "G"
+                                }
+                            ]
                         }
                     ],
                     "variants": [
@@ -313,6 +323,16 @@ class TestPanelJsonParsing(unittest.TestCase):
                                 {
                                     "rsid": "rs1212125",
                                     "altAlleleV38": "C"
+                                }
+                            ]
+                        },
+                        {
+                            "haplotypeName": "*5",
+                            "function": "Reduced Function",
+                            "haplotypeVariants": [
+                                {
+                                    "rsid": "rs1212125",
+                                    "altAlleleV38": "G"
                                 }
                             ]
                         }

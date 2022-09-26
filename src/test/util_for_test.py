@@ -16,7 +16,8 @@ def get_wide_example_panel(include_transcript_ids: bool, include_variants_to_ign
     dpyd_two_a_variant = Variant("rs3918290", "T")
     dpyd_two_b_variant = Variant("rs1801159", "C")
     dpyd_three_variant = Variant("rs72549303", "TG")
-    fake_variant = Variant("rs1212125", "C")
+    fake_four_variant = Variant("rs1212125", "C")
+    fake_five_variant = Variant("rs1212125", "G")
     fake2_variant = Variant("rs1212127", "C")
 
     dpyd_haplotypes = frozenset({
@@ -44,7 +45,8 @@ def get_wide_example_panel(include_transcript_ids: bool, include_variants_to_ign
     })
 
     fake_haplotypes = frozenset({
-        Haplotype("*4A", "Reduced Function", frozenset({fake_variant})),
+        Haplotype("*4A", "Reduced Function", frozenset({fake_four_variant})),
+        Haplotype("*5", "Reduced Function", frozenset({fake_five_variant})),
     })
     fake_rs_id_infos = frozenset({
         RsIdInfo(
