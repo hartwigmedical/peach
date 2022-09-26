@@ -1403,6 +1403,122 @@ class TestPgxAnalysis(unittest.TestCase):
         pgx_analysis_expected = PgxAnalysis(AnnotatedDualCallData(all_dual_calls_expected), gene_to_haplotype_calls_expected)
         self.assertEqual(pgx_analysis_expected, pgx_analysis)
 
+    def test_multiple_calls_with_different_alts_v37(self) -> None:
+        """
+            Can handle multiple heterozygous calls with different alts at same position,
+            if alts are all known variants.
+        """
+        panel = get_wide_example_panel(include_transcript_ids=True)
+        vcf_call_data = VcfCallData(frozenset({
+            VcfCall(
+                ReferenceSite(GeneCoordinate("5", 97915617), "T"), ("T", "C"),
+                ("rs1212125",), "1324T>C", VcfCallFilter.PASS),
+            VcfCall(
+                ReferenceSite(GeneCoordinate("5", 97915617), "T"), ("T", "G"),
+                ("rs1212125",), "1324T>G", VcfCallFilter.PASS),
+        }), ReferenceAssembly.V37)
+        pgx_analysis = PgxAnalyser().create_pgx_analysis(vcf_call_data, panel)
+
+        gene_to_haplotype_calls_expected = {
+            "DPYD": {HaplotypeCall("*3", 2)},
+            "FAKE": {HaplotypeCall("*4A", 1), HaplotypeCall("*5", 1)},
+            "FAKE2": {HaplotypeCall("*4A", 2)},
+        }
+
+        all_dual_calls_expected = frozenset({
+            AnnotatedDualCall(
+                ReferenceSite(GeneCoordinate("1", 97915614), "C"), ReferenceSite(GeneCoordinate("chr1", 97450058), "C"),
+                ("C", "C"), "DPYD", ("rs3918290",),
+                "REF_CALL", DualCallFilter.NO_CALL, "REF_CALL", DualCallFilter.NO_CALL,
+            ),
+            AnnotatedDualCall(
+                ReferenceSite(GeneCoordinate("1", 97915621), "TG"), ReferenceSite(GeneCoordinate("chr1", 97450065), "TC"),
+                ("TG", "TG"), "DPYD", ("rs72549303",),
+                "REF_CALL", DualCallFilter.NO_CALL, "6744GA>CA", DualCallFilter.INFERRED_PASS,
+            ),
+            AnnotatedDualCall(
+                ReferenceSite(GeneCoordinate("1", 97981395), "T"), ReferenceSite(GeneCoordinate("chr1", 97515839), "T"),
+                ("T", "T"), "DPYD", ("rs1801159",),
+                "REF_CALL", DualCallFilter.NO_CALL, "REF_CALL", DualCallFilter.NO_CALL,
+            ),
+            AnnotatedDualCall(
+                ReferenceSite(GeneCoordinate("1", 98205966), "GATGA"), ReferenceSite(GeneCoordinate("chr1", 97740410), "GATGA"),
+                ("GATGA", "GATGA"), "DPYD", ("rs72549309",),
+                "REF_CALL", DualCallFilter.NO_CALL, "REF_CALL", DualCallFilter.NO_CALL,
+            ),
+            AnnotatedDualCall(
+                ReferenceSite(GeneCoordinate("16", 97915617), "C"), ReferenceSite(GeneCoordinate("chr16", 97450060), "T"),
+                ("C", "C"), "FAKE2", ("rs1212127",),
+                "REF_CALL", DualCallFilter.NO_CALL, "1324T>C", DualCallFilter.INFERRED_PASS,
+            ),
+            AnnotatedDualCall(
+                ReferenceSite(GeneCoordinate("5", 97915617), "T"), ReferenceSite(GeneCoordinate("chr5", 97450060), "T"),
+                ("T", "C"), "FAKE", ("rs1212125",),
+                "1324T>C", DualCallFilter.PASS, "1324T>C", DualCallFilter.PASS,
+            ),
+            AnnotatedDualCall(
+                ReferenceSite(GeneCoordinate("5", 97915617), "T"), ReferenceSite(GeneCoordinate("chr5", 97450060), "T"),
+                ("T", "G"), "FAKE", ("rs1212125",),
+                "1324T>G", DualCallFilter.PASS, "1324T>G", DualCallFilter.PASS,
+            ),
+        })
+        pgx_analysis_expected = PgxAnalysis(AnnotatedDualCallData(all_dual_calls_expected), gene_to_haplotype_calls_expected)
+        self.assertEqual(pgx_analysis_expected, pgx_analysis)
+
+    def test_homozygous_call_at_site_with_different_alts_v37(self) -> None:
+        """
+            Can handle multiple heterozygous calls with different alts at same position,
+            if alts are all known variants.
+        """
+        panel = get_wide_example_panel(include_transcript_ids=True)
+        vcf_call_data = VcfCallData(frozenset({
+            VcfCall(
+                ReferenceSite(GeneCoordinate("5", 97915617), "T"), ("C", "C"),
+                ("rs1212125",), "1324T>C", VcfCallFilter.PASS),
+        }), ReferenceAssembly.V37)
+        pgx_analysis = PgxAnalyser().create_pgx_analysis(vcf_call_data, panel)
+
+        gene_to_haplotype_calls_expected = {
+            "DPYD": {HaplotypeCall("*3", 2)},
+            "FAKE": {HaplotypeCall("*4A", 2)},
+            "FAKE2": {HaplotypeCall("*4A", 2)},
+        }
+
+        all_dual_calls_expected = frozenset({
+            AnnotatedDualCall(
+                ReferenceSite(GeneCoordinate("1", 97915614), "C"), ReferenceSite(GeneCoordinate("chr1", 97450058), "C"),
+                ("C", "C"), "DPYD", ("rs3918290",),
+                "REF_CALL", DualCallFilter.NO_CALL, "REF_CALL", DualCallFilter.NO_CALL,
+            ),
+            AnnotatedDualCall(
+                ReferenceSite(GeneCoordinate("1", 97915621), "TG"), ReferenceSite(GeneCoordinate("chr1", 97450065), "TC"),
+                ("TG", "TG"), "DPYD", ("rs72549303",),
+                "REF_CALL", DualCallFilter.NO_CALL, "6744GA>CA", DualCallFilter.INFERRED_PASS,
+            ),
+            AnnotatedDualCall(
+                ReferenceSite(GeneCoordinate("1", 97981395), "T"), ReferenceSite(GeneCoordinate("chr1", 97515839), "T"),
+                ("T", "T"), "DPYD", ("rs1801159",),
+                "REF_CALL", DualCallFilter.NO_CALL, "REF_CALL", DualCallFilter.NO_CALL,
+            ),
+            AnnotatedDualCall(
+                ReferenceSite(GeneCoordinate("1", 98205966), "GATGA"), ReferenceSite(GeneCoordinate("chr1", 97740410), "GATGA"),
+                ("GATGA", "GATGA"), "DPYD", ("rs72549309",),
+                "REF_CALL", DualCallFilter.NO_CALL, "REF_CALL", DualCallFilter.NO_CALL,
+            ),
+            AnnotatedDualCall(
+                ReferenceSite(GeneCoordinate("16", 97915617), "C"), ReferenceSite(GeneCoordinate("chr16", 97450060), "T"),
+                ("C", "C"), "FAKE2", ("rs1212127",),
+                "REF_CALL", DualCallFilter.NO_CALL, "1324T>C", DualCallFilter.INFERRED_PASS,
+            ),
+            AnnotatedDualCall(
+                ReferenceSite(GeneCoordinate("5", 97915617), "T"), ReferenceSite(GeneCoordinate("chr5", 97450060), "T"),
+                ("C", "C"), "FAKE", ("rs1212125",),
+                "1324T>C", DualCallFilter.PASS, "1324T>C", DualCallFilter.PASS,
+            ),
+        })
+        pgx_analysis_expected = PgxAnalysis(AnnotatedDualCallData(all_dual_calls_expected), gene_to_haplotype_calls_expected)
+        self.assertEqual(pgx_analysis_expected, pgx_analysis)
+
 
 if __name__ == "__main__":  # pragma: no cover
     unittest.main()
