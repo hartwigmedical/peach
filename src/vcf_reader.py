@@ -163,7 +163,7 @@ class VcfReader(object):
 
         variant_annotation: Optional[str]
         if full_variant_annotation is None or full_variant_annotation == "":
-            variant_annotation = None
+            variant_annotation = full_variant_annotation
         elif full_variant_annotation.startswith(self.CODING_VARIANT_ANNOTATION_PREFIX):
             variant_annotation = self.__strip_prefix(full_variant_annotation, self.CODING_VARIANT_ANNOTATION_PREFIX)
         elif full_variant_annotation.startswith(self.NON_CODING_VARIANT_ANNOTATION_PREFIX):

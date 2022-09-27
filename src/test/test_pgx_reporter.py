@@ -51,6 +51,10 @@ class TestPgxReporter(unittest.TestCase):
                 ReferenceSite(GeneCoordinate("15", 24113), "A"), ReferenceSite(GeneCoordinate("chr15", 684633), "T"), ("T", "T"),
                 ".", ("rs462", "rs9820", "rs536"), "29482A>T", DualCallFilter.PASS, "REF_CALL", DualCallFilter.PASS,
             ),
+            AnnotatedDualCall(
+                ReferenceSite(GeneCoordinate("15", 48593), "A"), ReferenceSite(GeneCoordinate("chr15", 38234), "A"), ("A", "C"),
+                "UGT1A1", ("rs462",), "", DualCallFilter.PASS, "", DualCallFilter.PASS,
+            ),
         })
         pgx_analysis = PgxAnalysis(AnnotatedDualCallData(all_dual_calls), {})
         panel_id = "Panel_v0.2"
@@ -65,6 +69,7 @@ class TestPgxReporter(unittest.TestCase):
             "DPYD\t1\t15\tUNKNOWN\tC\tUNKNOWN\tC\tCAG\trs536\t35A>C;35A>G\tPASS\t35A>C;35A>G?\tUNKNOWN\tPanel_v0.2\tV1\tUNKNOWN\n"
             "BRAF\t2\t154663\t40565464\tT\tT\tT\tT\trs154;rs8839\tREF_CALL\tNO_CALL\tREF_CALL\tNO_CALL\tPanel_v0.2\tV1\tchr2\n"
             ".\t15\t24113\t684633\tA\tT\tT\tT\trs462;rs9820;rs536\t29482A>T\tPASS\tREF_CALL\tPASS\tPanel_v0.2\tV1\tchr15\n"
+            "UGT1A1\t15\t48593\t38234\tA\tA\tA\tC\trs462\tNONE\tPASS\tNONE\tPASS\tPanel_v0.2\tV1\tchr15\n"
             "GENE\tX\t15\t40\tTT\tAA\tTT\tTT\trs23\tREF_CALL\tNO_CALL\t627AA>TT\tINFERRED_PASS\tPanel_v0.2\tV1\tchrX\n"
         )
         self.assertEqual(result_expected, result)
@@ -95,6 +100,10 @@ class TestPgxReporter(unittest.TestCase):
                 ReferenceSite(GeneCoordinate("15", 24113), "T"), ReferenceSite(GeneCoordinate("chr15", 684633), "A"), ("T", "T"),
                 ".", ("rs462", "rs9820", "rs536"), "REF_CALL", DualCallFilter.PASS, "29482A>T", DualCallFilter.PASS,
             ),
+            AnnotatedDualCall(
+                ReferenceSite(GeneCoordinate("15", 48593), "A"), ReferenceSite(GeneCoordinate("chr15", 38234), "A"), ("A", "C"),
+                "UGT1A1", ("rs462",), "", DualCallFilter.PASS, "", DualCallFilter.PASS,
+            ),
         })
         pgx_analysis = PgxAnalysis(AnnotatedDualCallData(all_dual_calls), {})
         panel_id = "Panel_v0.2"
@@ -108,6 +117,7 @@ class TestPgxReporter(unittest.TestCase):
             "DPYD\t1\t5\t25\tA\tA\tC\tG\t.\tUNKNOWN\tPASS\tUNKNOWN\tPASS\tPanel_v0.2\tV1\tchr1\n"
             "DPYD\tUNKNOWN\tUNKNOWN\t35\tUNKNOWN\tC\tC\tCAG\trs536\t35A>C;35A>G?\tUNKNOWN\t35A>C;35A>G\tPASS\tPanel_v0.2\tV1\tchr1\n"
             "BRAF\t2\t154663\t40565464\tT\tT\tT\tT\trs154;rs8839\tREF_CALL\tNO_CALL\tREF_CALL\tNO_CALL\tPanel_v0.2\tV1\tchr2\n"
+            "UGT1A1\t15\t48593\t38234\tA\tA\tA\tC\trs462\tNONE\tPASS\tNONE\tPASS\tPanel_v0.2\tV1\tchr15\n"
             ".\t15\t24113\t684633\tT\tA\tT\tT\trs462;rs9820;rs536\tREF_CALL\tPASS\t29482A>T\tPASS\tPanel_v0.2\tV1\tchr15\n"
             "GENE\tX\t15\t40\tAA\tTT\tTT\tTT\trs23\t627AA>TT\tINFERRED_PASS\tREF_CALL\tNO_CALL\tPanel_v0.2\tV1\tchrX\n"
         )

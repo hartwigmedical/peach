@@ -51,6 +51,7 @@ class GenotypeReporter(object):
     UNKNOWN_POSITION_STRING = "UNKNOWN"
     UNKNOWN_REF_ALLELE_STRING = "UNKNOWN"
     UNKNOWN_VARIANT_ANNOTATION_STRING = "UNKNOWN"
+    EMPTY_VARIANT_ANNOTATION_STRING = "NONE"
 
     TSV_SEPARATOR = "\t"
     RS_ID_SEPARATOR = ";"
@@ -95,11 +96,15 @@ class GenotypeReporter(object):
 
             if dual_call.variant_annotation_v37 is None:
                 variant_annotation_v37 = self.UNKNOWN_VARIANT_ANNOTATION_STRING
+            elif dual_call.variant_annotation_v37 == "":
+                variant_annotation_v37 = self.EMPTY_VARIANT_ANNOTATION_STRING
             else:
                 variant_annotation_v37 = dual_call.variant_annotation_v37
 
             if dual_call.variant_annotation_v38 is None:
                 variant_annotation_v38 = self.UNKNOWN_VARIANT_ANNOTATION_STRING
+            elif dual_call.variant_annotation_v38 == "":
+                variant_annotation_v38 = self.EMPTY_VARIANT_ANNOTATION_STRING
             else:
                 variant_annotation_v38 = dual_call.variant_annotation_v38
 
