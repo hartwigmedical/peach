@@ -5,7 +5,7 @@ the [Hartwig Medical Foundation pipeline](https://github.com/hartwigmedical/pipe
 It imports haplotypes and related variants from a curated JSON file, reports the presence of these variants in a 
 germline VCF, and infers the simplest combination of haplotypes that explains the presence of these variants. 
 
-The germline VCF file can be annotated by either [SNPEFF](https://pcingola.github.io/SnpEff/) or [PAVE](https://github.com/hartwigmedical/hmftools/tree/master/pave).
+The germline VCF file can be annotated by either [SnpEff](https://pcingola.github.io/SnpEff/) or [PAVE](https://github.com/hartwigmedical/hmftools/tree/master/pave).
 When the VCF has been annotated by both, the PAVE annotations are used.
 
 The two output files are:
@@ -37,7 +37,7 @@ The two output files are:
 ## Installation
 PEACH has been designed to work with Python 3.6.
 
-1. Download this repository. See for instance [Github instructions](https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository).
+1. Download this repository. See for instance [GitHub instructions](https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository).
 2. Install the requirements in one fo the following ways:
     1. Generate a local Python 3.6 virtual environment and install the requirements:
     ```bash
@@ -91,22 +91,24 @@ the subsections "Gene Name" and "HGVS.c",
 or annotation as created by [PAVE v1.0](https://github.com/hartwigmedical/hmftools/tree/master/pave). 
 One of the samples in the VCF should have a label 
 equal to the `sample_r_id` argument,
-and the "GT" sub-field for this sample should be included and filled in with diploid calls.
+and the "GT" subfield for this sample should be included and filled in with diploid calls.
 
 The calls in the VCF should be with respect to a v37 reference genome. Support for calls wrt v38 is experimental.
 
 One subtlety with the annotations has to do with calls with multiple sets of annotations. 
-For SNPEFF annotations, PEACH simply uses the first of the annotations. 
+For SnpEff annotations, PEACH simply uses the first of the annotations. 
 For PAVE annotations, PEACH uses only the annotations corresponding to the transcript ID's 
 in the "canonicalTranscript" fields in the panel JSON.
-If a call has multiple PAVE annotations with a transript ID matching one of the transcript ID's in the panel JSON,
+If a call has multiple PAVE annotations with a transcript ID matching one of the transcript ID's in the panel JSON,
 then an error is raised.
 
 ### JSON
 For an example of a valid panel JSON (with fake data), see 
-[example](https://github.com/hartwigmedical/peach/blob/master/src/test_resources/test_panel.json).
-Almost all fields in the example JSON are required. The only exception is "canonicalTranscript", 
-which is required for handling PAVE annotations, but ignored for SNPEFF annotations. Additional fields are ignored. 
+[example](https://github.com/hartwigmedical/peach/blob/master/src/test_resources/test_panel_with_variants_to_ignore.json).
+Almost all fields in the example JSON are required. The only exceptions are:
+* "canonicalTranscript", which is required for handling PAVE annotations, but ignored for SnpEff annotations. 
+* "variantsToIgnore", which can be used to ignore the specified variants when reading the input VCF.
+Additional fields are ignored. 
 
 See [example](https://nextcloud.hartwigmedicalfoundation.nl/s/LDkD3kBAzM6TmiC) for the panel JSON that is currently 
 being used in [Hartwig Medical Foundation pipeline](https://github.com/hartwigmedical/pipeline5).
@@ -117,7 +119,7 @@ has to be equal to the set of rs id's with entries in the "refSeqDifferenceAnnot
 This ensures that the variant annotation for variants at these locations can be translated to v38 properly
 
 PEACH does not (properly) support panel JSON files that contain (partially) overlapping genes.
-Variants in a panel JSON file are not allowed to (partially) overlap.
+Variants in a panel JSON file are only allowed to (partially) overlap if they have identical positions and reference alleles.
 
 ## Output
 PEACH outputs two TSV files. One contains genotypes/haplotypes for each gene, the other contains calls for all variants from the panel JSON.
@@ -162,7 +164,7 @@ Name: `[sample_t_id].peach.calls.tsv`
 Haplotypes are commonly defined wrt a v38 reference genome. 
 If the calls in the input VCF are wrt v37, then this requires a translation of v37 calls to v38 calls.
 PEACH extracts the required knowledge of the differences between these reference genomes from the information in the panel JSON.
-No matter wrt what reference genome version the calls in the input VCF have been defined, 
+No matter with respect to what reference genome version the calls in the input VCF have been defined, 
 PEACH always tries to translate these calls to the other reference genome by using the information in the panel JSON, 
 resulting in *dual calls* with information for both versions. 
 For haplotype calling we use the v38 information from the dual calls. 
@@ -203,24 +205,25 @@ which we will call the *combined VCF calls*.
 
 The annotation and filter of the combined VCF calls are determined in the following way:
 
-| Condition                                     | Variant Annotation VCF RG Version | Filter VCF RG Version |
-|-----------------------------------------------|-----------------------------------|-----------------------|
-| Homozygous alt or heterozygous observed call. | From HGVS.c field in ANN in VCF   | PASS                  |
-| Homozygous reference observed call.           | REF_CALL                          | PASS                  |
-| Inferred call.                                | REF_CALL                          | NO_CALL               |
+| Condition                                     | Variant Annotation VCF RG Version     | Filter VCF RG Version |
+|-----------------------------------------------|---------------------------------------|-----------------------|
+| Homozygous alt or heterozygous observed call. | From PAVE or SnpEff annotation in VCF | PASS                  |
+| Homozygous reference observed call.           | REF_CALL                              | PASS                  |
+| Inferred call.                                | REF_CALL                              | NO_CALL               |
+
+If the PAVE or SnpEff annotation in the VCF has no HGVS coding impact annotation, then the string NONE is used instead.
 
 ### Annotate Calls with Panel Information
 For each of the combined VCF calls, an attempt is made to find a variant in the panel JSON that has the same VCF position and reference allele.
 
 If successful:
 * If the rs id of the call has not been set, then it is set to the value from the matching variant.
-* If the gene of the call has been set based on the VCF, then compare with the gene from the panel and error out if they are different.
-* If the gene of the call has not been set based on the VCF, then it is set to the gene from the matching variant.
+* Set the gene to the gene from the matching variant.
 * The reference allele and position wrt the non-VCF RG version are determined from the matching variant.
 
 If unsuccessful:
 * If the rs id of the call has not been set, set it to "UNKNOWN".
-* If the gene of the call has not been set based on the VCF, then it is set to "UNKNOWN".
+* Set the gene to "UNKNOWN".
 * Set reference allele and position wrt non-VCF RG version to "UNKNOWN".
 
 Also, the correct annotation and filter wrt the non-VCF RG version are determined according to the following table, 
@@ -261,8 +264,8 @@ If you want PEACH to call *2A_HET/*5_HET instead of *2B_HET/*1_HET in this situa
 
 To make this more precise, define the *length* of a haplotype combination as the total number of non-wild-type
 haplotypes in the combination, where homozygous haplotype calls are counted as 2. 
-PEACH will always attempt to call the unique haplotype combination of minimum length that explain all of the variant calls.
-If there are no haplotype combinations that explain all of the variant calls, 
+PEACH will always attempt to call the unique haplotype combination of minimum length that explain all the variant calls.
+If there are no haplotype combinations that explain all the variant calls, 
 or if there is more than one combination of the same minimum length, 
 then the haplotype combination for that gene is called as "Unresolved Haplotype". 
 
@@ -384,25 +387,30 @@ PEACH does not support calling for multiple (partially) overlapping genes.
 If one wishes to attain results for (partially) overlapping genes anyway,
 split them across separate panel JSON files and run PEACH multiple times.
 
-Variants in a panel JSON file are not allowed to (partially) overlap.
+Variants in a panel JSON file are not allowed to (partially) overlap unless they have identical positions and reference alleles.
 
 ## Tests
 To run PEACH's test suite, including mypy, run the script `test_peach`.
 If you have installed PEACH's requirements into a venv, then remember to source the venv before running `test_peach`.
 
 ## Version History and Download Links
+* [1.7](https://github.com/hartwigmedical/peach/releases/tag/v1.7)
+  * Ignore gene of variant in VCF and only use gene names from panel JSON. 
+  * Allow multiple calls at the same location if reference allele matches. 
+    * Needed for UGT1A1 *28/*37. 
+  * Stop treating empty variant annotation as unknown variant annotation, but instead indicate as annotation=”NONE”.
 * [1.6](https://github.com/hartwigmedical/peach/releases/tag/v1.6)
   * Make --sample_t_id argument optional.
   * Fix crash when PAVE_TI has "Number=." in VCF header.
 * [1.5](https://github.com/hartwigmedical/peach/releases/tag/v1.5)
   * Add support for [PAVE](https://github.com/hartwigmedical/hmftools/tree/master/pave) annotations.
   * Add optional "canonicalTranscript" entry in panel JSON. 
-    * This entry is required for parsing PAVE annotations, and ignored for SNPEFF annotations.
+    * This entry is required for parsing PAVE annotations, and ignored for SnpEff annotations.
 * [1.4](https://github.com/hartwigmedical/peach/releases/tag/v1.4)
   * Change formats of output files to essentially being PEACH v1.0 output files with some additional columns, 
     to avoid breaking the expectations from downstream tools based on semantic versioning.
 * [1.3](https://github.com/hartwigmedical/peach/releases/tag/v1.3)
-  * Update sciki-allel version to fix pip-install failure.
+  * Update scikit-allel version to fix pip-install failure.
 * [1.2](https://github.com/hartwigmedical/peach/releases/tag/v1.2)
   * Allow for different chromosome names wrt v37 and v38 
   * Includes changes to the panel JSON and the genotype output file.
