@@ -403,7 +403,6 @@ If you have installed PEACH's requirements into a venv, then remember to source 
     * Add option to panel JSON to specify variants to ignore. 
       * Needed for UGT1A1 *36.
     * Stop treating empty variant annotation as unknown variant annotation, but instead indicate as annotation=”NONE”.
-
 * [1.6](https://github.com/hartwigmedical/peach/releases/tag/v1.6)
   * Make --sample_t_id argument optional.
   * Fix crash when PAVE_TI has "Number=." in VCF header.
