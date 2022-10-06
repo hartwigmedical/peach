@@ -395,10 +395,15 @@ If you have installed PEACH's requirements into a venv, then remember to source 
 
 ## Version History and Download Links
 * [1.7](https://github.com/hartwigmedical/peach/releases/tag/v1.7)
-  * Ignore gene of variant in VCF and only use gene names from panel JSON. 
-  * Allow multiple calls at the same location if reference allele matches. 
-    * Needed for UGT1A1 *28/*37. 
-  * Stop treating empty variant annotation as unknown variant annotation, but instead indicate as annotation=”NONE”.
+  * Adjust PEACH to support UGT1A1 calling.
+  * Specifics:
+    * Ignore gene of variant in VCF and only use gene names from panel JSON. 
+    * Allow multiple calls at the same location if reference allele matches. 
+      * Needed for UGT1A1 *28/*37.
+    * Add option to panel JSON to specify variants to ignore. 
+      * Needed for UGT1A1 *36.
+    * Stop treating empty variant annotation as unknown variant annotation, but instead indicate as annotation=”NONE”.
+
 * [1.6](https://github.com/hartwigmedical/peach/releases/tag/v1.6)
   * Make --sample_t_id argument optional.
   * Fix crash when PAVE_TI has "Number=." in VCF header.
