@@ -110,8 +110,8 @@ Almost all fields in the example JSON are required. The only exceptions are:
 * "variantsToIgnore", which can be used to ignore the specified variants when reading the input VCF.
 Additional fields are ignored. 
 
-See [example](https://nextcloud.hartwigmedicalfoundation.nl/s/LDkD3kBAzM6TmiC) for the panel JSON that is currently 
-being used in [Hartwig Medical Foundation pipeline](https://github.com/hartwigmedical/pipeline5).
+See [config](https://github.com/hartwigmedical/peach/blob/master/config/peach.json) for the panel JSON (with real data) that is currently 
+being used in the [Hartwig Medical Foundation pipeline](https://github.com/hartwigmedical/pipeline5).
 
 Relevant differences between the v37 and v38 reference sequences for a gene should be included as an entry in the "variants" field
 of that gene where the "referenceAlleleV37" and "referenceAlleleV38" fields are different. The set of rs id's with such entries 

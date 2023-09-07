@@ -1,0 +1,258 @@
+{
+  "panelName": "peach_prod",
+  "panelVersion": "1.3",
+  "modificationDate": "Oct 5, 2022",
+  "variantsToIgnore": [
+    {
+      "chromosomeV37": "2",
+      "chromosomeV38": "chr2",
+      "positionV37": "234668879",
+      "positionV38": "233760233",
+      "referenceAlleleV37": "CAT",
+      "referenceAlleleV38": "CAT",
+      "altAlleleV37": "C",
+      "altAlleleV38": "C"
+    }
+  ],
+  "genes": [
+    {
+      "gene": "DPYD",
+      "orientation": "-1",
+      "chromosomeV37": "1",
+      "chromosomeV38": "chr1",
+      "canonicalTranscript": "ENST00000370192",
+      "wildTypeHaplotype": "*1",
+      "haplotypes": [
+        {
+          "haplotypeName": "*2A",
+          "function": "No Function",
+          "haplotypeVariants": [
+            {
+              "rsid": "rs3918290",
+              "chromosomeHgvsName": "1905+1G>A",
+              "altAlleleV37": "T",
+              "altAlleleV38": "T"
+            }
+          ]
+        },
+        {
+          "haplotypeName": "*7",
+          "function": "No Function",
+          "haplotypeVariants": [
+            {
+              "rsid": "rs72549309",
+              "chromosomeHgvsName": "295_298delTCAT",
+              "altAlleleV37": "G",
+              "altAlleleV38": "G"
+            }
+          ]
+        },
+        {
+          "haplotypeName": "*13",
+          "function": "No Function",
+          "haplotypeVariants": [
+            {
+              "rsid": "rs55886062",
+              "chromosomeHgvsName": "1679T>G",
+              "altAlleleV37": "C",
+              "altAlleleV38": "C"
+            }
+          ]
+        },
+        {
+          "haplotypeName": "2846A>T",
+          "function": "Reduced Function",
+          "haplotypeVariants": [
+            {
+              "rsid": "rs67376798",
+              "chromosomeHgvsName": "2846A>T",
+              "altAlleleV37": "A",
+              "altAlleleV38": "A"
+            }
+          ]
+        },
+        {
+          "haplotypeName": "*B3",
+          "function": "Reduced Function",
+          "haplotypeVariants": [
+            {
+              "rsid": "rs56038477",
+              "chromosomeHgvsName": "1236G>A",
+              "altAlleleV37": "T",
+              "altAlleleV38": "T"
+            },
+            {
+              "rsid": "rs75017182",
+              "chromosomeHgvsName": "1129-5923C>G",
+              "altAlleleV37": "C",
+              "altAlleleV38": "C"
+            }
+          ]
+        }
+      ],
+      "variants": [
+        {
+          "positionV37": "97915614",
+          "positionV38": "97450058",
+          "rsid": "rs3918290",
+          "type": "SNV",
+          "referenceAlleleV37": "C",
+          "referenceAlleleV38": "C",
+          "source": "PharmGKB DPYD allele definition table, April 10, 2017"
+        },
+        {
+          "positionV37": "98205966",
+          "positionV38": "97740410",
+          "rsid": "rs72549309",
+          "type": "DEL",
+          "referenceAlleleV37": "GATGA",
+          "referenceAlleleV38": "GATGA",
+          "source": "PharmGKB DPYD allele definition table, April 10, 2017"
+        },
+        {
+          "positionV37": "97981343",
+          "positionV38": "97515787",
+          "rsid": "rs55886062",
+          "type": "SNV",
+          "referenceAlleleV37": "A",
+          "referenceAlleleV38": "A",
+          "source": "PharmGKB DPYD allele definition table, April 10, 2017"
+        },
+        {
+          "positionV37": "97547947",
+          "positionV38": "97082391",
+          "rsid": "rs67376798",
+          "type": "SNV",
+          "referenceAlleleV37": "T",
+          "referenceAlleleV38": "T",
+          "source": "PharmGKB DPYD allele definition table, April 10, 2017"
+        },
+        {
+          "positionV37": "98045449",
+          "positionV38": "97579893",
+          "rsid": "rs75017182",
+          "type": "SNV",
+          "referenceAlleleV37": "G",
+          "referenceAlleleV38": "G",
+          "source": "KNMP algemene achtergrondtekst Farmacogenetica - Dihydropyrimidinedehydrogenase (DPD), May 9, 2019"
+        },
+        {
+          "positionV37": "98039419",
+          "positionV38": "97573863",
+          "rsid": "rs56038477",
+          "type": "SNV",
+          "referenceAlleleV37": "C",
+          "referenceAlleleV38": "C",
+          "source": "KNMP algemene achtergrondtekst Farmacogenetica - Dihydropyrimidinedehydrogenase (DPD), May 9, 2019"
+        }
+      ],
+      "drugs": [
+        {
+          "name": "5-Fluorouracil",
+          "urlGeneral": "https://www.pharmgkb.org/chemical/PA128406956",
+          "urlPrescriptionInfo": "https://www.pharmgkb.org/guidelineAnnotation/PA166104939"
+        },
+        {
+          "name": "Capecitabine",
+          "urlGeneral": "https://www.pharmgkb.org/chemical/PA448771",
+          "urlPrescriptionInfo": "https://www.pharmgkb.org/guidelineAnnotation/PA166104963"
+        },
+        {
+          "name": "Tegafur",
+          "urlGeneral": "https://www.pharmgkb.org/chemical/PA452620",
+          "urlPrescriptionInfo": "https://www.pharmgkb.org/guidelineAnnotation/PA166104944"
+        }
+      ],
+      "refSeqDifferenceAnnotations": [
+      ],
+      "notes": [
+        "rsID=RefSNP accession ID number (http://www.ncbi.nlm.nih.gov/snp/)",
+        "All variants are annotated to the positive DNA strand.",
+        "Nomenclature from *1-10 from McLeod et al (PMID: 9918128), *11 and *12 from Mattison et al, (PMID: 11875367), *13 from Johnson et al, (PMID: 11895907).",
+        "An important caveat for all genotyping tests is that the decision to assign an allele a 'wild-type' status is based upon a genotyping test that interrogates only the most common and already-proven sites of functional variation. In human DNA, it is always possible that a new, previously undiscovered (and therefore un-interrogated) site of variation may confer loss-of-function in an individual, and thus lead to the rare possibility of a non-functional allele being erroneously called as 'wild-type.' ",
+        "Citations for assignment of function can be found at https://www.pharmgkb.org/page/dpydRefMaterials",
+        "In a 2014 update on PharmGKB (https://www.pharmgkb.org/guideline/PA166109594) the CPIC authors recommend that the DPYD*4, *5, *6 and *9A alleles be categorized as 'normal' activity, in part based upon the recent publication: Comparative Functional Analysis of DPYD Variants of Potential Clinical Relevance to Dihydropyrimidine Dehydrogenase Activity (PMID: 24648345).",
+        "refSeqDifferenceAnnotation provides annotation for the rs ids that point to a location on the genome that has a different reference base in GRCh37 and GRCh38.",
+        "While processing the variants, the variants with different ref allelles in the two ref sequences should be flipped (if reference call, include in results and if hom alt in results, delete and assume ref call)."
+      ]
+    },
+    {
+      "gene": "UGT1A1",
+      "orientation": "1",
+      "chromosomeV37": "2",
+      "chromosomeV38": "chr2",
+      "canonicalTranscript": "ENST00000305208",
+      "wildTypeHaplotype": "*1",
+      "haplotypes": [
+        {
+          "haplotypeName": "*28",
+          "function": "Reduced Function",
+          "haplotypeVariants": [
+            {
+              "rsid": "rs3064744",
+              "chromosomeHgvsName": "CA(TA)7TAA",
+              "altAlleleV37": "CAT",
+              "altAlleleV38": "CAT"
+            }
+          ]
+        },
+        {
+          "haplotypeName": "*37",
+          "function": "Reduced Function",
+          "haplotypeVariants": [
+            {
+              "rsid": "rs3064744",
+              "chromosomeHgvsName": "CA(TA)8TAA",
+              "altAlleleV37": "CATAT",
+              "altAlleleV38": "CATAT"
+            }
+          ]
+        },
+        {
+          "haplotypeName": "*6",
+          "function": "Reduced Function",
+          "haplotypeVariants": [
+            {
+              "rsid": "rs4148323",
+              "chromosomeHgvsName": "211G>A",
+              "altAlleleV37": "A",
+              "altAlleleV38": "A"
+            }
+          ]
+        }
+      ],
+      "variants": [
+        {
+          "positionV37": "234668879",
+          "positionV38": "233760233",
+          "rsid": "rs3064744",
+          "type": "INS",
+          "referenceAlleleV37": "C",
+          "referenceAlleleV38": "C",
+          "source": "PharmGKB UGT1A1 allele definition table, date"
+        },
+        {
+          "positionV37": "234669144",
+          "positionV38": "233760498",
+          "rsid": "rs4148323",
+          "type": "SNP",
+          "referenceAlleleV37": "G",
+          "referenceAlleleV38": "G",
+          "source": "PharmGKB UGT1A1 allele definition table, date"
+        }
+      ],
+      "drugs": [
+        {
+          "name": "Irinotecan",
+          "urlGeneral": "https://www.pharmgkb.org/chemical/PA450085",
+          "urlPrescriptionInfo": "https://www.pharmgkb.org/guidelineAnnotation/PA166104951"
+        }
+      ],
+      "refSeqDifferenceAnnotations": [
+      ],
+      "notes": [
+      ]
+    }
+  ]
+}
+
