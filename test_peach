@@ -5,8 +5,12 @@ SCRIPT_NAME="$(basename "$0")" || exit 1
 
 echo "Started ${SCRIPT_NAME}"
 
+echo "Add paths to environment variables"
+export PYTHONPATH="${PYTHONPATH}:${REPO_DIR_NAME}/src/"
+export MYPYPATH="${MYPYPATH}:${REPO_DIR_NAME}/src/"
+
 echo "Run PEACH tests"
-python3 -m unittest discover --buffer --verbose --start-directory "${REPO_DIR_NAME}" || exit 1
+python3 -m unittest discover --buffer --verbose --start-directory "${REPO_DIR_NAME}" --top-level-directory "${REPO_DIR_NAME}" || exit 1
 echo "PEACH tests succeeded"
 
 echo "Run PEACH type check"

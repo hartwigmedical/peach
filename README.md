@@ -35,13 +35,13 @@ The two output files are:
 * [Version History and Download Links](#version-history-and-download-links)
 
 ## Installation
-PEACH has been designed to work with Python 3.6.
+PEACH has been designed to work with Python 3.11.
 
 1. Download this repository. See for instance [GitHub instructions](https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository).
 2. Install the requirements in one fo the following ways:
-    1. Generate a local Python 3.6 virtual environment and install the requirements:
+    1. Generate a local Python 3.11 virtual environment and install the requirements:
     ```bash
-    $ python3.6 -m venv [path/to/new/virtual/environment, for example: ./peach]
+    $ python3.11 -m venv [path/to/new/virtual/environment, for example: ./peach]
     $ source [path/to/new/venv, for example: ./peach/bin/activate]
     (peach) $ pip install -r requirements.txt
     ```

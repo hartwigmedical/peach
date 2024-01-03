@@ -27,7 +27,7 @@ class GenotypeReporter(object):
     FILTER_V38_COLUMN_NAME = "filter_v38"
     PANEL_VERSION_COLUMN_NAME = "panel_version"
     TOOL_VERSION_COLUMN_NAME = "repo_version"
-    CALLS_TSV_COLUMNS = (
+    CALLS_TSV_COLUMNS = [
         GENE_COLUMN_NAME,
         CHROMOSOME_V37_COLUMN_NAME,
         POSITION_V37_COLUMN_NAME,
@@ -44,7 +44,7 @@ class GenotypeReporter(object):
         PANEL_VERSION_COLUMN_NAME,
         TOOL_VERSION_COLUMN_NAME,
         CHROMOSOME_V38_COLUMN_NAME,
-    )
+    ]
     CHROMOSOME_INDEX_NAME = "chromosome_index"
 
     UNKNOWN_CHROMOSOME_STRING = "UNKNOWN"
@@ -126,7 +126,7 @@ class GenotypeReporter(object):
                 self.PANEL_VERSION_COLUMN_NAME: panel_id,
                 self.TOOL_VERSION_COLUMN_NAME: version,
             }
-            data_frame = data_frame.append(line_data, ignore_index=True)
+            data_frame = pd.concat([data_frame, pd.DataFrame(line_data, index=[0])], ignore_index=True)
 
         if pd.isna(data_frame).any(axis=None):
             raise ValueError(f"This should never happen: Unhandled NaN values:\n{data_frame}")
