@@ -394,6 +394,8 @@ To run PEACH's test suite, including mypy, run the script `test_peach`.
 If you have installed PEACH's requirements into a venv, then remember to source the venv before running `test_peach`.
 
 ## Version History and Download Links
+* [1.8](https://github.com/hartwigmedical/peach/releases/tag/v1.8)
+  * Update supported Python version from 3.6 to 3.11.
 * [1.7](https://github.com/hartwigmedical/peach/releases/tag/v1.7)
   * Adjust PEACH to support UGT1A1 calling.
   * Specifics:
